@@ -29,6 +29,7 @@ int turn; // MY_TURN or OPPON_TURN
 
 typedef enum result { WATER, HIT, BAD } result_t;
 
+
 void show_curr_player() {
 	//Size text_size = graph_text_size("PLAYER ONE", LARGE_FONT);
 	// erase
@@ -115,7 +116,7 @@ void mouse_handler(MouseEvent me) {
 	}
 }
 
-/*
+ 
 void on_msg(const char sender[], const char msg[]) {
 	 printf("msg send from group joiner: %s\n", msg);
 }
@@ -146,8 +147,7 @@ void on_response(int status, const char response[]) {
 						
 }
 
-*/
-
+ 
 	
 int main() {
 	srand(time(NULL));
@@ -169,7 +169,8 @@ int main() {
 	//graph_refresh();
  	show_curr_player();
 	graph_regist_mouse_handler(mouse_handler);
-	//game_session = gs_connect("127.0.0.1", "mary", "mary_pass", on_response, on_msg);
+	
+	game_session = gs_connect("127.0.0.1", "mary", "mary_pass", on_response, on_msg);
 	printf("\nStart!\n\n");
 	graph_start();
 	return 0;

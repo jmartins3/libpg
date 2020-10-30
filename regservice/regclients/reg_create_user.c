@@ -20,7 +20,7 @@
 
 #include "../include/reg_service.h"
 
-#define REG_SERVER_ADDR "192.168.1.134"
+
 #define MAX_SOCK_NAME 256
 #define CLIENT_SOCK_PREFIX "sock_client_"
 
@@ -113,6 +113,7 @@ int main(int argc, char *argv[]) {
 	user = argv[2];
 	pass = argv[3];
 	
+	
 	struct sockaddr_in srv_addr;
 	int cfd;
 	 
@@ -121,7 +122,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
  
-	char *server_ip_addr = REG_SERVER_ADDR;
+	char *server_ip_addr = getenv("REG_SERVER_IP");
 	
 	/* Construct server address, and make the connection */
 	bzero(&srv_addr, sizeof(struct sockaddr_in));
