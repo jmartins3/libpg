@@ -8,7 +8,7 @@ REGCLIENT2_SRCS = regsrv2.c
 REGCLIENT2_OBJS = $(REGSERVER_SRCS:.c=.o)
 
 
-all: reg_client2   reg_stop reg_create_user reg_create_theme
+all: reg_client2   reg_stop reg_create_user reg_create_theme reg_list_themes
 
 reg_client2:	reg_client2.c
 	$(CC) -o reg_client2  $(CFLAGS) reg_client2.c  -pthread
@@ -22,6 +22,9 @@ reg_create_user:	reg_create_user.c
 
 reg_create_theme:	reg_create_theme.c
 	$(CC) -o reg_create_theme  $(CFLAGS) reg_create_theme.c  
+	
+reg_list_themes:	reg_list_themes.c
+	$(CC) -o reg_list_themes  $(CFLAGS) reg_list_themes.c  
 
 # Compile rule	
 .c.o:
@@ -29,4 +32,4 @@ reg_create_theme:	reg_create_theme.c
 	
 
 clean:
-	rm -rf *.o reg_client2 reg_create_theme reg_stop reg_create_user
+	rm -rf *.o reg_client2 reg_create_theme reg_stop reg_create_user reg_list_themes
