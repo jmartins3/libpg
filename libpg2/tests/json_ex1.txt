@@ -1,0 +1,808 @@
+{
+ "kind": "books#volumes",
+ "totalItems": 72,
+ "items": [
+  {
+   "kind": "books#volume",
+   "id": "kCTMFpEcIOwC",
+   "etag": "5sphcOLbJI8",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/kCTMFpEcIOwC",
+   "volumeInfo": {
+    "title": "Advanced Programming in the UNIX Environment",
+    "authors": [
+     "W. Richard Stevens",
+     "Stephen A. Rago"
+    ],
+    "publisher": "Addison-Wesley",
+    "publishedDate": "2013-06-10",
+    "description": "For more than twenty years, serious C programmers have relied on one book for practical, in-depth knowledge of the programming interfaces that drive the UNIX and Linux kernels: W. Richard Stevens’ Advanced Programming in the UNIX® Environment . Now, once again, Rich’s colleague Steve Rago has thoroughly updated this classic work. The new third edition supports today’s leading platforms, reflects new technical advances and best practices, and aligns with Version 4 of the Single UNIX Specification. Steve carefully retains the spirit and approach that have made this book so valuable. Building on Rich’s pioneering work, he begins with files, directories, and processes, carefully laying the groundwork for more advanced techniques, such as signal handling and terminal I/O. He also thoroughly covers threads and multithreaded programming, and socket-based IPC. This edition covers more than seventy new interfaces, including POSIX asynchronous I/O, spin locks, barriers, and POSIX semaphores. Most obsolete interfaces have been removed, except for a few that are ubiquitous. Nearly all examples have been tested on four modern platforms: Solaris 10, Mac OS X version 10.6.8 (Darwin 10.8.0), FreeBSD 8.0, and Ubuntu version 12.04 (based on Linux 3.2). As in previous editions, you’ll learn through examples, including more than ten thousand lines of downloadable, ISO C source code. More than four hundred system calls and functions are demonstrated with concise, complete programs that clearly illustrate their usage, arguments, and return values. To tie together what you’ve learned, the book presents several chapter-length case studies, each reflecting contemporary environments. Advanced Programming in the UNIX® Environment has helped generations of programmers write code with exceptional power, performance, and reliability. Now updated for today’s systems, this third edition will be even more valuable.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_13",
+      "identifier": "9780321638007"
+     },
+     {
+      "type": "ISBN_10",
+      "identifier": "032163800X"
+     }
+    ],
+    "pageCount": 1024,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "averageRating": 4.0,
+    "ratingsCount": 11,
+    "contentVersion": "1.2.2.0.preview.3",
+    "imageLinks": {
+     "smallThumbnail": "http://bks9.books.google.pt/books?id=kCTMFpEcIOwC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+     "thumbnail": "http://bks9.books.google.pt/books?id=kCTMFpEcIOwC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=kCTMFpEcIOwC&printsec=frontcover&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=1&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=kCTMFpEcIOwC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Advanced_Programming_in_the_UNIX_Environ.html?hl=&id=kCTMFpEcIOwC"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 44.27,
+     "currencyCode": "EUR"
+    },
+    "retailPrice": {
+     "amount": 44.27,
+     "currencyCode": "EUR"
+    },
+    "buyLink": "http://books.google.pt/books?id=kCTMFpEcIOwC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&buy=&source=gbs_api",
+    "offers": [
+     {
+      "finskyOfferType": 1,
+      "listPrice": {
+       "amountInMicros": 4.427E7,
+       "currencyCode": "EUR"
+      },
+      "retailPrice": {
+       "amountInMicros": 4.427E7,
+       "currencyCode": "EUR"
+      }
+     }
+    ]
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED_FOR_ACCESSIBILITY",
+    "epub": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Advanced_Programming_in_the_UNIX_Environ-sample-epub.acsm?id=kCTMFpEcIOwC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "pdf": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Advanced_Programming_in_the_UNIX_Environ-sample-pdf.acsm?id=kCTMFpEcIOwC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=kCTMFpEcIOwC&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "He also thoroughly covers threads and multithreaded programming, and socket-based IPC. This edition covers more than seventy new interfaces, including POSIX asynchronous I/O, spin locks, barriers, and POSIX semaphores."
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "ZEtj42aa1z4C",
+   "etag": "RdkQDBNh6VU",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/ZEtj42aa1z4C",
+   "volumeInfo": {
+    "title": "Advanced Programming in the UNIX® Environment: For VTU",
+    "authors": [
+     "Stevens W Richard"
+    ],
+    "publisher": "Pearson Education India",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_10",
+      "identifier": "8131759016"
+     },
+     {
+      "type": "ISBN_13",
+      "identifier": "9788131759011"
+     }
+    ],
+    "printType": "BOOK",
+    "contentVersion": "0.1.1.0.preview.0",
+    "imageLinks": {
+     "smallThumbnail": "http://bks1.books.google.pt/books?id=ZEtj42aa1z4C&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+     "thumbnail": "http://bks1.books.google.pt/books?id=ZEtj42aa1z4C&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=ZEtj42aa1z4C&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=2&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=ZEtj42aa1z4C&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Advanced_Programming_in_the_UNIX_Environ.html?hl=&id=ZEtj42aa1z4C"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": false
+    },
+    "pdf": {
+     "isAvailable": false
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=ZEtj42aa1z4C&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "vlM72G-1VDkC",
+   "etag": "FxrGzQDb0ug",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/vlM72G-1VDkC",
+   "volumeInfo": {
+    "title": "Advanced UNIX Programming",
+    "authors": [
+     "Marc J. Rochkind"
+    ],
+    "publisher": "Pearson Education",
+    "publishedDate": "2004-04-29",
+    "description": "The classic guide to UNIX® programming-completely updated! UNIX application programming requires a mastery of system-level services. Making sense of the many functions-more than 1,100 functions in the current UNIX specification-is a daunting task, so for years programmers have turned to Advanced UNIX Programming for its clear, expert advice on how to use the key functions reliably. An enormous number of changes have taken place in the UNIX environment since the landmark first edition. In Advanced UNIX Programming, Second Edition, UNIX pioneer Marc J. Rochkind brings the book fully up to date, with all-new, comprehensive coverage including: POSIX Solaris™ Linux® FreeBSD Darwin, the Mac™ OS X kernel And more than 200 new system calls Rochkind's fully updated classic explains all the UNIX system calls you're likely to need, all in a single volume! Interprocess communication, networking (sockets), pseudo terminals, asynchronous I/O, advanced signals, realtime, and threads Covers the system calls you'll actually use-no need to plow through hundreds of improperly implemented, obsolete, and otherwise unnecessary system calls! Thousands of lines of example code include a Web browser and server, a keystroke recorder/player, and a shell complete with pipelines, redirection, and background processes Emphasis on the practical-ensuring portability, avoiding pitfalls, and much more! Since 1985, the one book to have for mastering UNIX application programming has been Rochkind's Advanced UNIX Programming. Now completely updated, the second edition remains the choice for up-to-the-minute, in-depth coverage of the essential system-level services of the UNIX family of operating systems.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_10",
+      "identifier": "0132466139"
+     },
+     {
+      "type": "ISBN_13",
+      "identifier": "9780132466134"
+     }
+    ],
+    "pageCount": 736,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "averageRating": 3.0,
+    "ratingsCount": 1,
+    "contentVersion": "0.2.0.0.preview.3",
+    "imageLinks": {
+     "smallThumbnail": "http://bks0.books.google.pt/books?id=vlM72G-1VDkC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+     "thumbnail": "http://bks0.books.google.pt/books?id=vlM72G-1VDkC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=vlM72G-1VDkC&printsec=frontcover&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=3&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=vlM72G-1VDkC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Advanced_UNIX_Programming.html?hl=&id=vlM72G-1VDkC"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 38.12,
+     "currencyCode": "EUR"
+    },
+    "retailPrice": {
+     "amount": 38.12,
+     "currencyCode": "EUR"
+    },
+    "buyLink": "http://books.google.pt/books?id=vlM72G-1VDkC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&buy=&source=gbs_api",
+    "offers": [
+     {
+      "finskyOfferType": 1,
+      "listPrice": {
+       "amountInMicros": 3.812E7,
+       "currencyCode": "EUR"
+      },
+      "retailPrice": {
+       "amountInMicros": 3.812E7,
+       "currencyCode": "EUR"
+      }
+     }
+    ]
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED_FOR_ACCESSIBILITY",
+    "epub": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Advanced_UNIX_Programming-sample-epub.acsm?id=vlM72G-1VDkC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "pdf": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Advanced_UNIX_Programming-sample-pdf.acsm?id=vlM72G-1VDkC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=vlM72G-1VDkC&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "In Advanced UNIX Programming, Second Edition, UNIX pioneer Marc J. Rochkind brings the book fully up to date, with all-new, comprehensive coverage including: POSIX Solaris™ Linux® FreeBSD Darwin, the Mac™ OS X kernel And more than 200 ..."
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "Rc1QAAAAMAAJ",
+   "etag": "/B7x80RZNr0",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/Rc1QAAAAMAAJ",
+   "volumeInfo": {
+    "title": "Unix Network Programming",
+    "authors": [
+     "W. Richard Stevens"
+    ],
+    "publishedDate": "1990",
+    "description": "A practical book that explains many of the details that have been considered a mystery, this guidebook focuses on the design, development, and coding of networking software under the UNIX operating system. It begins by showing how a fundamental basic for networking programming is interprocess communication (IPC), and a requisite for understanding IPC is a knowledge of what constitutes a process. Throughout, the text provides both a description and examples of how and why a particular solution is arrived at.",
+    "industryIdentifiers": [
+     {
+      "type": "OTHER",
+      "identifier": "UOM:39015058918502"
+     }
+    ],
+    "pageCount": 772,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "averageRating": 4.5,
+    "ratingsCount": 10,
+    "contentVersion": "0.0.1.0.preview.0",
+    "imageLinks": {
+     "smallThumbnail": "http://bks9.books.google.pt/books?id=Rc1QAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+     "thumbnail": "http://bks9.books.google.pt/books?id=Rc1QAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=Rc1QAAAAMAAJ&q=%22advanced+programming+in+the+unix+environment%22&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=4&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=Rc1QAAAAMAAJ&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Unix_Network_Programming.html?hl=&id=Rc1QAAAAMAAJ"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": false
+    },
+    "pdf": {
+     "isAvailable": false
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=Rc1QAAAAMAAJ&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "Throughout, the text provides both a description and examples of how and why a particular solution is arrived at."
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "haUXRoFaBvwC",
+   "etag": "broqNnWYS+E",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/haUXRoFaBvwC",
+   "volumeInfo": {
+    "title": "Network and System Security",
+    "authors": [
+     "John R. Vacca"
+    ],
+    "publisher": "Elsevier",
+    "publishedDate": "2010-02-27",
+    "description": "Network and System Security provides focused coverage of network and system security technologies. It explores practical solutions to a wide range of network and systems security issues. Chapters are authored by leading experts in the field and address the immediate and long-term challenges in the authors’ respective areas of expertise. Coverage includes building a secure organization; cryptography; system intrusion; UNIX and Linux security; Internet security, intranet security; LAN security; wireless network security; cellular network security, RFID security, and more. This compilation of 13 chapters is tightly focused and ideally suited as an essential desk reference in this high-growth subject area. Chapters contributed by leaders in the field covering foundational and practical aspects of system and network security, providing a new level of technical expertise not found elsewhere Comprehensive and updated coverage of the subject area allows the reader to put current technologies to work Presents methods of analysis and problem-solving techniques, enhancing the reader’s grasp of the material and ability to implement practical solutions",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_10",
+      "identifier": "1597495360"
+     },
+     {
+      "type": "ISBN_13",
+      "identifier": "9781597495363"
+     }
+    ],
+    "pageCount": 408,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "contentVersion": "1.2.0.0.preview.3",
+    "imageLinks": {
+     "smallThumbnail": "http://bks2.books.google.pt/books?id=haUXRoFaBvwC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+     "thumbnail": "http://bks2.books.google.pt/books?id=haUXRoFaBvwC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=haUXRoFaBvwC&pg=PT250&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=5&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=haUXRoFaBvwC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Network_and_System_Security.html?hl=&id=haUXRoFaBvwC"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 52.83,
+     "currencyCode": "EUR"
+    },
+    "retailPrice": {
+     "amount": 52.83,
+     "currencyCode": "EUR"
+    },
+    "buyLink": "http://books.google.pt/books?id=haUXRoFaBvwC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&buy=&source=gbs_api",
+    "offers": [
+     {
+      "finskyOfferType": 1,
+      "listPrice": {
+       "amountInMicros": 5.283E7,
+       "currencyCode": "EUR"
+      },
+      "retailPrice": {
+       "amountInMicros": 5.283E7,
+       "currencyCode": "EUR"
+      }
+     }
+    ]
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Network_and_System_Security-sample-epub.acsm?id=haUXRoFaBvwC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "pdf": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Network_and_System_Security-sample-pdf.acsm?id=haUXRoFaBvwC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=haUXRoFaBvwC&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "[4] Lundqvist A. Image:Gldt, http://en.wikipedia.org/wiki/ Image:Gldt.svg; May 12, \u003cbr\u003e\n2008 [accessed October 6, 2008, from Wikipedia]. [6] Richard Stevens W. \u003cbr\u003e\n\u003cb\u003eAdvanced Programming in the UNIX Environment\u003c/b\u003e. Reading: Addison-Wesley; \u003cbr\u003e\n1992."
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "CoQ_AQAAIAAJ",
+   "etag": "6gKmWADcfDE",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/CoQ_AQAAIAAJ",
+   "volumeInfo": {
+    "title": "UNIX Network Programming: Interprocess communications",
+    "authors": [
+     "W. Richard Stevens"
+    ],
+    "publisher": "Prentice Hall",
+    "publishedDate": "1998-08-01",
+    "description": "8108A-2 Don't miss the rest of the series! Vol. 1, Networking APIs: Sockets and XTI Vol. 3, Applications (forthcoming) The only guide to UNIX(r) interprocess communications you'll ever need! Well-implemented interprocess communications (IPC) are key to the performance of virtually every non-trivial UNIX program. In \"UNIX Network Programming, Volume 2, Second Edition,\" legendary UNIX expert W. Richard Stevens presents a comprehensive guide to every form of IPC, including message passing, synchronization, shared memory, and Remote Procedure Calls (RPC). Stevens begins with a basic introduction to IPC and the problems it is intended to solve. Step-by-step you'll learn how to maximize both System V IPC and the new Posix standards, which offer dramatic improvements in convenience and performance. You'll find extensive coverage of Pthreads, with many examples reflecting multiple threads instead of multiple processes. Along the way, you'll master every current IPC technique and technology, including: Pipes and FIFOs. Posix and System V Message Queues Mutexes and Condition Variables Read-Write Locks Record Locking Posix and System V Semaphores Posix and System V Shared Memory Solaris Doors and Sun RPC Performance Measurements of IPC Techniques If you've read Stevens' best-selling first edition of UNIX Network Programming, this book expands its IPC coverage by a factor of five! You won't just learn about IPC \"from the outside.\" You'll actually create implementations of Posix message queues, read-write locks, and semaphores, gaining an in-depth understanding of these capabilities you simply can't get anywhere else. The book contains extensive new source code-all carefully optimized and available on the Web. You'll even find a complete guide to measuring IPC performance with message passing bandwidth and latency programs, and thread and process synchronization programs. The better you understand IPC, the better your UNIX software will run. One book contains all you need to know: UNIX Network Programming, Volume 2, Second Edition.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_10",
+      "identifier": "0130810819"
+     },
+     {
+      "type": "ISBN_13",
+      "identifier": "9780130810816"
+     }
+    ],
+    "pageCount": 558,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "averageRating": 4.5,
+    "ratingsCount": 10,
+    "contentVersion": "preview-1.0.0",
+    "imageLinks": {
+     "smallThumbnail": "http://bks8.books.google.pt/books?id=CoQ_AQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+     "thumbnail": "http://bks8.books.google.pt/books?id=CoQ_AQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=CoQ_AQAAIAAJ&q=%22advanced+programming+in+the+unix+environment%22&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=6&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=CoQ_AQAAIAAJ&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/UNIX_Network_Programming_Interprocess_co.html?hl=&id=CoQ_AQAAIAAJ"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": false
+    },
+    "pdf": {
+     "isAvailable": false
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=CoQ_AQAAIAAJ&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "8108A-2 Don&#39;t miss the rest of the series! Vol. 1, Networking APIs: Sockets and XTI Vol. 3, Applications (forthcoming) The only guide to UNIX(r) interprocess communications you&#39;ll ever need!"
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "-nivOizJyqsC",
+   "etag": "dEQquu/K0+Y",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/-nivOizJyqsC",
+   "volumeInfo": {
+    "title": "Cross-Platform Development in C++",
+    "subtitle": "Building Mac OS X, Linux, and Windows Applications",
+    "authors": [
+     "Syd Logan"
+    ],
+    "publisher": "Pearson Education",
+    "publishedDate": "2007-11-27",
+    "description": "Cross-Platform Development in C++ is the definitive guide to developing portable C/C++ application code that will run natively on Windows, Macintosh, and Linux/Unix platforms without compromising functionality, usability, or quality. Long-time Mozilla and Netscape developer Syd Logan systematically addresses all the technical and management challenges associated with software portability from planning and design through coding, testing, and deployment. Drawing on his extensive experience with cross-platform development, Logan thoroughly covers issues ranging from the use of native APIs to the latest strategies for portable GUI development. Along the way, he demonstrates how to achieve feature parity while avoiding the problems inherent to traditional cross-platform development approaches. This book will be an indispensable resource for every software professional and technical manager who is building new cross-platform software, porting existing C/C++ software, or planning software that may someday require cross-platform support. Build Cross-Platform Applications without Compromise Throughout the book, Logan illuminates his techniques with realistic scenarios and extensive, downloadable code examples, including a complete cross-platform GUI toolkit based on Mozilla’s XUL that you can download, modify, and learn from. Coverage includes Policies and procedures used by Netscape, enabling them to ship Web browsers to millions of users on Windows, Mac OS, and Linux Delivering functionality and interfaces that are consistent on all platforms Understanding key similarities and differences among leading platform-specific GUI APIs, including Win32/.NET, Cocoa, and Gtk+ Determining when and when not to use native IDEs and how to limit their impact on portability Leveraging standards-based APIs, including POSIX and STL Avoiding hidden portability pitfalls associated with floating point, char types, data serialization, and types in C++ Utilizing platform abstraction libraries such as the Netscape Portable Runtime (NSPR) Establishing an effective cross-platform bug reporting and tracking system Creating builds for multiple platforms and detecting build failures across platforms when they occur Understanding the native runtime environment and its impact on installation Utilizing wxWidgets to create multi-platform GUI applications from a single code base Thoroughly testing application portability Understanding cross-platform GUI toolkit design with Trixul",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_10",
+      "identifier": "0132702185"
+     },
+     {
+      "type": "ISBN_13",
+      "identifier": "9780132702188"
+     }
+    ],
+    "pageCount": 576,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "averageRating": 1.0,
+    "ratingsCount": 1,
+    "contentVersion": "0.3.2.0.preview.3",
+    "imageLinks": {
+     "smallThumbnail": "http://bks3.books.google.pt/books?id=-nivOizJyqsC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+     "thumbnail": "http://bks3.books.google.pt/books?id=-nivOizJyqsC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=-nivOizJyqsC&pg=PT370&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=7&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=-nivOizJyqsC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Cross_Platform_Development_in_C++.html?hl=&id=-nivOizJyqsC"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 34.43,
+     "currencyCode": "EUR"
+    },
+    "retailPrice": {
+     "amount": 34.43,
+     "currencyCode": "EUR"
+    },
+    "buyLink": "http://books.google.pt/books?id=-nivOizJyqsC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&buy=&source=gbs_api",
+    "offers": [
+     {
+      "finskyOfferType": 1,
+      "listPrice": {
+       "amountInMicros": 3.443E7,
+       "currencyCode": "EUR"
+      },
+      "retailPrice": {
+       "amountInMicros": 3.443E7,
+       "currencyCode": "EUR"
+      }
+     }
+    ]
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED_FOR_ACCESSIBILITY",
+    "epub": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Cross_Platform_Development_in_C++-sample-epub.acsm?id=-nivOizJyqsC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "pdf": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Cross_Platform_Development_in_C++-sample-pdf.acsm?id=-nivOizJyqsC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=-nivOizJyqsC&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "A couple of books—Richard Stevens&#39; and Stephen Rago&#39; s \u003cb\u003eAdvanced\u003c/b\u003e \u003cbr\u003e\n\u003cb\u003eProgramming in the Unix Environment\u003c/b\u003e (Addison-Wesley, 2005) and Marc \u003cbr\u003e\nRochkind&#39;s Advanced Unix Programming (Addison-Wesley, 2004)—provide \u003cbr\u003e\nplenty of details and&nbsp;\u003cb\u003e...\u003c/b\u003e"
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "_fSVKDn7v04C",
+   "etag": "IVfOqDyFeQQ",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/_fSVKDn7v04C",
+   "volumeInfo": {
+    "title": "Enterprise Patterns and MDA",
+    "subtitle": "Building Better Software with Archetype Patterns and UML",
+    "authors": [
+     "Jim Arlow",
+     "Ila Neustadt"
+    ],
+    "publisher": "Addison-Wesley Professional",
+    "publishedDate": "2003-12-22",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_10",
+      "identifier": "0132702533"
+     },
+     {
+      "type": "ISBN_13",
+      "identifier": "9780132702539"
+     }
+    ],
+    "pageCount": 528,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "contentVersion": "1.4.2.0.preview.3",
+    "imageLinks": {
+     "smallThumbnail": "http://bks6.books.google.pt/books?id=_fSVKDn7v04C&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+     "thumbnail": "http://bks6.books.google.pt/books?id=_fSVKDn7v04C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=_fSVKDn7v04C&pg=PA462&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=8&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=_fSVKDn7v04C&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Enterprise_Patterns_and_MDA.html?hl=&id=_fSVKDn7v04C"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 34.43,
+     "currencyCode": "EUR"
+    },
+    "retailPrice": {
+     "amount": 34.43,
+     "currencyCode": "EUR"
+    },
+    "buyLink": "http://books.google.pt/books?id=_fSVKDn7v04C&dq=%22advanced+programming+in+the+unix+environment%22&hl=&buy=&source=gbs_api",
+    "offers": [
+     {
+      "finskyOfferType": 1,
+      "listPrice": {
+       "amountInMicros": 3.443E7,
+       "currencyCode": "EUR"
+      },
+      "retailPrice": {
+       "amountInMicros": 3.443E7,
+       "currencyCode": "EUR"
+      }
+     }
+    ]
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED_FOR_ACCESSIBILITY",
+    "epub": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Enterprise_Patterns_and_MDA-sample-epub.acsm?id=_fSVKDn7v04C&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "pdf": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Enterprise_Patterns_and_MDA-sample-pdf.acsm?id=_fSVKDn7v04C&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=_fSVKDn7v04C&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "For a good introduction on both topics, see \u003cb\u003eAdvanced Programming in the Unix\u003c/b\u003e \u003cbr\u003e\n\u003cb\u003eEnvironment\u003c/b\u003e and Unix Network Programming by W. Richard Stevens. System V \u003cbr\u003e\nInterprocess Communications System V Interprocess Communications&nbsp;\u003cb\u003e...\u003c/b\u003e"
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "ZZ9kF3mwZjEC",
+   "etag": "MUyQE3++AXc",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/ZZ9kF3mwZjEC",
+   "volumeInfo": {
+    "title": "Web Commerce Security",
+    "subtitle": "Design and Development",
+    "authors": [
+     "Hadi Nahari",
+     "Ronald L. Krutz"
+    ],
+    "publisher": "John Wiley & Sons",
+    "publishedDate": "2011-05-04",
+    "description": "A top-level security guru for both eBay and PayPal and a best-selling information systems security author show how to design and develop secure Web commerce systems. Whether it's online banking or ordering merchandise using your cell phone, the world of online commerce requires a high degree of security to protect you during transactions. This book not only explores all critical security issues associated with both e-commerce and mobile commerce (m-commerce), it is also a technical manual for how to create a secure system. Covering all the technical bases, this book provides the detail that developers, system architects, and system integrators need to design and implement secure, user-friendly, online commerce systems. Co-authored by Hadi Nahari, one of the world’s most renowned experts in Web commerce security; he is currently the Principal Security, Mobile and DevicesArchitect at eBay, focusing on the architecture and implementation of eBay and PayPal mobile Co-authored by Dr. Ronald Krutz; information system security lecturer and co-author of the best-selling Wiley CISSP Prep Guide Series Shows how to architect and implement user-friendly security for e-commerce and especially, mobile commerce Covers the fundamentals of designing infrastructures with high availability, large transactional capacity, and scalability Includes topics such as understanding payment technologies and how to identify weak security, and how to augment it. Get the essential information you need on Web commerce security—as well as actual design techniques—in this expert guide.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_13",
+      "identifier": "9781118098912"
+     },
+     {
+      "type": "ISBN_10",
+      "identifier": "1118098919"
+     }
+    ],
+    "pageCount": 528,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "contentVersion": "0.3.3.0.preview.3",
+    "imageLinks": {
+     "smallThumbnail": "http://bks4.books.google.pt/books?id=ZZ9kF3mwZjEC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+     "thumbnail": "http://bks4.books.google.pt/books?id=ZZ9kF3mwZjEC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=ZZ9kF3mwZjEC&pg=PA455&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=9&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=ZZ9kF3mwZjEC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/Web_Commerce_Security.html?hl=&id=ZZ9kF3mwZjEC"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 31.99,
+     "currencyCode": "EUR"
+    },
+    "retailPrice": {
+     "amount": 31.99,
+     "currencyCode": "EUR"
+    },
+    "buyLink": "http://books.google.pt/books?id=ZZ9kF3mwZjEC&dq=%22advanced+programming+in+the+unix+environment%22&hl=&buy=&source=gbs_api",
+    "offers": [
+     {
+      "finskyOfferType": 1,
+      "listPrice": {
+       "amountInMicros": 3.199E7,
+       "currencyCode": "EUR"
+      },
+      "retailPrice": {
+       "amountInMicros": 3.199E7,
+       "currencyCode": "EUR"
+      }
+     }
+    ]
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Web_Commerce_Security-sample-epub.acsm?id=ZZ9kF3mwZjEC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "pdf": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/Web_Commerce_Security-sample-pdf.acsm?id=ZZ9kF3mwZjEC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=ZZ9kF3mwZjEC&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "\u003cb\u003eAdvanced Programming in the UNIX Environment\u003c/b\u003e, 2nd Edition. New York: \u003cbr\u003e\nAddison-Wesley, 2005. Stevens, Richard, Bill Fenner, and Andrew Rudoff. UNIX \u003cbr\u003e\nNetwork Programming: Volume 1: The Sockets Networking API, 3rd Edition. New \u003cbr\u003e\nYork:&nbsp;\u003cb\u003e...\u003c/b\u003e"
+   }
+  },
+  {
+   "kind": "books#volume",
+   "id": "6H9AxyFd0v0C",
+   "etag": "Mfl3Ko9Zgpw",
+   "selfLink": "https://www.googleapis.com/books/v1/volumes/6H9AxyFd0v0C",
+   "volumeInfo": {
+    "title": "TCP/IP Illustrated",
+    "authors": [
+     "Gary R. Wright",
+     "W. Richard Stevens"
+    ],
+    "publisher": "Addison-Wesley Professional",
+    "publishedDate": "1995-01-31",
+    "description": "TCP/IP Illustrated, an ongoing series covering the many facets of TCP/IP, brings a highly-effective visual approach to learning about this networking protocol suite. TCP/IP Illustrated, Volume 2 contains a thorough explanation of how TCP/IP protocols are implemented. There isn't a more practical or up-to-date bookothis volume is the only one to cover the de facto standard implementation from the 4.4BSD-Lite release, the foundation for TCP/IP implementations run daily on hundreds of thousands of systems worldwide. Combining 500 illustrations with 15,000 lines of real, working code, TCP/IP Illustrated, Volume 2 uses a teach-by-example approach to help you master TCP/IP implementation. You will learn about such topics as the relationship between the sockets API and the protocol suite, and the differences between a host implementation and a router. In addition, the book covers the newest features of the 4.4BSD-Lite release, including multicasting, long fat pipe support, window scale, timestamp options, and protection against wrapped sequence numbers, and many other topics. Comprehensive in scope, based on a working standard, and thoroughly illustrated, this book is an indispensable resource for anyone working with TCP/IP.",
+    "industryIdentifiers": [
+     {
+      "type": "ISBN_10",
+      "identifier": "0321617649"
+     },
+     {
+      "type": "ISBN_13",
+      "identifier": "9780321617644"
+     }
+    ],
+    "pageCount": 1174,
+    "printType": "BOOK",
+    "categories": [
+     "Computers"
+    ],
+    "averageRating": 5.0,
+    "ratingsCount": 1,
+    "contentVersion": "1.3.2.0.preview.3",
+    "imageLinks": {
+     "smallThumbnail": "http://bks6.books.google.pt/books?id=6H9AxyFd0v0C&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+     "thumbnail": "http://bks6.books.google.pt/books?id=6H9AxyFd0v0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.pt/books?id=6H9AxyFd0v0C&pg=PA1184&dq=%22advanced+programming+in+the+unix+environment%22&hl=&cd=10&source=gbs_api",
+    "infoLink": "http://books.google.pt/books?id=6H9AxyFd0v0C&dq=%22advanced+programming+in+the+unix+environment%22&hl=&source=gbs_api",
+    "canonicalVolumeLink": "http://books.google.pt/books/about/TCP_IP_Illustrated.html?hl=&id=6H9AxyFd0v0C"
+   },
+   "saleInfo": {
+    "country": "PT",
+    "saleability": "FOR_SALE",
+    "isEbook": true,
+    "listPrice": {
+     "amount": 54.11,
+     "currencyCode": "EUR"
+    },
+    "retailPrice": {
+     "amount": 54.11,
+     "currencyCode": "EUR"
+    },
+    "buyLink": "http://books.google.pt/books?id=6H9AxyFd0v0C&dq=%22advanced+programming+in+the+unix+environment%22&hl=&buy=&source=gbs_api",
+    "offers": [
+     {
+      "finskyOfferType": 1,
+      "listPrice": {
+       "amountInMicros": 5.411E7,
+       "currencyCode": "EUR"
+      },
+      "retailPrice": {
+       "amountInMicros": 5.411E7,
+       "currencyCode": "EUR"
+      }
+     }
+    ]
+   },
+   "accessInfo": {
+    "country": "PT",
+    "viewability": "PARTIAL",
+    "embeddable": true,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED_FOR_ACCESSIBILITY",
+    "epub": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/TCP_IP_Illustrated-sample-epub.acsm?id=6H9AxyFd0v0C&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "pdf": {
+     "isAvailable": true,
+     "acsTokenLink": "http://books.google.pt/books/download/TCP_IP_Illustrated-sample-pdf.acsm?id=6H9AxyFd0v0C&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+    },
+    "webReaderLink": "http://books.google.pt/books/reader?id=6H9AxyFd0v0C&hl=&printsec=frontcover&output=reader&source=gbs_api",
+    "accessViewStatus": "SAMPLE",
+    "quoteSharingAllowed": false
+   },
+   "searchInfo": {
+    "textSnippet": "W. Richard Stevens is the highly-respected author of three best-selling books, \u003cbr\u003e\nTCP/IP Illustrated, Volume 1 (Addison-Wesley, I994), \u003cb\u003eAdvanced Programming in\u003c/b\u003e \u003cbr\u003e\n\u003cb\u003ethe UNIX Environment\u003c/b\u003e (Addison-Weslev, I 992), and UNIX Network Programming\u003cbr\u003e\n,&nbsp;\u003cb\u003e...\u003c/b\u003e"
+   }
+  }
+ ]
+}
