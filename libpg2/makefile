@@ -1,5 +1,5 @@
 
-BIN=  bin	
+BIN=bin
 LIBS= -lpthread -Wl,-rpath,/usr/local/lib -lSDL2_gfx -lSDL2_image  -lSDL2_mixer -lSDL2 -luv 
 
 
