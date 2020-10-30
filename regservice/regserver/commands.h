@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../include/reg_service2.h"
+#include "../include/reg_service.h"
 #include <stdbool.h>
 #include "../include/list.h"
 #include "repository.h"

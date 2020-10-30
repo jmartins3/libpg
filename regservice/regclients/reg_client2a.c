@@ -1,6 +1,10 @@
 /*
  * implements an echo client using a stream IP socket 
  */
+ 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -14,7 +18,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#include "../include/reg_service2.h"
+#include "../include/reg_service.h"
 
 #define REG_SERVER_ADDR "127.0.0.1"
 #define MAX_SOCK_NAME 256

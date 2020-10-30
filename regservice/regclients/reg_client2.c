@@ -18,7 +18,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#include "../include/reg_service2.h"
+#include "../include/reg_service.h"
 
 #define REG_SERVER_ADDR "192.168.1.134"
 #define MAX_SOCK_NAME 256

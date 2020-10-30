@@ -13,23 +13,41 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
+#include <strings.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#include "../include/reg_service2.h"
+#include "../include/reg_service.h"
 
-#define REG_SERVER_ADDR "127.0.0.1"
- 
-  
+#define REG_SERVER_ADDR "192.168.1.134"
+#define MAX_SOCK_NAME 256
+#define CLIENT_SOCK_PREFIX "sock_client_"
+
+#define NITERS 10000
+
+
 pthread_t thread;
 
 int create_client_socket() {
 	return socket(AF_INET, SOCK_STREAM, 0); 
 }
 
- 
+int create_client_udp_socket(int *port) {
+	int sock = socket(AF_INET, SOCK_DGRAM, 0); 
+	if (sock < 0) return sock;
+	struct sockaddr_in addr = {0};
+	socklen_t len = sizeof(struct sockaddr_in);
+	if (bind(sock, (struct sockaddr *) &addr, sizeof(struct sockaddr_in)) != 0) {
+		close(sock); return -1;
+	}
+	if (getsockname( sock, (struct sockaddr *) &addr, &len) != 0) {
+		close(sock); return -1;
+	}
+	*port = addr.sin_port;
+	return sock;
+	
+}
 
 #define SUCCESS(s) ( ((s) / 100) == 2)
 
@@ -64,7 +82,8 @@ int show_response_status(FILE *resp) {
 	return res;
 }
 
- 
+
+
 int exec_regist(int socket, FILE *resp, const char *username, const char *pass, int number) {
 	char cmd[128];
 	
@@ -81,50 +100,19 @@ int exec_regist(int socket, FILE *resp, const char *username, const char *pass, 
 	
 }
 
-int exec_create_theme(int socket, FILE *resp, 
-					const char *username, const char *pass, const char *theme) {
-	char cmd[128];
 	
-	printf("Execute create theme!\n");
-	int cmd_size = sprintf(cmd, "CREATE_THEME\n%s %s\n%s\n\n", username, pass, theme);
-	write(socket, cmd, cmd_size);
-	
-	return show_response_status(resp);
-}
-
-
-int exec_create_topic(int socket, FILE *resp, 
-					const char *username, const char *pass,
-					const char *theme, const char *topic, int msg_port) {
-	char cmd[128];
-	
-	printf("Execute create topic!\n");
-	int cmd_size = sprintf(cmd, "CREATE_TOPIC\n%s %s\n%s %s\n%d\n\n", 
-					username, pass, theme, topic, msg_port);
-	write(socket, cmd, cmd_size);
-	
-	return show_response_status(resp);
-}
-
-
-
-int exec_stop(int socket, FILE *resp ) {
-	char cmd[128];
-	
-	printf("Execute stop server!\n");
-	int cmd_size = sprintf(cmd, "STOP\n\n");
-	write(socket, cmd, cmd_size);
-	
- 
-	
-	return show_response_status(resp);
-	
-}
- 
-  
 int main(int argc, char *argv[]) {
-	 
- 
+	int number;
+	char *user, *pass;
+	if (argc != 4) {
+		printf("usage: reg_client2 <number> <user> <pass> \n");
+		return 1; 
+	}
+	
+	number = atoi(argv[1]);
+	user = argv[2];
+	pass = argv[3];
+	
 	struct sockaddr_in srv_addr;
 	int cfd;
 	 
@@ -132,12 +120,13 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "error creating socket\n");
 		return 1;
 	}
-	 
+ 
+	char *server_ip_addr = REG_SERVER_ADDR;
 	
 	/* Construct server address, and make the connection */
 	bzero(&srv_addr, sizeof(struct sockaddr_in));
 	srv_addr.sin_family = AF_INET;
-	srv_addr.sin_addr.s_addr = inet_addr(REG_SERVER_ADDR);
+	srv_addr.sin_addr.s_addr = inet_addr(server_ip_addr);
 	srv_addr.sin_port = htons(REG_SERVER_PORT);
 		
 	if (connect(cfd, (struct sockaddr *) &srv_addr, sizeof(struct sockaddr_in)) == -1) {
@@ -151,21 +140,11 @@ int main(int argc, char *argv[]) {
 		close(cfd);
 		return 0;
 	}
-		
-	 
-	/*
-	if (exec_regist(cfd, resp, "stopper", "stoper_pass", 50000) != STATUS_OK) return 1;
-	
-	if (exec_create_theme(cfd, resp,  "mary", "mary_pass", "battleship") != STATUS_OK) return 1;
- 	 
-	if (exec_create_topic(cfd, resp, "mary", "mary_pass", "battleship", "battle1", 45000) != STATUS_OK) return 1;
-	*/
-	if (exec_stop(cfd, resp) != STATUS_OK) return 1;
+		 
+	if (exec_regist(cfd, resp, user, pass, number) != STATUS_OK) return 1;
  	
-
 	fclose(resp);
 	close(cfd);
-  	
-	printf("client done!\n");
+ 
 	return 0;
 }
