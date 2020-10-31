@@ -30,6 +30,9 @@
 #define BOAT_TYPES 	5
 #define TOTAL_BOATS	4
 
+
+#define TOTAL_PARTS (4*SUBMARINE+3*CANNON_2+2*CANNON_3+CANNON_4+AIR_CARRIER)
+
 typedef struct opponent_info {
 	Point shots[BOAT_TYPES][TOTAL_BOATS];
 	int damaged[BOAT_TYPES][TOTAL_BOATS];
@@ -43,6 +46,8 @@ typedef struct board {
 typedef struct battleship {
 	board_t my_board, oppon_board;
 	opponent_info_t op_stats;
+	int last_target;
+	Point last_play;
 	int total_hits, total_injuries;
 } battleship_t;
 

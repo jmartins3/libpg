@@ -180,6 +180,7 @@ void create_battleship(battleship_t *battle, int my_x, int my_y,
 	create_board(&battle->oppon_board, oppon_x, oppon_y);
 	battle->total_hits = 0;
 	battle->total_injuries = 0;
+	battle->last_target = -1;
 }
 
 

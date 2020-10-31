@@ -13,6 +13,8 @@
 
 
 #define CREATE_GAME "CREATE_TOPIC"
+#define JOIN_GAME   "JOIN_TOPIC"
+#define PLAY		"BROADCAST"
 
 
 #ifdef __cplusplus 

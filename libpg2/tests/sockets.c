@@ -15,6 +15,7 @@ void create_game(char *game, int nplayers) {
 }
 
 
+
 void on_msg(const char sender[], const char msg[]) {
 	 printf("msg send from group joiner: %s\n", msg);
 }

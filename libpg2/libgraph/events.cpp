@@ -216,6 +216,11 @@ static bool process_user_event(SDL_Event *event) {
 	}
 	else if (event->user.code == REQUEST_RESPONSE_EVENT) {
 		msg_request_t *msg = (msg_request_t*) event->user.data1;
+		
+		// adjust status 
+		if (msg->status == 0) { // no comm error
+			sscanf(msg->resp, "%d", &msg->status);
+		}
 		msg->on_response(msg->status, msg->resp);
 		if (msg->resp != NULL) free(msg->resp);
 		if (msg->cmd != NULL) free(msg->cmd);
