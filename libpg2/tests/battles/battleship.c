@@ -34,7 +34,7 @@ battleship_t battle;
 
 typedef enum state { Start, CreateGame, JoinGame, InGame, Done, Error } state_t;
 
-char *username;
+char *username, userpass[64];
 
 session_t game_session;
 state_t state;
@@ -216,11 +216,12 @@ int main() {
 	draw_board(&battle.oppon_board, false);
 	
 	username = getenv("GAME_USER");
- 
+	sprintf(userpass, "%s_pass", username);
  	show_curr_player();
 	graph_regist_mouse_handler(mouse_handler);
 	
-	game_session = gs_connect("127.0.0.1", "john", "john_pass", on_response, on_msg);
+	char *server_ip = getenv("REG_SERVER_IP");
+	game_session = gs_connect(server_ip, username, userpass, on_response, on_msg);
 	printf("\nStart!\n\n");
 	graph_start();
 	return 0;
