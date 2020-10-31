@@ -292,16 +292,19 @@ int topic_leave(char *theme_name, char *name, user_t *leaving_user, int *njoiner
 int topics_collection(char *theme_name, names_result_t *res) {
 	theme_t *theme = theme_search(theme_name);
 	if (theme == NULL) return THEME_INEXISTENT;
-	
-	// create buffer  for max size;
-	if (theme->ntopics == 0) return TOPIC_NO_TOPICS;
-	printf("malloc: buffer for topics_collection\n"); inc_mallocs();
-	char *buf = (char*) malloc((MAX_TOPIC_NAME+1+ MAX_USER_NAME+ 5)*theme->ntopics);
 	int pos = 0;
-	for(LIST_ENTRY *curr = theme->topics.flink; curr != &theme->topics; curr = curr->flink) {
-		topic_t *topic = container_of(curr, topic_t, link);
+	char *buf = NULL;
+	// create buffer  for max size;
+	if (theme->ntopics > 0)  {
+		printf("malloc: buffer for topics_collection\n"); inc_mallocs();
+		buf = (char*) malloc((MAX_TOPIC_NAME+1+ MAX_USER_NAME+ 5)*theme->ntopics);
+	
+		for(LIST_ENTRY *curr = theme->topics.flink; curr != &theme->topics; curr = curr->flink) {
+			topic_t *topic = container_of(curr, topic_t, link);
 
-		pos += sprintf(buf + pos, "%s %s %d\n", topic->name, topic->owner_user->name, topic->njoiners);  
+			pos += sprintf(buf + pos, "%s %s %d\n", topic->name, topic->owner_user->name, topic->njoiners);  
+		}
+		
 	}
 	res->nresults = theme->ntopics;
 	res->buf_size = pos;
@@ -400,16 +403,19 @@ int user_remove(user_t* user) {
 
 int users_collection(names_result_t *res) {
 	// create buffer  for max size;
-	printf("malloc: buffer for users_collection\n"); inc_mallocs();
-	char *buf = 
-		(char*) malloc( (MAX_USER_NAME+10)*nusers);
+	char *buf = NULL;
 	int pos = 0;
-	for(LIST_ENTRY *curr = users.flink; curr != &users; curr = curr->flink) {
-		user_t *user = container_of(curr, user_t, link);
+	
+	if (nusers > 0) {
+		printf("malloc: buffer for users_collection\n"); inc_mallocs();
+		buf = (char*) malloc( (MAX_USER_NAME+10)*nusers);
+		for(LIST_ENTRY *curr = users.flink; curr != &users; curr = curr->flink) {
+			user_t *user = container_of(curr, user_t, link);
 
-		pos += sprintf(buf + pos, "%s %d\n", 
-						user->name, user->number);  
-		 
+			pos += sprintf(buf + pos, "%s %d\n", 
+							user->name, user->number);  
+			 
+		}
 	}
 	res->nresults = nusers;
 	res->buf_size = pos;

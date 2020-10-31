@@ -113,7 +113,8 @@ static void build_response_status(ResponseBuilder *builder, int status )  {
 
 static void build_list_response(ResponseBuilder *builder, Cmd *cmd, Answer *answer) {
 	names_result_t *names = &answer->names;
-	builder->curr += sprintf(builder->buf+builder->curr, "%s", names->buffer);
+	if (names->nresults > 0)
+		builder->curr += sprintf(builder->buf+builder->curr, "%s", names->buffer);
 }
 
 static void build_join_response(ResponseBuilder *builder, Cmd *_cmd, Answer *answer) {
@@ -134,6 +135,7 @@ static void build_response_content(ResponseBuilder *builder, Cmd *cmd, Answer *a
 	switch(cmd->type) {
 		case ListThemes:
 		case ListTopics:
+		case ListUsers:
 			build_list_response(builder, cmd, answer);
 			// free response buffer
 			printf("free: buffer_list\n"); inc_frees();
