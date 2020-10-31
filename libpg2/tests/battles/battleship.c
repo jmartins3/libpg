@@ -141,6 +141,7 @@ void on_msg(const char sender[], const char msg[]) {
 	 if (state == WaitPartner) {
 		 printf("game is active!\n");
 		 state = InGame;
+		 strcpy(opponent_name, sender);
 		 turn = MY_TURN;
 		 return;
 	 }
