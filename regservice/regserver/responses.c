@@ -130,6 +130,12 @@ static void build_leave_response(ResponseBuilder *builder, Cmd *_cmd, Answer *an
 }
 
 
+static void build_create_topic_response(ResponseBuilder *builder, Cmd *_cmd, Answer *answer) {
+	builder->curr += sprintf(builder->buf+builder->curr, "%s\n", 
+		answer->username);
+}
+
+
 
 static void build_response_content(ResponseBuilder *builder, Cmd *cmd, Answer *answer) {
 	switch(cmd->type) {
@@ -144,6 +150,8 @@ static void build_response_content(ResponseBuilder *builder, Cmd *cmd, Answer *a
 		case JoinTopic:
 			build_join_response(builder, cmd, answer);
 			break;
+		case CreateTopic:
+			build_create_topic_response(builder,cmd, answer);
 		case LeaveTopic:
 			build_leave_response(builder, cmd, answer);
 			break;

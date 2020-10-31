@@ -165,13 +165,17 @@ topic_t * topic_search(char *theme_name, char *topic_name) {
 	return topic_internal_search(&theme->topics, topic_name);
 }
 	 
-int topic_create(char *theme_name, char *name, struct sockaddr_in *sock_addr, user_t *creator) {
+int topic_create(char *theme_name, char *name, struct sockaddr_in *sock_addr, user_t *creator, char *owner) {
 	if (strlen(name) > MAX_TOPIC_NAME) return TOPIC_NAME_TOO_BIG;
 	
 	theme_t *theme = theme_search(theme_name);
 	if (theme == NULL) return THEME_INEXISTENT;
 	
-	if (topic_internal_search(&theme->topics, name) != NULL) return TOPIC_DUPLICATE;
+	topic_t *old_topic;
+	if ((old_topic = topic_internal_search(&theme->topics, name)) != NULL) {
+		strcpy(owner, old_topic->owner_user->name);
+		return TOPIC_DUPLICATE;
+	}
  
 	printf("malloc: topic_t for topic_create\n"); inc_mallocs();
 	topic_t *topic = (topic_t *) malloc(sizeof(topic_t));

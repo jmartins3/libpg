@@ -35,6 +35,7 @@ battleship_t battle;
 typedef enum state { Start, CreateGame, JoinGame, WaitPartner, InGame, Done, Error } state_t;
 
 char *username, userpass[64];
+char opponent_name[64];
 
 session_t game_session;
 state_t state;
@@ -163,7 +164,7 @@ void on_msg(const char sender[], const char msg[]) {
 			
 		 }
 		 
-		 int val = val_place(&battle.my_board, letter - 'A', num-1);
+		 int val = val_place(&battle.my_board, letter - 'A', num);
 		 battle.last_target = val;
 		 if (val != EMPTY) {
 			 battle.total_injuries++;
@@ -177,6 +178,16 @@ void on_msg(const char sender[], const char msg[]) {
 		 turn = MY_TURN;
 	 }
 }
+
+void get_opponent_from_response(const char *resp, char *opponent_name) {
+	int i=0;
+	while(resp[i] != '\n') ++i;
+	++i;
+	int j =0;
+	while(resp[i] != '\n') opponent_name[j++] =resp[i++];
+	opponent_name[j] = 0;
+}
+	
 
 void on_response(int status, const char response[]) {
 	switch(state) {
@@ -195,6 +206,7 @@ void on_response(int status, const char response[]) {
 			if (status != STATUS_OK) {
 				printf("error: %s\n", response);
 				if (status == ERR_TOPIC_DUPLICATE) {
+					get_opponent_from_response(response, opponent_name);
 					state = JoinGame;
 					join_game(GAME_NAME);
 				}
@@ -205,6 +217,9 @@ void on_response(int status, const char response[]) {
 				
 			else {
 				printf("I start game!\n");
+				turn = MY_TURN;
+				show_curr_player();
+				
 				state = WaitPartner;
 			
 			}
@@ -240,7 +255,7 @@ int main() {
 	
 	username = getenv("GAME_USER");
 	sprintf(userpass, "%s_pass", username);
- 	show_curr_player();
+ 
 	graph_regist_mouse_handler(mouse_handler);
 	
 	char *server_ip = getenv("REG_SERVER_IP");

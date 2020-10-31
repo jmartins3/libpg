@@ -571,12 +571,17 @@ void cmd_create_topic(Cmd *_cmd) {
 	else {
 		CmdCreateTopic *cmd = (CmdCreateTopic *) _cmd;
 		struct sockaddr_in addr;
-		int addr_len;
+		int addr_len=sizeof(struct sockaddr_in);
+		char owner[MAX_USER_NAME];
 		uv_tcp_getpeername((uv_tcp_t*) _cmd->chn, (struct sockaddr* ) &addr, &addr_len);
 		addr.sin_port = cmd->port;
-		int res = topic_create(cmd->theme, cmd->topic, &addr, _cmd->user);
-		if (res != OPER_OK)
-			status = COMMAND_ERROR + res;
+		int res = topic_create(cmd->theme, cmd->topic, &addr, _cmd->user, owner);
+		if (res != OPER_OK) {
+			Answer a = {.status = COMMAND_ERROR + res };
+			a.username = owner;
+			send_response(_cmd->chn, &a);
+			return;
+		}
 	}
 	send_status_response(_cmd->chn, status);
 }
@@ -721,7 +726,7 @@ void cmd_join_topic(Cmd *_cmd) {
 	else {
 		CmdJoinTopic *cmd = (CmdJoinTopic *) _cmd;
 		struct sockaddr_in addr;
-		int addr_len;
+		int addr_len=sizeof(struct sockaddr_in);
 		int njoiners;
 		uv_tcp_getpeername((uv_tcp_t*) _cmd->chn, (struct sockaddr* ) &addr, &addr_len);
 		addr.sin_port = cmd->port;

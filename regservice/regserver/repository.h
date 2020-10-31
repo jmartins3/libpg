@@ -123,7 +123,7 @@ int themes_collection(names_result_t *res);
 topic_t * topic_search(char *theme, char *topic);
  
 	 
-int topic_create(char *theme_name, char *name, struct sockaddr_in *sock_addr, user_t *creator);
+int topic_create(char *theme_name, char *name, struct sockaddr_in *sock_addr, user_t *creator, char *old);
  
 	 
 int topic_remove(char *theme_name, char *name, user_t* remover);
