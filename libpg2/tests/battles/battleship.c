@@ -27,7 +27,7 @@
 #define MY_TURN		0
 #define OPPON_TURN	1
 
-#define MSG_PLAYER_X	400
+#define MSG_PLAYER_X	300
 #define MSG_PLAYER_Y	50
  
 battleship_t battle;
@@ -69,14 +69,14 @@ void do_play(char *game, int x, int y, int target) {
 
 
 void show_curr_player() {
-	char msg[60];
+	char msg[128];
 	
 	if (turn == MY_TURN) 
-		sprintf(msg, "PLAYER ONE - %s", username);
+		sprintf(msg, "PLAYER ONE - %s    ", username);
 	else
-		sprintf(msg, "PLAYER TWO");
+		sprintf(msg, "PLAYER TWO - %s    ", opponent_name);
 	 
-	graph_text(MSG_PLAYER_X, MSG_PLAYER_Y, c_gray,  msg, LARGE_FONT);
+	graph_text(MSG_PLAYER_X, MSG_PLAYER_Y, c_gray ,  msg, LARGE_FONT);
 	 
 }
 
@@ -207,7 +207,9 @@ void on_response(int status, const char response[]) {
 				printf("error: %s\n", response);
 				if (status == ERR_TOPIC_DUPLICATE) {
 					get_opponent_from_response(response, opponent_name);
+					turn = OPPON_TURN;
 					state = JoinGame;
+					show_curr_player();
 					join_game(GAME_NAME);
 				}
 				else {
