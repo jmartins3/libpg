@@ -726,6 +726,8 @@ void cmd_join_topic(Cmd *_cmd) {
 		uv_tcp_getpeername((uv_tcp_t*) _cmd->chn, (struct sockaddr* ) &addr, &addr_len);
 		addr.sin_port = cmd->port;
 		int res = topic_join(cmd->theme, cmd->topic, &addr, _cmd->user, &njoiners);
+		printf("address %s,%d join to topic %s\n", 
+			inet_ntoa(addr.sin_addr), addr.sin_port, cmd->topic);
 		if (res != OPER_OK) send_status_response(_cmd->chn, COMMAND_ERROR + res);
 		else {
 		
@@ -859,6 +861,8 @@ void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, int total) {
 		bufs[l].len = cmd->sz_lines[l-1];
 	}
 	for (int p = 0; p < total; p++) {
+		printf("Send broadcast to %s,%d\n", inet_ntoa(joiners[p].sock_addr.sin_addr), 
+		joiners[p].sock_addr.sin_port);
 		cmd->reqs[p].idx = p;
 		uv_udp_send(&cmd->reqs[p].req, &broadcaster, bufs, cmd->nlines + 1, (struct sockaddr *) &joiners[p].sock_addr, send_cb);
 	}

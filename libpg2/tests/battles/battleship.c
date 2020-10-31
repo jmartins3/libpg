@@ -92,7 +92,7 @@ bool play(int x, int y) {
 	do_play(GAME_NAME, p.x, p.y, battle.last_target);
 	
 	
-	turn = (turn+1) % 2;
+	turn = OPPON_TURN;
 	show_curr_player();
 	return true;
 }
@@ -128,7 +128,12 @@ void mouse_handler(MouseEvent me) {
 	}
 }
 
- 
+
+void process_opponent_turn(const char msg) {
+	// jump first line
+}
+	
+	
 void on_msg(const char sender[], const char msg[]) {
 	 printf("msg send from group joiner: %s\n", msg);
 	 
@@ -168,6 +173,7 @@ void on_msg(const char sender[], const char msg[]) {
 				return;
 			 }
 		 }
+		 turn = MY_TURN;
 	 }
 }
 
