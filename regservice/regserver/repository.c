@@ -398,6 +398,26 @@ int user_remove(user_t* user) {
 	 
 }
 
+int users_collection(names_result_t *res) {
+	// create buffer  for max size;
+	printf("malloc: buffer for users_collection\n"); inc_mallocs();
+	char *buf = 
+		(char*) malloc( (MAX_USER_NAME+10)*nusers);
+	int pos = 0;
+	for(LIST_ENTRY *curr = users.flink; curr != &users; curr = curr->flink) {
+		user_t *user = container_of(curr, user_t, link);
+
+		pos += sprintf(buf + pos, "%s %d\n", 
+						user->name, user->number);  
+		 
+	}
+	res->nresults = nusers;
+	res->buf_size = pos;
+	res->buffer = buf;
+	return OPER_OK;
+}
+
+
 
 void db_init() {
 	init_list_head(&themes);

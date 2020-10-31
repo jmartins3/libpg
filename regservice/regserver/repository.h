@@ -154,7 +154,9 @@ int user_create(char *name, char *passwd, int number );
 	 
 
 int user_remove(user_t *user);
- 
+
+int users_collection(names_result_t *res);
+
 
 void db_init();
  

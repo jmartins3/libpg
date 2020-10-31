@@ -338,6 +338,19 @@ int exec_message(connection_t *cn,
 	return show_response_status(resp);
 }
 
+int exec_list_users(connection_t *cn) {
+	char cmd[128];
+	int socket = cn->cfd;
+	FILE *resp = cn->resp;
+	
+	printf("Execute list users!\n");
+	int cmd_size = sprintf(cmd, "LIST_USERS\n\n");
+	write(socket, cmd, cmd_size);
+	
+	return show_response_list(resp);
+}
+
+
 int exec_stop(connection_t *cn ) {
 	char cmd[128];
 	int socket = cn->cfd;

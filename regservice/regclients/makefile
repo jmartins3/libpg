@@ -6,7 +6,7 @@ CFLAGS = -g -Wall -std=c99
 
 
 all: reg_client2   reg_stop reg_create_user reg_create_theme reg_list_themes \
-	 reg_create_topic reg_list_topics
+	 reg_create_topic reg_list_topics reg_list_users
 
 reg_client2:	reg_client2.c
 	$(CC) -o reg_client2  $(CFLAGS) reg_client2.c  -pthread
@@ -29,7 +29,10 @@ reg_create_topic:	reg_create_topic.c reg_client_utils.c
 
 reg_list_topics:	reg_list_topics.c reg_client_utils.c
 	$(CC) -o reg_list_topics  $(CFLAGS) reg_list_topics.c   reg_client_utils.c
-		
+
+reg_list_users:	reg_list_users.c reg_client_utils.c
+	$(CC) -o reg_list_users  $(CFLAGS) reg_list_users.c   reg_client_utils.c
+			
 # Compile rule	
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
@@ -37,4 +40,4 @@ reg_list_topics:	reg_list_topics.c reg_client_utils.c
 
 clean:
 	rm -rf *.o reg_client2 reg_create_theme reg_stop reg_create_user reg_list_themes \
-	reg_create_topic reg_list_topics
+	reg_create_topic reg_list_topics reg_list_users

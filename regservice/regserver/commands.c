@@ -170,6 +170,11 @@ static int args_list_topics(Cmd * _cmd, const char *line) {
 	return -BAD_COMMAND;
 }
 
+static int args_list_users(Cmd * _cmd, const char *line) {
+	if (check_line_termination(line, 0)) return 0;
+	return -BAD_COMMAND;
+}
+
 
 static int args_create_topic(Cmd * _cmd, const char *line) {
  	CmdCreateTopic *cmd = (CmdCreateTopic *) _cmd;
@@ -421,6 +426,8 @@ ArgsReader cmd_args_reader(Cmd *cmd) {
 			return args_broadcast;
 		case Message:
 			return args_msg;
+		case ListUsers:
+			return args_list_users;
 		case Stop:
 			return args_stop;
 		default:
@@ -486,6 +493,10 @@ Cmd *cmd_create(const char *cmd_name, channel_t *chn) {
 	else if (strcasecmp("STOP\n", cmd_name) == 0) {
 		cmd =  (Cmd *) calloc(1, sizeof(Cmd)); 
 		cmd->type = Stop;
+	}
+	else if (strcasecmp("LIST_USERS\n", cmd_name) == 0) {
+		cmd =  (Cmd *) calloc(1, sizeof(Cmd)); 
+		cmd->type = ListUsers;
 	}
 	if (cmd != NULL) {
 		cmd->chn = chn;
@@ -602,6 +613,28 @@ void cmd_list_topics(Cmd *_cmd) {
 		CmdListTopics *cmd = (CmdListTopics *) _cmd;
 		names_result_t names;
 		int res = topics_collection(cmd->theme, &names);
+
+		if (res != OPER_OK)
+			send_status_response(_cmd->chn,  COMMAND_ERROR + res);
+		else {
+			Answer a = {.status = STATUS_OK };
+			a.names = names;
+			send_response(_cmd->chn, &a);
+		}
+	}
+}
+
+
+/*
+ * lLst users command
+ */
+void cmd_list_users(Cmd *_cmd) {
+	
+	if (_cmd->type != ListUsers ) send_status_response(_cmd->chn, BAD_COMMAND); 
+	else {
+	 
+		names_result_t names;
+		int res = users_collection(&names);
 
 		if (res != OPER_OK)
 			send_status_response(_cmd->chn,  COMMAND_ERROR + res);
@@ -937,8 +970,10 @@ void cmd_exec(Cmd *cmd) {
 			cmd_remove_topic(cmd); break;
 		case Message:
 			cmd_message(cmd); break;
+		case ListUsers:
+			cmd_list_users(cmd); break;
 		case Stop:
-			cmd_stop(cmd);
+			cmd_stop(cmd); break;
 		default: 
 			break;
 		

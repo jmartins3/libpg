@@ -14,6 +14,21 @@
  * <status> <LF> // 200 -ok 400 - Invalid command 500 - Server error
  * <LF>
  * 
+ * 
+ * "LIST USERS"
+ * 
+ * Request:
+ * LIST_USERS <LF>
+ * <LF>
+ * 
+ * Response:
+ * <status> <LF> // 200 -ok 400 - Invalid command 500 - Server error
+ * <number_1> <name_1> <LF>
+ * <number_2> <name_2> <LF>
+ * ...
+ * <number_2> <name_2> <LF>
+ * <LF>
+ * 
  * "UNREGIST USER"
  * 
  * Request:

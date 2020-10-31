@@ -34,6 +34,8 @@ battleship_t battle;
 
 typedef enum state { Start, CreateGame, JoinGame, InGame, Done, Error } state_t;
 
+char *username;
+
 session_t game_session;
 state_t state;
 
@@ -66,16 +68,15 @@ void do_play(char *game, int x, int y, int target) {
 
 
 void show_curr_player() {
-	//Size text_size = graph_text_size("PLAYER ONE", LARGE_FONT);
-	// erase
-	//graph_rect(MSG_PLAYER_X, MSG_PLAYER_Y-text_size.height,text_size.width, text_size.height, c_white, true);
+	char msg[60];
+	
+	if (turn == MY_TURN) 
+		sprintf(msg, "PLAYER ONE - %s", username);
+	else
+		sprintf(msg, "PLAYER TWO");
 	 
-	if (turn == MY_TURN) {
-		graph_text(MSG_PLAYER_X, MSG_PLAYER_Y, c_gray,  "PLAYER ONE", LARGE_FONT);
-	}
-	else {
-		graph_text(MSG_PLAYER_X, MSG_PLAYER_Y, c_gray,  "PLAYER TWO", LARGE_FONT);
-	}
+	graph_text(MSG_PLAYER_X, MSG_PLAYER_Y, c_gray,  msg, LARGE_FONT);
+	 
 }
 
 
@@ -214,7 +215,7 @@ int main() {
 	draw_board(&battle.my_board, true);
 	draw_board(&battle.oppon_board, false);
 	
-	
+	username = getenv("GAME_USER");
  
  	show_curr_player();
 	graph_regist_mouse_handler(mouse_handler);

@@ -10,7 +10,7 @@
 
 enum command { Regist, Unregist, CreateTheme, CreateTopic, ListThemes, 
 			ListTopics, RemoveTheme, RemoveTopic, JoinTopic, Unknown,
-			LeaveTopic, Broadcast, Message, Stop};
+			LeaveTopic, Broadcast, Message, ListUsers, Stop};
 
 typedef enum command  CmdType;
  

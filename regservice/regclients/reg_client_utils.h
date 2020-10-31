@@ -85,7 +85,7 @@ int exec_leave_topic(connection_t *cn,
 					const char *username, const char *pass,
 					const char *theme, const char *topic);
 	 
-
+int exec_list_users(connection_t *cn);
 
  
 
