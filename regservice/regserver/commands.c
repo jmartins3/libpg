@@ -750,7 +750,7 @@ void cmd_join_topic(Cmd *_cmd) {
 				udp_send_t *send = (udp_send_t *) malloc(sizeof(uv_udp_send_t)+128);
 				// prepare notification message
 				int msg_size = sprintf(send->buffer, "ENTER_PARTNER\n%s %s %d\n\n", 
-					cmd->topic, _cmd->user->name, njoiners);
+					_cmd->user->name, cmd->topic, njoiners);
 			 
 				send->cmd = _cmd;
 				uv_buf_t buf;
@@ -808,7 +808,7 @@ void cmd_leave_topic(Cmd *_cmd) {
 							owner_info.sock_addr.sin_addr.s_addr, owner_info.sock_addr.sin_port);
 				udp_send_t *send = (udp_send_t *) malloc(sizeof(uv_udp_send_t)+128);
 				int msg_size = sprintf(send->buffer, "LEAVE_PARTNER\n%s %s %d\n\n", 
-					cmd->topic, _cmd->user->name, njoiners);
+					_cmd->user->name, cmd->topic, njoiners);
 				 
 				send->cmd = _cmd;
 				uv_buf_t buf;
@@ -855,7 +855,7 @@ void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, int total) {
 	}	
 	cmd->total_partners = total;
 	cmd->send_partners = 0;
-	int info_size = sprintf(cmd->send_info, "%s %s %s %d\n", 
+	int info_size = sprintf(cmd->send_info, "BROADCAST\n%s %s %s %d\n", 
 		cmd->base.user->name, cmd->theme, cmd->topic, total);
 	// prepare message to partner p
 	uv_buf_t bufs[cmd->nlines+1];
@@ -897,9 +897,9 @@ static void send_message(CmdMsg *cmd) {
 		send_status_response(cmd->base.chn, COMMAND_ERROR + res);
 	}	
 	else {
-		// now send the message to all the topic partners
+		// now send the message to the topic partners
 	  
-		int info_size = sprintf(cmd->send_info, "%s %s %s %s\n", 
+		int info_size = sprintf(cmd->send_info, "MESSAGE\n%s %s %s %s\n", 
 				cmd->base.user->name, cmd->theme, cmd->topic, cmd->user_dest);
 		// prepare message to partner p
 		uv_buf_t bufs[cmd->nlines+1];

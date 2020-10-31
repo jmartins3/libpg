@@ -136,7 +136,7 @@ void process_opponent_turn(const char msg) {
 	
 	
 void on_msg(const char sender[], const char msg[]) {
-	 printf("msg send from group joiner: %s\n", msg);
+	 printf("msg send from group joiner %s: %s\n", sender, msg);
 	 
 	 if (state == WaitPartner) {
 		 printf("game is active!\n");
@@ -187,6 +187,7 @@ void get_opponent_from_response(const char *resp, char *opponent_name) {
 	int j =0;
 	while(resp[i] != '\n') opponent_name[j++] =resp[i++];
 	opponent_name[j] = 0;
+	printf("opponent_name=%s\n", opponent_name);
 }
 	
 
