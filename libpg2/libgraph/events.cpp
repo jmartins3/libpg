@@ -230,6 +230,7 @@ static bool process_user_event(SDL_Event *event) {
 		session_t session = (session_t) event->user.data1;
 		// TODO
 		char *line2 = session->notification;
+		printf("msg received:%s\n", session->notification);
 		while(*line2 !='\n') ++line2;
 		++line2;
 		char *sender = line2;

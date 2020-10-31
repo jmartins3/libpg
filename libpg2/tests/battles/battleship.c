@@ -177,6 +177,7 @@ void on_msg(const char sender[], const char msg[]) {
 			 }
 		 }
 		 turn = MY_TURN;
+		 show_curr_player();
 	 }
 }
 
