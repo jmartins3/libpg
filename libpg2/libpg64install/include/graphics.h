@@ -2,6 +2,11 @@
 
 #define GRAPHICS_H
 
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #ifndef __cplusplus
 #include 	<stdbool.h>
 #endif
