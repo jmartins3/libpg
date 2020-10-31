@@ -62,7 +62,7 @@ void do_play(char *game, int x, int y, int target) {
 	char args[256];
 	char letter = x + 'A';
 	sprintf(args, "battleship %s\n%c %d %d\n\n", 
-				game, letter, y, target);
+				game, letter, y+1, target);
 	gs_request(game_session, PLAY, args);
 }
 
@@ -85,7 +85,7 @@ bool play(int x, int y) {
 	if (turn != MY_TURN) return false;
 	Point p = place_selected(&battle.oppon_board, x, y);
 	
-	printf("play at board coords %c,%d\n", 'A' + p.x, p.y);
+	printf("play at board coords %c,%d\n", 'A' + p.x, p.y+1);
 	if (p.x == -1) return false;
 	draw_place_try(&battle.oppon_board, p.x, p.y);
 	battle.last_play = p;
@@ -163,7 +163,7 @@ void on_msg(const char sender[], const char msg[]) {
 			
 		 }
 		 
-		 int val = val_place(&battle.my_board, letter - 'A', num);
+		 int val = val_place(&battle.my_board, letter - 'A', num-1);
 		 battle.last_target = val;
 		 if (val != EMPTY) {
 			 battle.total_injuries++;

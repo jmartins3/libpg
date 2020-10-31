@@ -21,7 +21,7 @@
 #define CLR_CANNON_4	c_orange
 #define CLR_AIR_CARRIER	c_gray
 #define CLR_WATER		graph_rgb(220,255,255)
-#define CLR_TRY			graph_rgb(240,240,240)
+#define CLR_TRY			graph_rgb(240,240,100)
 
 
 // orientations

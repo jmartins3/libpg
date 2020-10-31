@@ -215,7 +215,8 @@ void draw_place_try(board_t *board, int x, int y) {
 	int screen_x = board->x + x*SQUARE_SIDE + 2;
 	int screen_y = board->y + y*SQUARE_SIDE + 2;
 	
-	graph_rect(screen_x, screen_y, SQUARE_SIDE-3, SQUARE_SIDE-3, CLR_TRY, true);
+	graph_rect(screen_x, screen_y, SQUARE_SIDE-3, SQUARE_SIDE-3, CLR_TRY, false);
+	graph_rect(screen_x+1, screen_y+1, SQUARE_SIDE-5, SQUARE_SIDE-5, CLR_TRY, false);
 }
 
 
