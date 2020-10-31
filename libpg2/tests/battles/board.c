@@ -211,6 +211,14 @@ void draw_place(board_t *board, int x, int y) {
 	}
 }
 
+void draw_place_try(board_t *board, int x, int y) {
+	int screen_x = board->x + x*SQUARE_SIDE + 2;
+	int screen_y = board->y + y*SQUARE_SIDE + 2;
+	
+	graph_rect(screen_x, screen_y, SQUARE_SIDE-3, SQUARE_SIDE-3, CLR_TRY, true);
+}
+
+
 
 static void hide_place(board_t *board, int x, int y) {
 	int screen_x = board->x + x*SQUARE_SIDE + 2;

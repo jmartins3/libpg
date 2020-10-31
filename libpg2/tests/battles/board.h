@@ -21,6 +21,7 @@
 #define CLR_CANNON_4	c_orange
 #define CLR_AIR_CARRIER	c_gray
 #define CLR_WATER		graph_rgb(220,255,255)
+#define CLR_TRY			graph_rgb(240,240,240)
 
 
 // orientations
@@ -87,6 +88,8 @@ void populate_board(board_t *board);
 void create_board(board_t *board, int x, int y);
 
 void draw_place(board_t *board, int x, int y);
+
+void draw_place_try(board_t *board, int x, int y);
 
 void draw_board(board_t *board, bool draw_places);
 

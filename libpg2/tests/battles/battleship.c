@@ -62,7 +62,7 @@ void do_play(char *game, int x, int y, int target) {
 	char args[256];
 	char letter = x + 'A';
 	sprintf(args, "battleship %s\n%c %d %d\n\n", 
-				game, letter, x, target);
+				game, letter, y, target);
 	gs_request(game_session, PLAY, args);
 }
 
@@ -87,7 +87,7 @@ bool play(int x, int y) {
 	
 	printf("play at board coords %c,%d\n", 'A' + p.x, p.y);
 	if (p.x == -1) return false;
-	
+	draw_place_try(&battle.oppon_board, p.x, p.y);
 	battle.last_play = p;
 	do_play(GAME_NAME, p.x, p.y, battle.last_target);
 	
@@ -153,7 +153,8 @@ void on_msg(const char sender[], const char msg[]) {
 		 sscanf(msg, "%c%d%d", &letter, &num, &target);
 		 
 		 if (target != -1) {
-			fill_place(&battle.my_board, battle.last_play.x, battle.last_play.y, target);
+			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
+			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
 			if (++battle.total_hits == TOTAL_PARTS) {
 				state = Done;
 				printf("I Win");
