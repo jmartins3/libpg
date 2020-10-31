@@ -63,7 +63,7 @@ void do_play(char *game, int x, int y, int target) {
 	char letter = x + 'A';
 	sprintf(args, "battleship %s\n%c %d %d\n\n", 
 				game, letter, x, target);
-	gs_request(game_session, JOIN_GAME, args);
+	gs_request(game_session, PLAY, args);
 }
 
 
@@ -118,10 +118,10 @@ void toggle_board(int x, int y) {
 	
 void mouse_handler(MouseEvent me) {
 	if (me.type == MOUSE_BUTTON_EVENT && 
-		me.state == BUTTON_RELEASED) {
-	
+		me.state == BUTTON_PRESSED) {
+		printf("do play at %d, %d, turn=%d, state=%d\n", me.x, me.y, turn, state);
 		if (me.button == BUTTON_LEFT && turn == MY_TURN && state == InGame) {
-			printf("do play at %d, %d\n", me.x, me.y);
+			
 			play(me.x, me.y);
 		}
 	 
@@ -191,6 +191,9 @@ void on_response(int status, const char response[]) {
 					state = JoinGame;
 					join_game(GAME_NAME);
 				}
+				else {
+					state = Error;
+				}
 			}
 				
 			else {
@@ -198,7 +201,6 @@ void on_response(int status, const char response[]) {
 				state = WaitPartner;
 			
 			}
-			state = Done;
 			break;
 		case JoinGame:
 			if (status != STATUS_OK) {
