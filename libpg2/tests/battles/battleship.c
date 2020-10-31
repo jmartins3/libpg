@@ -9,7 +9,7 @@
 
 // 
 // server codes
-#define ERR_TOPIC_DUPLICATE 412
+#define ERR_TOPIC_DUPLICATE 432
 #define STATUS_OK			201
 
 #include "pg/graphics.h"
@@ -32,7 +32,7 @@
  
 battleship_t battle;
 
-typedef enum state { Start, CreateGame, JoinGame, InGame, Done, Error } state_t;
+typedef enum state { Start, CreateGame, JoinGame, WaitPartner, InGame, Done, Error } state_t;
 
 char *username, userpass[64];
 
@@ -84,6 +84,8 @@ bool play(int x, int y) {
 	
 	if (turn != MY_TURN) return false;
 	Point p = place_selected(&battle.oppon_board, x, y);
+	
+	printf("play at board coords %c,%d\n", 'A' + p.x, p.y);
 	if (p.x == -1) return false;
 	
 	battle.last_play = p;
@@ -116,9 +118,10 @@ void toggle_board(int x, int y) {
 	
 void mouse_handler(MouseEvent me) {
 	if (me.type == MOUSE_BUTTON_EVENT && 
-		me.state == BUTTON_PRESSED) {
+		me.state == BUTTON_RELEASED) {
 	
 		if (me.button == BUTTON_LEFT && turn == MY_TURN && state == InGame) {
+			printf("do play at %d, %d\n", me.x, me.y);
 			play(me.x, me.y);
 		}
 	 
@@ -128,6 +131,13 @@ void mouse_handler(MouseEvent me) {
  
 void on_msg(const char sender[], const char msg[]) {
 	 printf("msg send from group joiner: %s\n", msg);
+	 
+	 if (state == WaitPartner) {
+		 printf("game is active!\n");
+		 state = InGame;
+		 turn = MY_TURN;
+		 return;
+	 }
 	 if (turn == OPPON_TURN) {
 		 // play from opponent 
 		 // play format:  {A-J}' '{1-10} {0-5}
@@ -184,8 +194,9 @@ void on_response(int status, const char response[]) {
 			}
 				
 			else {
-				state = InGame;
-				turn = MY_TURN;
+				printf("I start game!\n");
+				state = WaitPartner;
+			
 			}
 			state = Done;
 			break;
@@ -194,7 +205,10 @@ void on_response(int status, const char response[]) {
 				state = Error;
 			}
 			else {
+				printf("Opponent start game!\n");
+				printf("game is active!\n");
 				state = InGame;
+				turn = OPPON_TURN;
 			}	
 			break;
 		default:

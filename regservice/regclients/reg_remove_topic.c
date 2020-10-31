@@ -1,5 +1,5 @@
 /*
- * create a regist user
+ * remove a topic
  */
 
 
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 	char pass[64];
 	
 	if (argc != 4) {
-		printf("usage: reg_create_topic <theme> <topic> <user>\n");
+		printf("usage: reg_remove_topic <theme> <topic> <user>\n");
 		return 1; 
 	}
 	
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	}
  
 				 
-	exec_create_topic(cn, user, pass, theme, topic, MSG_PORT);
+	exec_remove_topic(cn, user, pass, theme, topic);
  	
 	cn_close(cn);
 	return 0;
