@@ -12,7 +12,14 @@
 	
 int main(int argc, char *argv[]) {
 	 
- 
+	char *theme;
+	
+	if (argc != 2) {
+		printf("usage: reg_list_topic <theme>\n");
+		return 1;
+	}
+	theme = argv[1];
+	
 	char *server_ip_addr = getenv("REG_SERVER_IP");
 
 	connection_t *cn;
@@ -22,7 +29,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
  	 
-	exec_list_themes(cn, ADMIN, ADMIN_PASS);
+	exec_list_topics(cn,ADMIN, ADMIN_PASS,  theme);
  	
 	cn_close(cn);
 	return 0;

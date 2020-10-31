@@ -194,7 +194,7 @@
 #define UNREACHABLE_TOPIC_OWNER 502
 
 #define REG_SERVER_PORT 60000
-
+#define MSG_PORT 		60001
 
 
 	

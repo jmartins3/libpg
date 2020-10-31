@@ -30,6 +30,13 @@ int turn; // MY_TURN or OPPON_TURN
 typedef enum result { WATER, HIT, BAD } result_t;
 
 
+void create_game(char *game, int nplayers) {
+	char args[256];
+	int port = session_get_msg_port(game_session);
+	sprintf(args, "battleship %s %d\n%d\n\n",  game, nplayers, port);
+	gs_request(game_session, CREATE_GAME, args);
+}
+
 void show_curr_player() {
 	//Size text_size = graph_text_size("PLAYER ONE", LARGE_FONT);
 	// erase
