@@ -150,7 +150,7 @@ void show_loose_message() {
 void process_opponent_response(int x, int y, int target) {
 		 // play format:  {A-J}' '{1-10} {0-5}
 		 
-		 if (target != -1) {
+		 if (target > 0) {
 			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
 			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
 			if (++battle.total_hits == battle.total_parts) {
