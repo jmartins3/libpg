@@ -132,7 +132,7 @@ void mouse_handler(MouseEvent me) {
 }
 
 MsgView msg;
-#define MSG_X 200
+#define MSG_X 350
 #define MSG_Y 200
 #define MSG_BC c_dgray
 #define MSG_TC c_orange
@@ -150,10 +150,10 @@ void show_loose_message() {
 void process_opponent_response(int x, int y, int target) {
 		 // play format:  {A-J}' '{1-10} {0-5}
 		 
-		 if (target > 0) {
+		 if (target >= 0) {
 			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
 			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
-			if (++battle.total_hits == battle.total_parts) {
+			if (target > 0 && ++battle.total_hits == battle.total_parts) {
 				state = Done;
 				printf("I Win");
 				show_victory_message();
@@ -275,7 +275,7 @@ int main() {
 	draw_board(&battle.my_board, true);
 	draw_board(&battle.oppon_board, false);
 	msg = mv_create(MSG_X, MSG_Y, 20, MEDIUM_FONT,MSG_TC, MSG_BC);
-	
+	mv_set_margins(&msg, 10, 20);
 	username = getenv("GAME_USER");
 	sprintf(userpass, "%s_pass", username);
  
