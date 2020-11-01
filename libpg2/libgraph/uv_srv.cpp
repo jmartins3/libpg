@@ -110,6 +110,7 @@ void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 			
 			
 		}
+		chn->valid = false;
 		fprintf(stderr, "close handle %p\n", client);
 		uv_close((uv_handle_t*)client, on_close);
 		
@@ -166,14 +167,22 @@ void create_client_udp_socket(session_t session) {
 	uv_udp_recv_start(&session->msg_sock, alloc_notification_buffer, on_notification);
 }
 
-static void connect_to(msg_request_t *msg ) {
-	/// execute the request
-	struct sockaddr_in dest;
-	
+static channel_t *chn_create(msg_request_t *msg ) {
 	channel_t *chn = ( channel_t *) malloc(sizeof(channel_t));
 	uv_tcp_init(&loop, (uv_tcp_t *) chn);
 	chn->msg = msg;
 	chn->len  = 0;
+	
+	chn->valid = true;
+	return chn;
+}
+
+static void connect_to(msg_request_t *msg ) {
+	/// execute the request
+	struct sockaddr_in dest;
+	
+	channel_t *chn = chn_create(msg);
+	 
 	
 	// in case it is a channel to group server communication
 	// we must create a udp socket for msg notifications

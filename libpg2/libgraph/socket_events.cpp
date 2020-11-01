@@ -101,7 +101,9 @@ void gs_request(session_t session, const char cmd[], const char args[]) {
 	
 	int auth_size = sprintf(authcmd, "%s\n%s %s\n", cmd, session->user, session->pass);
 	int args_size = strlen(args) ;
-	if (args_size+auth_size >=1023) // cmd too big, tell error via callback
+	if (session->chn != NULL && !session->chn->valid)
+		session->on_response(-4, "Invalid session channel");
+	else if (args_size+auth_size >=1023) // cmd too big, tell error via callback
 		session->on_response(-1, "Command too big");
 	else if (args_size<2 || args[args_size-1] != '\n' || args[args_size-2] != '\n')
 		session->on_response(-2, "Bad terminated command");

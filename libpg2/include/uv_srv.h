@@ -78,7 +78,7 @@ typedef struct channel {
     uv_write_t writereq;	 // Write request - must survive until write completion	
 	char buffer[BUFFER_SIZE];// I/O buffer 
 	int len;                 // buffer data length 
-   
+    bool valid;				 // valid state channel
 	msg_request_t *msg;		 // the associated lib context
 } channel_t;
 
