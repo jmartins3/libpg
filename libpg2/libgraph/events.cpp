@@ -217,27 +217,31 @@ static bool process_user_event(SDL_Event *event) {
 	else if (event->user.code == REQUEST_RESPONSE_EVENT) {
 		msg_request_t *msg = (msg_request_t*) event->user.data1;
 		
-		// adjust status 
-		if (msg->status == 0) { // no comm error
-			sscanf(msg->resp, "%d", &msg->status);
+		if (msg != NULL) {
+			// adjust status 
+			if (msg->status == 0) { // no comm error
+				sscanf(msg->resp, "%d", &msg->status);
+			}
+			msg->on_response(msg->status, msg->resp);
+			if (msg->resp != NULL) free(msg->resp);
+			if (msg->cmd != NULL) free(msg->cmd);
+			free(msg);
 		}
-		msg->on_response(msg->status, msg->resp);
-		if (msg->resp != NULL) free(msg->resp);
-		if (msg->cmd != NULL) free(msg->cmd);
-		free(msg);
 	}
 	else if (event->user.code == NOTIFICATION_EVENT) {
 		session_t session = (session_t) event->user.data1;
-		// TODO
-		char *line2 = session->notification;
-		printf("msg received:%s\n", session->notification);
-		while(*line2 !='\n') ++line2;
-		++line2;
-		char *sender = line2;
-		while(*line2 !=' ') ++line2;
-		*line2++ = 0;
-		while(*line2 !='\n') ++line2;
-		*line2++=0;
+		if (session != NULL && session->notification != null) {
+			// TODO
+			char *line2 = session->notification;
+			printf("msg received:%s\n", session->notification);
+			while(*line2 !='\n') ++line2;
+			++line2;
+			char *sender = line2;
+			while(*line2 !=' ') ++line2;
+			*line2++ = 0;
+			while(*line2 !='\n') ++line2;
+			*line2++=0;
+		}
 		 
 		session->on_msg(sender, line2);
 		free(session->notification);
