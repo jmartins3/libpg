@@ -73,6 +73,11 @@ void on_write(uv_write_t* req, int status) {
 	printf("wrote on thread %ld.\n", pthread_self());
 }
 
+static void channel_set_invalid(channel_t *chn) {
+	chn->valid = false;
+	if (chn->session != NULL) chn->session->state = SessionClosed;
+}
+
 
 void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 	
@@ -110,7 +115,7 @@ void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 			
 			
 		}
-		chn->valid = false;
+		channel_set_invalid(chn);
 		fprintf(stderr, "close handle %p\n", client);
 		uv_close((uv_handle_t*)client, on_close);
 		
@@ -122,6 +127,7 @@ void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 void on_connect(uv_connect_t* connection, int status)
 {
 	channel_t * chn = (channel_t*) connection->handle;
+	if (chn->session != NULL) chn->session->state = Connected;
 	msg_request_t *msg = (msg_request_t *) chn->msg;
 	if (status != 0) { 
 		printf("error %d on connection.\n", status); 
@@ -171,6 +177,7 @@ static channel_t *chn_create(msg_request_t *msg ) {
 	channel_t *chn = ( channel_t *) malloc(sizeof(channel_t));
 	uv_tcp_init(&loop, (uv_tcp_t *) chn);
 	chn->msg = msg;
+	chn->session = msg->session;
 	chn->len  = 0;
 	
 	chn->valid = true;
@@ -201,6 +208,7 @@ static void connect_to(msg_request_t *msg ) {
 void async_cb(uv_async_t * async)
 {
 	msg_request_t *msg = (msg_request_t*) async->data;
+	free(async);
 	switch(msg->type) {
 		case GroupSrvConnect:
 		case GenericRequest:
@@ -220,6 +228,7 @@ void async_cb(uv_async_t * async)
 }
 
 void exec_request(msg_request_t *req) {
+	if (req == NULL) return;
 	uv_async_t * async = (uv_async_t*) malloc(sizeof(uv_async_t));
 	
 	async->data = req;

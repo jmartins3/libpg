@@ -20,6 +20,8 @@ typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
 
 struct channel;
 
+typedef enum sess_state { Created, Pending, Connected, SessionClosed } session_state_t;
+
 typedef struct session {
 	struct channel*chn;
 	uv_udp_t msg_sock;
@@ -29,7 +31,8 @@ typedef struct session {
 	char sip[MAX_IP_ADDR];    // group service ip
 	char user[MAX_USER_NAME]; // user name
 	char pass[MAX_USER_PASS]; // user pass
-
+	session_state_t state;
+	
 	// callbacks
 	ResponseEventHandler on_response;
 	MsgEventHandler on_msg;
@@ -79,6 +82,8 @@ typedef struct channel {
 	char buffer[BUFFER_SIZE];// I/O buffer 
 	int len;                 // buffer data length 
     bool valid;				 // valid state channel
+    bool busy;				 // tells a request is active on channel
+    session_t session;		 // associated session
 	msg_request_t *msg;		 // the associated lib context
 } channel_t;
 

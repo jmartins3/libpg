@@ -218,15 +218,19 @@ static bool process_user_event(SDL_Event *event) {
 		msg_request_t *msg = (msg_request_t*) event->user.data1;
 		
 		if (msg != NULL) {
+			if (msg->session != NULL && msg->session->chn != NULL) {
+					msg->session->chn->msg = NULL;
+					msg->session->chn->busy=false;
+			}
 			// adjust status 
 			if (msg->status == 0) { // no comm error
 				sscanf(msg->resp, "%d", &msg->status);
+			
 				msg->on_response(msg->status, msg->resp);
 				if (msg->resp != NULL) free(msg->resp);
+				
 				if (msg->cmd != NULL) free(msg->cmd);
-				if (msg->session != NULL) {
-					msg->session->chn->msg = NULL;
-				}
+			
 				free(msg);
 			
 			}

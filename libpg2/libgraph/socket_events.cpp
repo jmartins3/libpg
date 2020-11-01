@@ -30,8 +30,17 @@ static msg_request_t *mr_create(msg_type_t type, const char cmd[], ResponseEvent
 
 // specialized mesage request creator
 static msg_request_t *mr_gs_cmd(session_t session, const char cmd[])  {
+	if (session->state != Created) {
+		session->on_response(-4, "Not connected session!");
+		return NULL;
+	}
+	if (session->chn != NULL && session->chn->busy) {
+		session->on_response(-4, "channel is busy!");
+		return NULL;
+	}
 	msg_request_t *mr=  mr_create(GroupSrvCmd, cmd, session->on_response);
 	mr->session = session;
+	
 	return mr;
 }
 
@@ -39,12 +48,19 @@ static msg_request_t *mr_gs_cmd(session_t session, const char cmd[])  {
 msg_request_t *mr_gs_connect(session_t session)  {
 	char authcmd[1024];
 	
+	if (session->state != Created) {
+		session->on_response(-4, "Already created session!");
+		return NULL;
+	}
+	session->state = Pending;
+	
 	sprintf(authcmd, "%s\n%s %s\n%s\n",
 		LIST_BATTLESHIP_GAMES_CMD, session->user, session->pass, LIST_BATTLESHIP_GAMES_ARGS);
 	msg_request_t *mr=  mr_create(GroupSrvConnect, authcmd, session->on_response);
 	strcpy(mr->ip_addr, session->sip);
 	mr->ip_port = GROUP_SERVER_PORT;
 	mr->session = session;
+
 	return mr;
 }
 
@@ -71,6 +87,7 @@ static session_t gs_session_create(const char gs_addr[],
 	strcpy(session->pass, pass);
 	session->on_response = on_response;
 	session->on_msg = on_msg;
+	session->state = Created;
 	// TO DO
 	session->msg_port = 2000;
 	return session;
@@ -110,6 +127,7 @@ void gs_request(session_t session, const char cmd[], const char args[]) {
 	else {
 		sprintf(authcmd+auth_size, "%s", args);
 		msg_request_t *msg = mr_gs_cmd(session, authcmd);
+		if (session->chn != NULL) session->chn->busy = true;
 		exec_request(msg);
 	}
 }
