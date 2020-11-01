@@ -95,6 +95,7 @@ void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 	}
 	else if (nread < 0) {
 		if (nread == UV_EOF) {
+			chn->buffer[chn->len]=0;
 			msg->status = 0;
 			msg->resp = strdup(chn->buffer);
 		}
@@ -102,16 +103,19 @@ void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 			msg->status = nread;
 			msg->resp = strdup("Communication error");
 		}
+		
+		chn->len = 0;
 		chn->buffer[chn->len]=0;
 		 
 		send_graph_response(msg);
 		
 		// check if the handle is to maintain
 		// (in case we have a session with the group server)
-		if (msg->session  == NULL) {
-			fprintf(stderr, "close handle %p\n", client);
-			uv_close((uv_handle_t*)client, on_close);
-		}
+		// ??
+		//if (msg->session  == NULL) {
+		fprintf(stderr, "close handle %p\n", client);
+		uv_close((uv_handle_t*)client, on_close);
+		//}
 		
 	}
 	 
