@@ -13,6 +13,8 @@
 #define STATUS_OK			201
 
 #include "pg/graphics.h"
+#include "components.h"
+
 #include "board.h"
 
 
@@ -129,9 +131,51 @@ void mouse_handler(MouseEvent me) {
 	}
 }
 
+MsgView msg;
+#define MSG_X 200
+#define MSG_Y 200
+#define MSG_BC c_dgray
+#define MSG_TC c_orange
 
-void process_opponent_turn(const char msg) {
-	// jump first line
+
+void show_victory_message() {
+	mv_show_text(&msg, "I win!", ALIGN_CENTER);
+}
+
+void show_loose_message() {
+	mv_show_text(&msg, "I loose!", ALIGN_CENTER);
+}
+		
+
+void process_opponent_response(int x, int y, int target) {
+		 // play format:  {A-J}' '{1-10} {0-5}
+		 
+		 if (target != -1) {
+			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
+			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
+			if (++battle.total_hits == battle.total_parts) {
+				state = Done;
+				printf("I Win");
+				show_victory_message();
+				return;
+			}
+			
+		 }
+		 
+		 int val = val_place(&battle.my_board, x, y);
+		 battle.last_target = val;
+		 if (val != EMPTY) {
+			 battle.total_injuries++;
+			 if (battle.total_injuries == TOTAL_PARTS) {
+				state = Done;
+				printf("I Loose");
+				do_play(GAME_NAME, 0, 0, val);
+				show_loose_message();
+				return;
+			 }
+		 }
+		 turn = MY_TURN;
+		 show_curr_player();
 }
 	
 	
@@ -145,39 +189,12 @@ void on_msg(const char sender[], const char msg[]) {
 		 turn = MY_TURN;
 		 return;
 	 }
-	 if (turn == OPPON_TURN) {
-		 // play from opponent 
-		 // play format:  {A-J}' '{1-10} {0-5}
-		 
+	 if (state == InGame && turn == OPPON_TURN) {
 		 char letter;
 		 int  num;
 		 int  target;
 		 sscanf(msg, "%c%d%d", &letter, &num, &target);
-		 
-		 if (target != -1) {
-			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
-			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
-			if (++battle.total_hits == TOTAL_PARTS) {
-				state = Done;
-				printf("I Win");
-				return;
-			}
-			
-		 }
-		 
-		 int val = val_place(&battle.my_board, letter - 'A', num);
-		 battle.last_target = val;
-		 if (val != EMPTY) {
-			 battle.total_injuries++;
-			 if (battle.total_injuries == TOTAL_PARTS) {
-				state = Done;
-				printf("I Loose");
-				do_play(GAME_NAME, 0, 0, val);
-				return;
-			 }
-		 }
-		 turn = MY_TURN;
-		 show_curr_player();
+		 process_opponent_response(letter-'A', num-1, target);
 	 }
 }
 
@@ -254,9 +271,10 @@ int main() {
 	
 	create_battleship(&battle, MY_BOARD_X, MY_BOARD_Y, MY_BOARD_X+500, MY_BOARD_Y);
 	
-	populate_board(&battle.my_board);
+	populate_battleship(&battle);
 	draw_board(&battle.my_board, true);
 	draw_board(&battle.oppon_board, false);
+	msg = mv_create(MSG_X, MSG_Y, 20, MEDIUM_FONT,MSG_TC, MSG_BC);
 	
 	username = getenv("GAME_USER");
 	sprintf(userpass, "%s_pass", username);

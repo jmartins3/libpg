@@ -142,6 +142,7 @@ void board_clear(board_t *board) {
 
 void populate_board(board_t *board) {
 	board_clear(board);
+/*
 	add_air_carrier(board);
 	
 	// put four cannon
@@ -160,7 +161,7 @@ void populate_board(board_t *board) {
 	add_n_cannon_boat(board, SUBMARINE);
 	add_n_cannon_boat(board, SUBMARINE);
 	add_n_cannon_boat(board, SUBMARINE);
-	 
+*/ 
 	add_n_cannon_boat(board, SUBMARINE);
 	
 }
@@ -183,6 +184,13 @@ void create_battleship(battleship_t *battle, int my_x, int my_y,
 	battle->total_hits = 0;
 	battle->total_injuries = 0;
 	battle->last_target = -1;
+	battle->total_parts = 0;
+}
+
+
+void populate_battleship(battleship_t *battle) {
+	populate_board(&battle->my_board);
+	battle->total_parts = 1;
 }
 
 

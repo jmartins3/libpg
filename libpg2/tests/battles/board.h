@@ -50,6 +50,7 @@ typedef struct battleship {
 	int last_target;
 	Point last_play;
 	int total_hits, total_injuries;
+	int total_parts;
 } battleship_t;
 
 int rand_range(int ll, int hl);
@@ -84,6 +85,7 @@ void show_board(board_t *board);
 
 void populate_board(board_t *board);
 
+void populate_battleship(battleship_t *battle);
 
 void create_board(board_t *board, int x, int y);
 
