@@ -230,7 +230,8 @@ static bool process_user_event(SDL_Event *event) {
 	}
 	else if (event->user.code == NOTIFICATION_EVENT) {
 		session_t session = (session_t) event->user.data1;
-		if (session != NULL && session->notification != null) {
+		 
+		if (session != NULL && session->notification != NULL) {
 			// TODO
 			char *line2 = session->notification;
 			printf("msg received:%s\n", session->notification);
@@ -241,11 +242,12 @@ static bool process_user_event(SDL_Event *event) {
 			*line2++ = 0;
 			while(*line2 !='\n') ++line2;
 			*line2++=0;
+			session->on_msg(sender, line2);
+			free(session->notification);
+			session->notification = NULL;
 		}
 		 
-		session->on_msg(sender, line2);
-		free(session->notification);
-		session->notification = NULL;
+		
 		 
 	}
 	return true;

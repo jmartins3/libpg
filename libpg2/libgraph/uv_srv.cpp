@@ -49,7 +49,7 @@ void on_notification(uv_udp_t* handle, ssize_t nread, const uv_buf_t* buf, const
 	
 	if (nread == 0) return;
 	if (nread < 0) {
-		session->notification = null;
+		session->notification = NULL;
 	}
 	else if (nread > 0) {
 		session->notification_buffer[nread] = 0;
