@@ -73,7 +73,9 @@ void do_play(char *game, int x, int y, int target) {
 void show_curr_player() {
 	char msg[128];
 	
-	if (turn == MY_TURN) 
+	if (state != InGame) 
+		sprintf(msg, "Waiting for opponent...");
+	else if (turn == MY_TURN) 
 		sprintf(msg, "PLAYER ONE - %s    ", username);
 	else
 		sprintf(msg, "PLAYER TWO - %s    ", opponent_name);
@@ -148,34 +150,34 @@ void show_loose_message() {
 		
 
 void process_opponent_response(int x, int y, int target) {
-		 // play format:  {A-J}' '{1-10} {0-5}
-		 
-		 if (target >= 0) {
-			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
-			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
-			if (target > 0 && ++battle.total_hits == battle.total_parts) {
-				state = Done;
-				printf("I Win");
-				show_victory_message();
-				return;
-			}
-			
+	 // play format:  {A-J}' '{1-10} {0-5}
+	 
+	 if (target >= 0) {
+		fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
+		draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
+		if (target > 0 && ++battle.total_hits == battle.total_parts) {
+			state = Done;
+			printf("I Win");
+			show_victory_message();
+			return;
+		}
+		
+	 }
+	 
+	 int val = val_place(&battle.my_board, x, y);
+	 battle.last_target = val;
+	 if (val != EMPTY) {
+		 battle.total_injuries++;
+		 if (battle.total_injuries == battle.total_parts) {
+			state = Done;
+			printf("I Loose");
+			do_play(GAME_NAME, 0, 0, val);
+			show_loose_message();
+			return;
 		 }
-		 
-		 int val = val_place(&battle.my_board, x, y);
-		 battle.last_target = val;
-		 if (val != EMPTY) {
-			 battle.total_injuries++;
-			 if (battle.total_injuries == TOTAL_PARTS) {
-				state = Done;
-				printf("I Loose");
-				do_play(GAME_NAME, 0, 0, val);
-				show_loose_message();
-				return;
-			 }
-		 }
-		 turn = MY_TURN;
-		 show_curr_player();
+	 }
+	 turn = MY_TURN;
+	 show_curr_player();
 }
 	
 	
@@ -187,6 +189,7 @@ void on_msg(const char sender[], const char msg[]) {
 		 state = InGame;
 		 strcpy(opponent_name, sender);
 		 turn = MY_TURN;
+		 show_curr_player();
 		 return;
 	 }
 	 if (state == InGame && turn == OPPON_TURN) {
@@ -229,7 +232,7 @@ void on_response(int status, const char response[]) {
 					get_opponent_from_response(response, opponent_name);
 					turn = OPPON_TURN;
 					state = JoinGame;
-					show_curr_player();
+					
 					join_game(GAME_NAME);
 				}
 				else {
@@ -255,6 +258,7 @@ void on_response(int status, const char response[]) {
 				printf("game is active!\n");
 				state = InGame;
 				turn = OPPON_TURN;
+				show_curr_player();
 			}	
 			break;
 		default:
