@@ -30,7 +30,7 @@ static msg_request_t *mr_create(msg_type_t type, const char cmd[], ResponseEvent
 
 // specialized mesage request creator
 static msg_request_t *mr_gs_cmd(session_t session, const char cmd[])  {
-	if (session->state != Created) {
+	if (session->state != Connected) {
 		session->on_response(-4, "Not connected session!");
 		return NULL;
 	}
