@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+
+#define WINDOW_WIDTH 600
+#define WINDOW_HEIGHT 350
 // 
 // server codes
 #define ERR_TOPIC_DUPLICATE 432
@@ -23,15 +26,16 @@
 #define MY_BOARD_X 50
 #define MY_BOARD_Y 90
 
-#define OPPON_BOARD_X 50
-#define OPPON_BOARD_Y 430
 
 #define MY_TURN		0
 #define OPPON_TURN	1
 
-#define MSG_PLAYER_X	300
-#define MSG_PLAYER_Y	50
+#define MSG_PLAYER_X	20
+#define MSG_PLAYER_Y	35
  
+ 
+bool demo_mode = false;
+
 battleship_t battle;
 
 typedef enum state { Start, CreateGame, JoinGame, WaitPartner, InGame, Done, Error } state_t;
@@ -46,7 +50,9 @@ int turn; // MY_TURN or OPPON_TURN
 
 typedef enum result { WATER, HIT, BAD } result_t;
 
+void play_auto();
 
+ 
 void create_game(char *game, int nplayers) {
 	char args[256];
 	int port = session_get_msg_port(game_session);
@@ -134,8 +140,8 @@ void mouse_handler(MouseEvent me) {
 }
 
 MsgView msg;
-#define MSG_X 350
-#define MSG_Y 200
+#define MSG_X 200
+#define MSG_Y 300
 #define MSG_BC c_dgray
 #define MSG_TC c_orange
 
@@ -152,14 +158,27 @@ void show_loose_message() {
 void process_opponent_response(int x, int y, int target) {
 	 // play format:  {A-J}' '{1-10} {0-5}
 	 
+	 printf("Process opponent response at %c-%d\n", 'A'+x, y+1);
 	 if (target >= 0) {
-		fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
-		draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
-		if (target > 0 && ++battle.total_hits == battle.total_parts) {
-			state = Done;
-			printf("I Win");
-			show_victory_message();
-			return;
+		if ( val_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y) == 0 ) {
+			 
+		
+			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
+			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
+			if (target > 0 )   {
+				
+				++battle.total_hits;
+				printf("hit at %c-%d! total_hits=%d, total_parts=%d\n", 
+						battle.last_play.x+'A', battle.last_play.y +1,
+						battle.total_hits, battle.total_parts);
+				// fprintf(stderr, "press enter to continue..."); getchar();
+				if (battle.total_hits == battle.total_parts) {
+					state = Done;
+					printf("I Win\n");
+					show_victory_message();
+					return;
+				}
+			}
 		}
 		
 	 }
@@ -170,7 +189,7 @@ void process_opponent_response(int x, int y, int target) {
 		 battle.total_injuries++;
 		 if (battle.total_injuries == battle.total_parts) {
 			state = Done;
-			printf("I Loose");
+			printf("I Loose\n");
 			do_play(GAME_NAME, 0, 0, val);
 			show_loose_message();
 			return;
@@ -178,8 +197,30 @@ void process_opponent_response(int x, int y, int target) {
 	 }
 	 turn = MY_TURN;
 	 show_curr_player();
-}
 	
+}
+
+
+void play_auto() {
+	if (turn != MY_TURN) return;
+	Point p;
+	do {
+		int x = rand_range(0, 9);
+		int y = rand_range(0,9);
+		p.x = x;
+		p.y = y;
+	}
+	while(val_place(&battle.oppon_board, p.x, p.y) > 0);
+	printf("play at board coords %c,%d\n", 'A' + p.x, p.y+1);
+	 
+	draw_place_try(&battle.oppon_board, p.x, p.y);
+	battle.last_play = p;
+	do_play(GAME_NAME, p.x, p.y, battle.last_target);
+	
+	turn = OPPON_TURN;
+	show_curr_player();
+	return;
+}	
 	
 void on_msg(const char sender[], const char msg[]) {
 	 printf("msg send from group joiner %s: %s\n", sender, msg);
@@ -190,6 +231,7 @@ void on_msg(const char sender[], const char msg[]) {
 		 strcpy(opponent_name, sender);
 		 turn = MY_TURN;
 		 show_curr_player();
+		 if (demo_mode) play_auto();
 		 return;
 	 }
 	 if (state == InGame && turn == OPPON_TURN) {
@@ -213,6 +255,11 @@ void get_opponent_from_response(const char *resp, char *opponent_name) {
 	
 
 void on_response(int status, const char response[]) {
+	if (status < 0) {
+		printf("error: %s\n", response);
+		state = Error;
+		return;
+	}
 	switch(state) {
 		case Start:
 			if (status != STATUS_OK) {
@@ -267,25 +314,38 @@ void on_response(int status, const char response[]) {
 						
 }
 
- 
+
+void timer_handler() {
+	if (turn == MY_TURN && state == InGame)
+		if (demo_mode) play_auto();
+}
 	
-int main() {
+int main(int argc, char *argv[]) {
 	srand(time(NULL));
-	graph_init();
+	graph_init2(WINDOW_WIDTH, WINDOW_HEIGHT);
 	
-	create_battleship(&battle, MY_BOARD_X, MY_BOARD_Y, MY_BOARD_X+500, MY_BOARD_Y);
+	create_battleship(&battle, MY_BOARD_X, MY_BOARD_Y, MY_BOARD_X+300, MY_BOARD_Y);
 	
 	populate_battleship(&battle);
 	draw_board(&battle.my_board, true);
 	draw_board(&battle.oppon_board, false);
 	msg = mv_create(MSG_X, MSG_Y, 20, MEDIUM_FONT,MSG_TC, MSG_BC);
 	mv_set_margins(&msg, 10, 20);
-	username = getenv("GAME_USER");
+	
+	char *server_ip ;
+	if (argc == 3) {
+		username = argv[1];
+		server_ip = argv[2];
+	}
+	else {
+		server_ip = getenv("REG_SERVER_IP");
+		username = getenv("GAME_USER");
+	}
 	sprintf(userpass, "%s_pass", username);
  
 	graph_regist_mouse_handler(mouse_handler);
-	
-	char *server_ip = getenv("REG_SERVER_IP");
+	graph_regist_timer_handler(timer_handler, 500);
+	 
 	game_session = gs_connect(server_ip, username, userpass, on_response, on_msg);
 	printf("\nStart!\n\n");
 	graph_start();

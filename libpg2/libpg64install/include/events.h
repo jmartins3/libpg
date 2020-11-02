@@ -13,6 +13,16 @@ typedef unsigned short ushort;
 typedef unsigned char byte;
 typedef unsigned int uint;
 
+/*
+ *  communication events callback types
+ */
+
+typedef  void (*ResponseEventHandler)(int status, const char response[]);
+typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
+
+typedef  void (*ResponseEventHandlerExt)(int status, const char response[], void * context);
+typedef  void (*MsgEventHandlerExt)(const char sender[], const char msg[], void * context);
+
 /*------------------------------------------
  * events callback registration
  * -----------------------------------------*/
@@ -78,6 +88,11 @@ typedef void (*MouseEventHandler)(MouseEvent me);
 typedef void (*TimerEventHandler)();
 
 
+// wrapper for game server communication callbacks
+struct comm_cb {
+	ResponseEventHandlerExt on_response;
+	MsgEventHandlerExt on_msg;
+};
 /*--------------------------------------------
  * publics
  *********************************************/

@@ -1,0 +1,265 @@
+
+
+
+
+
+
+
+
+
+
+orientation? vertical
+rx=8,ry=3
+fill 4 cannon boat
+fill 3 cannon boat
+fill 3 cannon boat
+fill 2 cannon boat
+fill 2 cannon boat
+fill 2 cannon boat
+fill 1 cannon boat
+fill 1 cannon boat
+fill 1 cannon boat
+fill 1 cannon boat
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 130
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+colour: FFFFFFFF, count: 260
+major: FFFFFFFF, ncolours: 1
+
+start exec_request  on thread 139787866113984
+
+Start!
+
+do exec_request  on thread 139787477292800
+connected!
+send command!
+wrote on thread 139787477292800.
+read completion on thread 139787477292800.
+response: 201 Status ok
+battle_john_jmartins jmartins 1
+
+
+start exec_request  on thread 139787866113984
+do exec_request  on thread 139787477292800
+send command: 'CREATE_TOPIC
+john john_pass
+battleship battle_john_jmartins 2
+18899
+
+'
+wrote on thread 139787477292800.
+read completion on thread 139787477292800.
+error: 432 Duplicated topic
+jmartins
+18899
+
+
+opponent_name=jmartins
+start exec_request  on thread 139787866113984
+do exec_request  on thread 139787477292800
+send command: 'JOIN_TOPIC
+john john_pass
+battleship battle_john_jmartins
+18899
+
+'
+wrote on thread 139787477292800.
+read completion on thread 139787477292800.
+Opponent start game!
+game is active!
+colour: FFFFFFFF, count: 13000
+major: FFFFFFFF, ncolours: 1
+
+msg received:BROADCAST
+jmartins battleship battle_john_jmartins 1
+E 6 -1
+
+msg send from group joiner jmartins: E 6 -1
+
+Process opponent response at E-6
+colour: FFD2D2D2, count: 2440
+colour: FFFFFFFF, count: 8480
+major: FFFFFFFF, ncolours: 2
+
+play at board coords G,1
+start exec_request  on thread 139787866113984
+do exec_request  on thread 139787477292800
+send command: 'BROADCAST
+john john_pass
+battleship battle_john_jmartins
+G 1 0
+
+'
+wrote on thread 139787477292800.
+read completion on thread 139787477292800.
+colour: FFD2D2D2, count: 2092
+colour: FFFFFFFF, count: 10908
+major: FFFFFFFF, ncolours: 2
+
+msg received:BROADCAST
+jmartins battleship battle_john_jmartins 1
+D 10 0
+
+msg send from group joiner jmartins: D 10 0
+
+Process opponent response at D-10
+colour: FFD2D2D2, count: 2440
+colour: FFFFFFFF, count: 8480
+major: FFFFFFFF, ncolours: 2
+
+play at board coords A,10
+start exec_request  on thread 139787866113984
+do exec_request  on thread 139787477292800
+send command: 'BROADCAST
+john john_pass
+battleship battle_john_jmartins
+A 10 1
+
+'
+wrote on thread 139787477292800.
+read completion on thread 139787477292800.
+colour: FFD2D2D2, count: 2092
+colour: FFFFFFFF, count: 10908
+major: FFFFFFFF, ncolours: 2
+
+msg received:BROADCAST
+jmartins battleship battle_john_jmartins 1
+B 4 1
+
+msg send from group joiner jmartins: B 4 1
+
+Process opponent response at B-4
+hit at A-10! total_hits=1, total_parts=25
+press enter to continue...colour: FFD2D2D2, count: 2440
+colour: FFFFFFFF, count: 8480
+major: FFFFFFFF, ncolours: 2
+
+play at board coords A,7
+start exec_request  on thread 139787866113984
+do exec_request  on thread 139787477292800
+send command: 'BROADCAST
+john john_pass
+battleship battle_john_jmartins
+A 7 3
+
+'
+wrote on thread 139787477292800.
+read completion on thread 139787477292800.
+colour: FFD2D2D2, count: 2092
+colour: FFFFFFFF, count: 10908
+major: FFFFFFFF, ncolours: 2
+

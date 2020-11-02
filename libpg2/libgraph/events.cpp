@@ -77,6 +77,23 @@ static void convertMouseMotionEvent(SDL_MouseMotionEvent *msdl, MouseEvent *me) 
 	
 }
 
+static ResponseEventHandlerExt forced_response_handler;
+
+static MsgEventHandlerExt forced_msg_handler;
+
+
+
+struct comm_cb gs_force_callbacks(ResponseEventHandlerExt on_response, MsgEventHandlerExt on_msg) {
+	struct comm_cb ccb = {
+		forced_response_handler,
+		forced_msg_handler
+	};
+	
+	forced_response_handler = on_response;
+	forced_msg_handler = on_msg;
+	return ccb;
+		
+}
 
 #define MAX_CLICK_PERIOD	20
 static MouseEvent lastMe;
@@ -204,6 +221,22 @@ void timebase_regist() {
 		my_timer_id = SDL_AddTimer(TIMEBASE, my_callbackfunc, NULL);
 }
 
+
+static void dispatch_response_cb(session_t session, msg_request_t *msg) {
+	if (forced_response_handler != NULL)
+		forced_response_handler(msg->status, msg->resp, 
+				session != NULL ? session->context : NULL);
+	else
+		msg->on_response(msg->status, msg->resp);
+}
+
+static void dispatch_msg_cb(session_t session, const char *sender, const char *msg) {
+	if (forced_msg_handler != NULL)
+		forced_msg_handler(sender, msg, session->context);
+	else
+		session->on_msg(sender, msg);
+}
+		
 static bool process_user_event(SDL_Event *event) {
 	if (event->user.code == USER_BASETIME_EVENT) {
 		timebase_handler();
@@ -225,8 +258,8 @@ static bool process_user_event(SDL_Event *event) {
 			// adjust status 
 			if (msg->status == 0) { // no comm error
 				sscanf(msg->resp, "%d", &msg->status);
-			
-				msg->on_response(msg->status, msg->resp);
+				dispatch_response_cb(msg->session, msg);
+				 
 				if (msg->resp != NULL) free(msg->resp);
 				
 				if (msg->cmd != NULL) free(msg->cmd);
@@ -251,7 +284,8 @@ static bool process_user_event(SDL_Event *event) {
 			*line2++ = 0;
 			while(*line2 !='\n') ++line2;
 			*line2++=0;
-			session->on_msg(sender, line2);
+			
+			dispatch_msg_cb(session, sender,line2);
 			free(session->notification);
 			session->notification = NULL;
 		}

@@ -15,10 +15,10 @@
 #define MAX_USER_NAME 32
 #define MAX_USER_PASS 32
 
-typedef  void (*ResponseEventHandler)(int status, const char response[]);
-typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
 
 struct channel;
+
+typedef enum sess_state { Created, Pending, Connected, SessionClosed } session_state_t;
 
 typedef struct session {
 	struct channel*chn;
@@ -29,7 +29,10 @@ typedef struct session {
 	char sip[MAX_IP_ADDR];    // group service ip
 	char user[MAX_USER_NAME]; // user name
 	char pass[MAX_USER_PASS]; // user pass
-
+	session_state_t state;
+	
+	// context for extended callbacks
+	void *context;
 	// callbacks
 	ResponseEventHandler on_response;
 	MsgEventHandler on_msg;
@@ -78,7 +81,9 @@ typedef struct channel {
     uv_write_t writereq;	 // Write request - must survive until write completion	
 	char buffer[BUFFER_SIZE];// I/O buffer 
 	int len;                 // buffer data length 
-   
+    bool valid;				 // valid state channel
+    bool busy;				 // tells a request is active on channel
+    session_t session;		 // associated session
 	msg_request_t *msg;		 // the associated lib context
 } channel_t;
 

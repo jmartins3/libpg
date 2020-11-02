@@ -142,7 +142,7 @@ void board_clear(board_t *board) {
 
 void populate_board(board_t *board) {
 	board_clear(board);
-/*
+
 	add_air_carrier(board);
 	
 	// put four cannon
@@ -161,7 +161,6 @@ void populate_board(board_t *board) {
 	add_n_cannon_boat(board, SUBMARINE);
 	add_n_cannon_boat(board, SUBMARINE);
 	add_n_cannon_boat(board, SUBMARINE);
-*/ 
 	add_n_cannon_boat(board, SUBMARINE);
 	
 }
@@ -190,7 +189,7 @@ void create_battleship(battleship_t *battle, int my_x, int my_y,
 
 void populate_battleship(battleship_t *battle) {
 	populate_board(&battle->my_board);
-	battle->total_parts = 1;
+	battle->total_parts = TOTAL_PARTS;
 }
 
 
@@ -217,6 +216,7 @@ void draw_place(board_t *board, int x, int y) {
 			graph_rect(screen_x, screen_y, SQUARE_SIDE-3, SQUARE_SIDE-3, CLR_WATER, true);
 			break;
 	}
+	graph_refresh();
 }
 
 void draw_place_try(board_t *board, int x, int y) {

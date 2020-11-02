@@ -8,7 +8,7 @@
 #include <map>
 
 
-#define PRINT_COLOURS
+// #define PRINT_COLOURS
 
 using namespace std;
 

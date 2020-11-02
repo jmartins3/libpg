@@ -15,8 +15,6 @@
 #define MAX_USER_NAME 32
 #define MAX_USER_PASS 32
 
-typedef  void (*ResponseEventHandler)(int status, const char response[]);
-typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
 
 struct channel;
 
@@ -33,6 +31,8 @@ typedef struct session {
 	char pass[MAX_USER_PASS]; // user pass
 	session_state_t state;
 	
+	// context for extended callbacks
+	void *context;
 	// callbacks
 	ResponseEventHandler on_response;
 	MsgEventHandler on_msg;

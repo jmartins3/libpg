@@ -81,15 +81,17 @@ static session_t gs_session_create(const char gs_addr[],
 						ResponseEventHandler on_response,
 						MsgEventHandler on_msg) {
 	session_t session = (session_t) malloc(sizeof(sess_t));
-	session->chn = NULL;
+	
 	strcpy(session->sip, gs_addr);
 	strcpy(session->user, user);
 	strcpy(session->pass, pass);
 	session->on_response = on_response;
 	session->on_msg = on_msg;
 	session->state = Created;
-	// TO DO
-	session->msg_port = 2000;
+	session->context = NULL;
+	//no sockets for now
+	session->chn = NULL;
+	session->msg_port = 0;
 	return session;
 	
 }

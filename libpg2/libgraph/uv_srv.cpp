@@ -9,6 +9,7 @@
 
 
 
+static 	uv_async_t async_handle;
 
 static uv_loop_t loop;	// the libuv loop 
 static pthread_t thread;
@@ -70,7 +71,7 @@ void on_write(uv_write_t* req, int status) {
 		return;
 	}
 	 
-	printf("wrote on thread %ld.\n", pthread_self());
+	
 }
 
 static void channel_set_invalid(channel_t *chn) {
@@ -80,8 +81,10 @@ static void channel_set_invalid(channel_t *chn) {
 
 
 void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
-	
+
+#ifdef DEBUG_OUT	
 	printf("read completion on thread %ld.\n", pthread_self());	
+#endif
 	channel_t *chn = (channel_t*) client;
 	msg_request_t *msg = (msg_request_t *) chn->msg;
 	if (nread > 0) {
@@ -138,12 +141,16 @@ void on_connect(uv_connect_t* connection, int status)
 		 
 	}
 	else {
+#ifdef DEBUG_OUT
 		printf("connected!\n");
+#endif
 		uv_read_start((uv_stream_t *) chn, alloc_buffer, on_read);
 		uv_buf_t buf;
 		buf.base = msg->cmd;
 		buf.len = strlen(msg->cmd);
+#ifdef DEBUG_OUT
 		printf("send command!\n");
+#endif
 		uv_write(&chn->writereq, (uv_stream_t*) chn, &buf, 1, on_write);
 		
 	}
@@ -208,7 +215,9 @@ static void connect_to(msg_request_t *msg ) {
 void async_cb(uv_async_t * async)
 {
 	msg_request_t *msg = (msg_request_t*) async->data;
-	free(async);
+#ifdef DEBUG_OUT
+	printf("do exec_request  on thread %ld\n", pthread_self());
+#endif
 	switch(msg->type) {
 		case GroupSrvConnect:
 		case GenericRequest:
@@ -219,25 +228,28 @@ void async_cb(uv_async_t * async)
 			buf.len = strlen(msg->cmd);
 			msg->session->chn->msg = msg;
 			msg->session->chn->len  = 0;
+#ifdef DEBUG_OUT
 			printf("send command: '%s'\n", msg->cmd);
+#endif
 			uv_write(&msg->session->chn->writereq, (uv_stream_t*) msg->session->chn, &buf, 1, on_write);
 		default:
 			break;
 	}
+
   
 }
 
 void exec_request(msg_request_t *req) {
 	if (req == NULL) return;
-	uv_async_t * async = (uv_async_t*) malloc(sizeof(uv_async_t));
 	
-	async->data = req;
-	
+	async_handle.data = req;
+#ifdef DEBUG_OUT
 	printf("start exec_request  on thread %ld\n", pthread_self());
+#endif
 	
-	uv_async_init(&loop, async, async_cb);
 	
-	uv_async_send(async);
+	
+	uv_async_send(&async_handle);
 }
 
 void on_new_connection(uv_stream_t *server, int status) {
@@ -255,11 +267,18 @@ static void* server_init(void *arg) {
 	 
 	uv_loop_init(& loop);
 	uv_tcp_init(&loop, &server);
-	uv_ip4_addr("0.0.0.0", SERVER_PORT, &addr);
-	uv_tcp_bind(&server, (const struct sockaddr*)&addr, 0);
+	uv_async_init(&loop, &async_handle, async_cb);
+	int port = SERVER_PORT-1;
+	
+	do {
+	
+		uv_ip4_addr("0.0.0.0", ++port, &addr);
+		uv_tcp_bind(&server, (const struct sockaddr*)&addr, 0);
+	}
+	while ( uv_listen((uv_stream_t*) &server, DEFAULT_BACKLOG, on_new_connection) != 0);
 	
 	
-    uv_listen((uv_stream_t*) &server, DEFAULT_BACKLOG, on_new_connection);
+  
     
     uv_sem_post(&server_started);
 	uv_run(&loop, UV_RUN_DEFAULT);

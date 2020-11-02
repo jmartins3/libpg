@@ -1,6 +1,6 @@
 #pragma once
 
-#define SQUARE_SIDE 30
+#define SQUARE_SIDE 20
 
 #define FONT_SIZE MEDIUM_FONT
 
