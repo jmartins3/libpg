@@ -1,2 +1,2 @@
 # libpg
-A library for teaching introductory event driven programming
+A library for learning introductory event driven programming
