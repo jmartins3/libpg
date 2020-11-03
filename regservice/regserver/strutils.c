@@ -4,6 +4,7 @@ bool is_space(int c) {
 	return c == ' ' || c == '\t' ;
 }
 
+
 int str_next(const char text[], int start, char str[], int max_size) {
 	int i= start;
 	while(text[i] != LF && is_space(text[i])) ++i;

@@ -10,15 +10,13 @@
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 350
-// 
-// server codes
-#define ERR_TOPIC_DUPLICATE 432
-#define STATUS_OK			201
+
 
 #include "pg/graphics.h"
 #include "components.h"
-
+#include "battleship.h"
 #include "board.h"
+#include "strutils.h"
 
 
 #define GAME_NAME "battle_john_jmartins"
@@ -33,12 +31,21 @@
 #define MSG_PLAYER_X	20
 #define MSG_PLAYER_Y	35
  
- 
+
+
+#define MSG_X 200
+#define MSG_Y 300
+#define MSG_BC c_dgray
+#define MSG_TC c_orange
+
+
+MsgView msg;
+
 bool demo_mode = false;
 
 battleship_t battle;
 
-typedef enum state { Start, CreateGame, JoinGame, WaitPartner, InGame, Done, Error } state_t;
+typedef enum state { Start, CreateGame,  InGame, Done, Error } state_t;
 
 char *username;
 char opponent_name[64];
@@ -52,27 +59,28 @@ typedef enum result { WATER, HIT, BAD } result_t;
 
 void play_auto();
 
- 
-void create_game(char *game, int nplayers) {
-	char args[256];
-	int port = session_get_msg_port(game_session);
-	sprintf(args, "battleship %s %d\n%d\n\n",  game, nplayers, port);
-	gs_request(game_session, CREATE_GAME, args);
-}
 
-void join_game(char *game) {
-	char args[256];
-	int port = session_get_msg_port(game_session);
-	sprintf(args, "battleship %s\n%d\n\n",  game, port);
-	gs_request(game_session, JOIN_GAME, args);
-}
-
-void do_play(char *game, int x, int y, int target) {
+void do_play(char *game, int x, int y) {
 	char args[256];
 	char letter = x + 'A';
-	sprintf(args, "battleship %s\n%c %d %d\n\n", 
+	sprintf(args, "battleship %s\nshot %c %d\n\n", 
+				game, letter, y+1);
+	gs_request(game_session, PLAY, args);
+}
+
+
+void do_response(char *game, int x, int y, int target) {
+	char args[256];
+	char letter = x + 'A';
+	sprintf(args, "battleship %s\nresult %c %d %d\n\n", 
 				game, letter, y+1, target);
 	gs_request(game_session, PLAY, args);
+}
+
+
+void error(const char *msg) {
+	printf("error: %s\n", msg);
+	state = Error;
 }
 
 
@@ -100,7 +108,7 @@ bool play(int x, int y) {
 	if (p.x == -1) return false;
 	draw_place_try(&battle.oppon_board, p.x, p.y);
 	battle.last_play = p;
-	do_play(GAME_NAME, p.x, p.y, battle.last_target);
+	do_play(GAME_NAME, p.x, p.y);
 	
 	
 	turn = OPPON_TURN;
@@ -127,23 +135,7 @@ void toggle_board(int x, int y) {
 	}
 }
 	
-void mouse_handler(MouseEvent me) {
-	if (me.type == MOUSE_BUTTON_EVENT && 
-		me.state == BUTTON_PRESSED) {
-		printf("do play at %d, %d, turn=%d, state=%d\n", me.x, me.y, turn, state);
-		if (me.button == BUTTON_LEFT && turn == MY_TURN && state == InGame) {
-			
-			play(me.x, me.y);
-		}
-	 
-	}
-}
 
-MsgView msg;
-#define MSG_X 200
-#define MSG_Y 300
-#define MSG_BC c_dgray
-#define MSG_TC c_orange
 
 
 void show_victory_message() {
@@ -153,20 +145,39 @@ void show_victory_message() {
 void show_loose_message() {
 	mv_show_text(&msg, "I loose!", ALIGN_CENTER);
 }
-		
 
-void process_opponent_response(int x, int y, int target) {
-	 // play format:  {A-J}' '{1-10} {0-5}
-	 
-	 printf("Process opponent response at %c-%d\n", 'A'+x, y+1);
-	 if (target >= 0) {
-		if ( val_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y) == 0 ) {
-			 
+
+void process_opponent_shot(int x, int y) {	
+	 int val = val_place(&battle.my_board, x, y);
+	 do_response(GAME_NAME, x, y, val);
+	 if (val > 0) {
+		 battle.total_injuries++;
+		 shot_place(&battle.my_board, x, y);
 		
-			fill_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y, target);
-			draw_place(&battle.oppon_board, battle.last_play.x, battle.last_play.y);
+		 if (battle.total_injuries == battle.total_parts) {
+			state = Done;
+			printf("I Loose\n");
+		
+			show_loose_message();
+			return;
+		 }
+	 }
+	 turn = MY_TURN;
+	 show_curr_player();
+}
+
+void process_opponent_result(int x, int y, int target) {
+	// play format:  {A-J}' '{1-10} {0-5}
+	 
+	if (x != battle.last_play.x || y != battle.last_play.y) {
+	 error("Inconsistent opponent result!\n"); return;
+	}
+	printf("Process opponent response at %c-%d\n", 'A'+x, y+1);
+	if (target >= 0) {
+		if ( val_place(&battle.oppon_board, x, y) == 0 ) {
+			fill_place(&battle.oppon_board, x, y, target);
+			draw_place(&battle.oppon_board, x, y);
 			if (target > 0 )   {
-				
 				++battle.total_hits;
 				printf("hit at %c-%d! total_hits=%d, total_parts=%d\n", 
 						battle.last_play.x+'A', battle.last_play.y +1,
@@ -180,23 +191,8 @@ void process_opponent_response(int x, int y, int target) {
 				}
 			}
 		}
-		
-	 }
-	 
-	 int val = val_place(&battle.my_board, x, y);
-	 battle.last_target = val;
-	 if (val != EMPTY) {
-		 battle.total_injuries++;
-		 if (battle.total_injuries == battle.total_parts) {
-			state = Done;
-			printf("I Loose\n");
-			do_play(GAME_NAME, 0, 0, val);
-			show_loose_message();
-			return;
-		 }
-	 }
-	 turn = MY_TURN;
-	 show_curr_player();
+
+	}
 	
 }
 
@@ -215,99 +211,91 @@ void play_auto() {
 	 
 	draw_place_try(&battle.oppon_board, p.x, p.y);
 	battle.last_play = p;
-	do_play(GAME_NAME, p.x, p.y, battle.last_target);
+	do_play(GAME_NAME, p.x, p.y);
 	
 	turn = OPPON_TURN;
 	show_curr_player();
 	return;
 }	
 	
-void on_msg(const char sender[], const char msg[]) {
-	 printf("msg send from group joiner %s: %s\n", sender, msg);
-	 
-	 if (state == WaitPartner) {
-		 printf("game is active!\n");
-		 state = InGame;
-		 strcpy(opponent_name, sender);
-		 turn = MY_TURN;
-		 show_curr_player();
-		 if (demo_mode) play_auto();
-		 return;
-	 }
-	 if (state == InGame && turn == OPPON_TURN) {
-		 char letter;
-		 int  num;
-		 int  target;
-		 sscanf(msg, "%c%d%d", &letter, &num, &target);
-		 process_opponent_response(letter-'A', num-1, target);
-	 }
+
+
+bool process_creation_response(const char *resp) {
+	int rank; 
+	
+	int res = sscanf(resp, "%s %d", opponent_name, &rank);
+	if (res != 2) return false;
+	if (rank == 1) {
+		printf("I start the game");
+		turn = MY_TURN;
+	}
+	else {
+		printf("The opponent start the game");
+		turn = OPPON_TURN;
+	}
+	
+	return true;
 }
 
-void get_opponent_from_response(const char *resp, char *opponent_name) {
-	int i=0;
-	while(resp[i] != '\n') ++i;
-	++i;
-	int j =0;
-	while(resp[i] != '\n') opponent_name[j++] =resp[i++];
-	opponent_name[j] = 0;
-	printf("opponent_name=%s\n", opponent_name);
-}
+
+
+#define MAX_RESP_TYPE_SIZE 10
+
+
+
+void on_msg(const char sender[], const char msg[]) {
+	printf("msg send from group joiner %s: %s\n", sender, msg);
+
+	if (state != InGame || turn != OPPON_TURN) {
+		error("Bad state"); return;
+	}
+	char msg_type[MAX_RESP_TYPE_SIZE] = {0};
+	int start = 0;
+	char letter = '.';
+	int num = -1;
 	
+	start = str_next(msg, start, msg_type, MAX_RESP_TYPE_SIZE, Letters);
+	if (start != -1) start = str_next_char(msg, start, &letter);
+	if (start != -1) start = str_next_int(msg, start, &num);
+	
+	if (start == -1 ) {
+		 error("Invalid message received!\n"); return;
+	}
+	
+	printf("msg received: type='%s', letter= '%c', num=%d\n", msg_type, letter, num);
+	if (strcmp("shot", msg_type) == 0) 	
+		process_opponent_shot(letter -'A', num-1);
+	else if (strcmp("result", msg_type)== 0) {
+		int target;
+		if ((start = str_next_int(msg, start, &target)) == -1) {
+			error("Invalid result message!\n"); return;
+		}
+		process_opponent_result(letter -'A', num-1, target);
+	}
+}
+
 
 void on_response(int status, const char response[]) {
-	if (status < 0) {
+	if (status < STATUS_OK) {
 		printf("error: %s\n", response);
 		state = Error;
 		return;
 	}
 	switch(state) {
 		case Start:
-			if (status != STATUS_OK) {
-				printf("error: %s\n", response);
-				state = Done;
-			}
-			else {
-				printf("response: %s\n", response);
+				printf("Now create the game\n");
 				state = CreateGame;
-				create_game(GAME_NAME, 2);
-			}
-			break;
+				gs_new_game(game_session, GAME_NAME);
+				break;
 		case CreateGame:
-			if (status != STATUS_OK) {
-				printf("error: %s\n", response);
-				if (status == ERR_TOPIC_DUPLICATE) {
-					get_opponent_from_response(response, opponent_name);
-					turn = OPPON_TURN;
-					state = JoinGame;
-					
-					join_game(GAME_NAME);
+				printf("game started!\n");
+				if (process_creation_response(response)) {
+					state = InGame;
+					show_curr_player();
 				}
-				else {
+				else
 					state = Error;
-				}
-			}
-				
-			else {
-				printf("I start game!\n");
-				turn = MY_TURN;
-				show_curr_player();
-				
-				state = WaitPartner;
-			
-			}
-			break;
-		case JoinGame:
-			if (status != STATUS_OK) {
-				state = Error;
-			}
-			else {
-				printf("Opponent start game!\n");
-				printf("game is active!\n");
-				state = InGame;
-				turn = OPPON_TURN;
-				show_curr_player();
-			}	
-			break;
+				break;
 		default:
 			break;
 	}
@@ -319,6 +307,20 @@ void timer_handler() {
 	if (turn == MY_TURN && state == InGame)
 		if (demo_mode) play_auto();
 }
+
+
+void mouse_handler(MouseEvent me) {
+	if (me.type == MOUSE_BUTTON_EVENT && 
+		me.state == BUTTON_PRESSED) {
+		printf("do play at %d, %d, turn=%d, state=%d\n", me.x, me.y, turn, state);
+		if (me.button == BUTTON_LEFT && turn == MY_TURN && state == InGame) {
+			
+			play(me.x, me.y);
+		}
+	 
+	}
+}
+
 	
 int main(int argc, char *argv[]) {
 	srand(time(NULL));
@@ -341,10 +343,12 @@ int main(int argc, char *argv[]) {
 		server_ip = getenv("REG_SERVER_IP");
 		username = getenv("GAME_USER");
 	}
- 
+
 	graph_regist_mouse_handler(mouse_handler);
 	graph_regist_timer_handler(timer_handler, 500);
-	 
+	
+	state = Start;
+	show_curr_player();
 	game_session = gs_connect(server_ip, username, on_response, on_msg);
 	printf("\nStart!\n\n");
 	graph_start();

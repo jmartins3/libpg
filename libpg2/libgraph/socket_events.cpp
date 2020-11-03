@@ -77,11 +77,12 @@ static msg_request_t *mr_generic_srv(const char ip_addr[], int ip_port,
 // creator of a sesssion object representing an active connection with a group server
 static session_t gs_session_create(const char gs_addr[], 
 						const char user[],
-						const char pass[],
 						ResponseEventHandler on_response,
 						MsgEventHandler on_msg) {
 	session_t session = (session_t) malloc(sizeof(sess_t));
+	char pass[64];
 	
+	sprintf(pass, "%s_pass", user);
 	strcpy(session->sip, gs_addr);
 	strcpy(session->user, user);
 	strcpy(session->pass, pass);
@@ -102,10 +103,9 @@ static session_t gs_session_create(const char gs_addr[],
 // on a connection a list battleship games command is send
 session_t gs_connect(const char gs_addr[], 
 					 const char user[],
-					 const char pass[],
 					 ResponseEventHandler on_response,
 					 MsgEventHandler on_msg) {
-	session_t session = gs_session_create(gs_addr, user, pass, on_response, on_msg);
+	session_t session = gs_session_create(gs_addr, user, on_response, on_msg);
 	msg_request_t *mr = mr_gs_connect(session);
 	exec_request(mr);
 	return session;

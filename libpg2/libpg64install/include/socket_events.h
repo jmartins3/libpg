@@ -24,9 +24,8 @@ extern "C" {
 // command to connect to a group server 
 // for future requests
 // on a connection a list battleship games command is send
-session_t gs_connect(const char gs_addr[], 
+session_t gs_connect(const char gs_ip_addr[], 
 					 const char user[],
-					 const char pass[],
 					 ResponseEventHandler on_response,
 					 MsgEventHandler on_msg);
  

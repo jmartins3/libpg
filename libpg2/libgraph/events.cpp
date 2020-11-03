@@ -83,7 +83,7 @@ static MsgEventHandlerExt forced_msg_handler;
 
 
 
-struct comm_cb gs_force_callbacks(ResponseEventHandlerExt on_response, MsgEventHandlerExt on_msg) {
+comm_cb_t gs_force_callbacks(ResponseEventHandlerExt on_response, MsgEventHandlerExt on_msg) {
 	struct comm_cb ccb = {
 		forced_response_handler,
 		forced_msg_handler

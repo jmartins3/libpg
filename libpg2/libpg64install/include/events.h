@@ -23,6 +23,15 @@ typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
 typedef  void (*ResponseEventHandlerExt)(int status, const char response[], void * context);
 typedef  void (*MsgEventHandlerExt)(const char sender[], const char msg[], void * context);
 
+
+// wrapper for game server communication callbacks
+typedef struct comm_cb {
+	ResponseEventHandlerExt on_response;
+	MsgEventHandlerExt on_msg;
+} comm_cb_t;
+
+
+
 /*------------------------------------------
  * events callback registration
  * -----------------------------------------*/
@@ -80,7 +89,7 @@ typedef struct KeyEvent {
 
 
 /*--------------------------------------------
- *  callbacks 
+ *  user interface callbacks 
  *-------------------------------------------*/
 
 typedef void (*KeyEventHandler)(KeyEvent ke);
@@ -88,11 +97,6 @@ typedef void (*MouseEventHandler)(MouseEvent me);
 typedef void (*TimerEventHandler)();
 
 
-// wrapper for game server communication callbacks
-struct comm_cb {
-	ResponseEventHandlerExt on_response;
-	MsgEventHandlerExt on_msg;
-};
 /*--------------------------------------------
  * publics
  *********************************************/
@@ -100,6 +104,8 @@ struct comm_cb {
 #ifdef __cplusplus 
 extern "C" {
 #endif
+
+comm_cb_t gs_force_callbacks(ResponseEventHandlerExt on_response, MsgEventHandlerExt on_msg);
 
 /*------------------------------------
  * regist the keyboard event handler

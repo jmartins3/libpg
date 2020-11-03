@@ -1,57 +1,75 @@
 
 #include "pg/graphics.h"
+#include "battleship.h"
 
+enum new_game_state { GameCreation, WaitingPartner, JoiningGame, Done, Error };
 
-enum new_game_state { Creation, WaitingPartner, Joining, Done, Error };
+typedef struct context {
+	enum new_game_state state;
+	comm_cb_t old_comm_cb;
+	session_t session;
+	char *game_name;
+	char opponent_name[64];
+	int rank;
+} context_t;
 
-static enum new__game_state state;
-static struct comm_cb  old_comm_cb;
-static session_t session;
-static const char *game_name;
-static opponent_game[64];
+static void on_msg(const char sender[], const char msg[], void*context);
+static void on_response(int status, const char response[], void *context);
 
-void create_game(char *game, int nplayers) {
+context_t *create_context(session_t session, const char *game_name) {
+	context_t *ctx = malloc(sizeof(context_t));
+	
+	ctx->old_comm_cb = gs_force_callbacks(on_response, on_msg);
+	ctx->state = GameCreation;
+	ctx->session = session;
+	ctx->game_name = strdup(game_name);
+	ctx->rank = 0;
+	return ctx;
+}
+
+void create_game(session_t session, const char *game, int nplayers) {
 	char args[256];
-	int port = session_get_msg_port(game_session);
+	int port = session_get_msg_port(session);
 	sprintf(args, "battleship %s %d\n%d\n\n",  game, nplayers, port);
-	gs_request(game_session, CREATE_GAME, args);
+	gs_request(session, CREATE_GAME, args);
 }
 
-void join_game(char *game) {
+void join_game(session_t session, char *game) {
 	char args[256];
-	int port = session_get_msg_port(game_session);
+	int port = session_get_msg_port(session);
 	sprintf(args, "battleship %s\n%d\n\n",  game, port);
-	gs_request(game_session, JOIN_GAME, args);
+	gs_request(session, JOIN_GAME, args);
 }
 
-void do_play(char *game, int x, int y, int target) {
-	char args[256];
-	char letter = x + 'A';
-	sprintf(args, "battleship %s\n%c %d %d\n\n", 
-				game, letter, y+1, target);
-	gs_request(game_session, PLAY, args);
-}
-
-
-static void abort(int status, const char *error_msg) {
-	gs_force_callbacks(old_comm_cb.on_response, old_comm_cb.on_msg);
-	printf("error: %s\n", response);
-	session->on_response(status, error_msg);
-	state = Error;
+static void connection_abort(int status, const char *error_msg, context_t *ctx) {
+	gs_force_callbacks(ctx->old_comm_cb.on_response, ctx->old_comm_cb.on_msg);
+	ctx->session->on_response(status, error_msg);
+	free(ctx->game_name);
+	free(ctx);
 }	
 
-static void done(
+static void done(context_t *ctx) { 
+	char resp[256];
+	
+	gs_force_callbacks(ctx->old_comm_cb.on_response, ctx->old_comm_cb.on_msg);
+	// Response message
+	// 201 Status Ok
+	// <opponent_name> <game_name> <rank>
+	sprintf(resp, "%s %d\n\n", ctx->opponent_name,   ctx->rank);
+	ctx->session->on_response(STATUS_OK, resp);
+	free(ctx->game_name);
+	free(ctx);
+}
 
-static void on_msg(const char sender[], const char msg[]) {
+static void on_msg(const char sender[], const char msg[], void * _ctx) {
+	context_t *ctx = (context_t *) _ctx;
 	 printf("msg send from group joiner %s: %s\n", sender, msg);
 	 
-	 if (state == WaitPartner) {
+	 if (ctx->state == WaitingPartner) {
 		 printf("game is active!\n");
-		 state = InGame;
-		 strcpy(opponent_name, sender);
-		 turn = MY_TURN;
-		 show_curr_player();
-		 if (demo_mode) play_auto();
+		 strcpy(ctx->opponent_name, sender);
+		 ctx->rank = 1;
+		 done(ctx);
 		 return;
 	 }
 }
@@ -68,46 +86,43 @@ void get_opponent_from_response(const char *resp, char *opponent_name) {
 
 
 
-static void on_response(int status, const char response[]) {
+static void on_response(int status, const char response[], void *_ctx) {
+	context_t *ctx = (context_t *) _ctx;
 	if (status < 0) {
-		abort(status, response);
+		connection_abort(status, response, ctx);
 		return;
 	}
-	switch(state) {
-		case Creation:
+	switch(ctx->state) {
+		case GameCreation:
 			if (status != STATUS_OK) {
-				printf("error: %s\n", response);
 				if (status == ERR_TOPIC_DUPLICATE) {
-					get_opponent_from_response(response, opponent_name);
-					turn = OPPON_TURN;
-					state = JoinGame;
-					
-					join_game(GAME_NAME);
+					get_opponent_from_response(response, ctx->opponent_name);
+					ctx->state = JoiningGame;	
+					join_game(ctx->session, ctx->game_name);
 				}
 				else {
-					abort(status, "Unexpected error creating game");
+					connection_abort(status, response, ctx);
 				}
 			}
 				
 			else {
 				printf("I start game!\n");	
-				state = WaitingPartner;
+				ctx->state = WaitingPartner;
 			}
 			break;
-	
 		 
-		case JoinGame:
+		case JoiningGame:
 			if (status != STATUS_OK) {
-				state = Error;
+				connection_abort(status, response, ctx);
 			}
 			else {
 				printf("Opponent start game!\n");
 				printf("game is active!\n");
-				state = InGame;
-				turn = OPPON_TURN;
-				show_curr_player();
+				ctx->rank = 2;
+				done(ctx);
 			}	
 			break;
+			
 		default:
 			break;
 	}
@@ -115,14 +130,9 @@ static void on_response(int status, const char response[]) {
 }
 
 
-void gs_new_game(session_t _session, const char *_game) {
-	
-	old_comm_cb = gs_force_callbacks(on_response, on_msg);
-	state = Creation;
-	session = _session;
-	game_name = strdup(_game);
-	create_game(_game, 2);
-	
+void gs_new_game(session_t session, const char *game) {
+	session->context = create_context(session, game);
+	create_game(session, game, 2);
 }
 	
 

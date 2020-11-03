@@ -16,6 +16,13 @@ void fill_place(board_t *board, int x, int y, int val) {
 	board->places[y][x] = val;
 }
 
+void shot_place(board_t *board, int x, int y) {
+	fill_place(board, x, y, -val_place(board,x, y));
+	int screen_x = board->x + x*SQUARE_SIDE + SQUARE_SIDE/2-1;
+	int screen_y = board->y + y*SQUARE_SIDE + SQUARE_SIDE/2-1;
+	graph_rect(screen_x, screen_y, 3, 3, c_white, true);
+}
+
 int val_place(board_t *board, int x, int y) {
 	return board->places[y][x];
 }
@@ -294,10 +301,6 @@ void hide_board(board_t *board) {
 	}
 }
 
-int shot_place(board_t *board, int x, int y) {
-	if (x < 0 || x >= NSQUARES || y < 0 || y > NSQUARES) return -1;
-	return val_place(board, x, y);
-}
 
 Point place_selected(board_t *board, int x, int y) {
 	int size = NSQUARES * SQUARE_SIDE;

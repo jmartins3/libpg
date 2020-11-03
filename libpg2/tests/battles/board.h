@@ -91,6 +91,8 @@ void create_board(board_t *board, int x, int y);
 
 void draw_place(board_t *board, int x, int y);
 
+void shot_place(board_t *board, int x, int y);
+
 void draw_place_try(board_t *board, int x, int y);
 
 void draw_board(board_t *board, bool draw_places);
