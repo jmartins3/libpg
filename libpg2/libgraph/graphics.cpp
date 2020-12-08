@@ -22,34 +22,37 @@
  *------------------------------------*/
 SDL_Renderer *screen;
 
-
+pthread_t ui_thread;
 
 // used for loop interruption
-int __done;
+volatile int __done;
 
 static int window_height;
 static int window_width;
 	
 static void interrupted(int s) {
-	graph_exit();
 	__done = 1;
 }
   
 
 
-static int internal_init(bool with_timer, int width, int height) {
+static int internal_init(const char title[], bool with_timer, int width, int height) {
 	SDL_Window *window= NULL;
 		
 	signal(SIGINT, interrupted);
-	 
+	
 	if ( SDL_Init(SDL_INIT_EVERYTHING) < 0 ) {
 		printf("SDL initialization error: %s\n", SDL_GetError());
 		return -1;
 	}
-	atexit(SDL_Quit);
+ 
+    __USER_EVENTS = SDL_RegisterEvents(4);	
+	if (__USER_EVENTS == (unsigned int) -1) {
+		printf("Can't regist new event type\n");
+		return  -1;	
+	}		 
 	
-  
-	window = SDL_CreateWindow("PG Graphics", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
 							  width, height, SDL_WINDOW_SHOWN);
 	
 	if (window == NULL) return -1;
@@ -66,6 +69,7 @@ static int internal_init(bool with_timer, int width, int height) {
     window_width = width;
     window_height = height;
     
+    ui_thread = pthread_self();
 	return 1;
 }
 
@@ -155,29 +159,43 @@ RGB graph_rgb(int r, int g, int b) {
 }
 
 
+RGB graph_transparent() {
+	return 0;
+}
+
 void graph_pixel(short x, short y, RGB color) {
 	pixelColor(screen, x, y, color);
 	if (sshot != NULL)  {
 		RGB* pixels = (RGB*) sshot->pixels;
 	    *(pixels + y*graph_get_width() + x) = color;
-	 }
+	}
+}
+
+
+
+void  graph_exit2(const char *name) {
+
+   __done = true;
+   
+   if (ui_thread != pthread_self()) {
+   
+		SDL_Event event;
+		SDL_memset(&event, 0, sizeof(event));
+		event.user.type = _END_LOOP;
+		event.user.code = END_SESSION_EVENT;
+		event.user.data1 = (char*) name;
+		event.user.data2 = NULL;
+
+		event.type = _END_LOOP;
+
+		SDL_PushEvent(&event);
+    }
 }
 
 void  graph_exit() {
-	SDL_Event event;
-    SDL_UserEvent userevent;
-
-    userevent.type = SDL_USEREVENT;
-    userevent.code = END_SESSION_EVENT;
-    userevent.data1 = NULL;
-    userevent.data2 = NULL;
-
-    event.type = SDL_USEREVENT;
-
-    event.user = userevent;
-
-    SDL_PushEvent(&event);
+	graph_exit2(NULL);
 }
+
 
 void graph_line(short x1, short y1, short x2, short y2, RGB color) {
 	lineColor(screen, x1, y1, x2, y2, color);
@@ -226,11 +244,11 @@ void graph_round_rect(short x0, short y0, short w, short h, RGB color, bool toFi
 		roundedRectangleColor(screen, x0, y0, x1, y1, 10, (Uint32) color);
 }
 
-int graph_init2(int width, int height) {
+int graph_init2(const char title[], int width, int height) {
 	SDL_Rect clip;
 	
 	 	
-	if (internal_init(true, width, height) < 0)
+	if (internal_init(title, true, width, height) < 0)
 		 return -1;
  
 	 
@@ -239,14 +257,16 @@ int graph_init2(int width, int height) {
 	clip.w = width;
 	clip.h = height;	
 	SDL_RenderSetViewport(screen, &clip);
-	
+	printf("start server!\n");
 	start_server();
 	
+	printf("server started!\n");
+	 
 	return 0;
 }
 
 int graph_init() {
-	return graph_init2(GRAPH_WIDTH, GRAPH_HEIGHT);
+	return graph_init2("PG Graphics", GRAPH_WIDTH, GRAPH_HEIGHT);
 }
 
 int graph_get_width() {

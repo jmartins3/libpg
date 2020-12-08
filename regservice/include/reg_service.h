@@ -1,6 +1,6 @@
 #pragma once
 
-/*-----------------------------------------------------------------
+/**-----------------------------------------------------------------
  * Player registration service
  * 
  * "REGIST USER"
@@ -122,6 +122,21 @@
  * <LF>
  * 
  * 
+ * "DESTROY_TOPIC"
+ * <username> <passwd>
+ * <theme> <topic> <LF>
+ * <LF>
+ * 
+ * Response:
+ * <status> <LF> // 200 -ok 400 - Invalid command 500 - Server error
+ * <LF>
+ * 
+ * Comments:
+ * A message is send to the owner of a topic presenting the new joiner
+ * ENTER_PARTNER <LF>
+ * <username>  <theme>  <topic> <total_joiners><LF>
+ * <LF>
+ * 
  * "JOIN A TOPIC"
  * 
  * Request:
@@ -137,9 +152,9 @@
  * <LF>
  * 
  * Comments:
- * A message is send to the owner of a topic presenting the new joiner
- * ENTER_PARTNER <LF>
- * <topic> <username>  <total_joiners><LF>
+ * A message is send to the topic  partners informating the topi destruction  
+ * TOPIC_DESTROYED <LF>
+ * <username>  <theme>  <topic> <total_joiners><LF>
  * <LF>
  * 
  *
@@ -160,7 +175,7 @@
  * A message is send to the owner of a topic informing the leaving partner
  * 
  * LEAVE_PARTNER <LF>
- * <topic> <username> <total_joiners> <LF>
+ * <username>  <theme>  <topic> <total_joiners><LF>
  * <LF>
  * 
  * "BROADCAST A MESSAGE TO A TOPIC GROUP"

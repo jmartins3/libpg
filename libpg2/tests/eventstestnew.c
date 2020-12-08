@@ -11,6 +11,8 @@
 #include "pg/graphics.h"
 #include "pg/events.h"
 
+#define GRAPH_WIDTH 1024
+#define GRAPH_HEIGHT 768
 
 /* handlers */
  
@@ -63,9 +65,9 @@ int  main() {
 	// "myMouseEventHandler" function will process the mouse events
 	graph_regist_mouse_handler(myMouseEventHandler);
 	
-	graph_image("DSC_0033.JPG", 0, 0, GRAPH_WIDTH, GRAPH_HEIGHT);
+	graph_image("media/DSC_0033.JPG", 0, 0, GRAPH_WIDTH, GRAPH_HEIGHT);
 	
-	sound_play("videogames.wav");
+	sound_play("media/videogames.wav");
 	// start the graph engine	
 	graph_start();
 	

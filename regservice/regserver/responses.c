@@ -90,17 +90,17 @@ typedef struct content_builder {
 
 
 void response_write_completion(uv_write_t *req, int status) {
-  if (status) {
-        fprintf(stderr, "write response error %s\n", uv_strerror(status));
-        return;
-    }
-	channel_t *chn = container_of(req, channel_t, writereq);
-	
-	
+	channel_t * chn = (channel_t*) req->handle;
+	if (status) {
+		fprintf(stderr, "write response error %s\n", uv_strerror(status));
+		
+	}
+
+
 	printf("free: command\n"); inc_frees();
 	free(chn->cmd);
 	chn->cmd= NULL;
- 
+	free(req);
 	printf("response completed!\n");
   
 }
@@ -176,7 +176,8 @@ void send_status_response(channel_t *chn, int status) {
   	
 	uv_buf_t buf = uv_buf_init(builder.buf, builder.curr);
 	 
-	uv_write(&chn->writereq, (uv_stream_t *) chn, &buf, 1, response_write_completion);
+	uv_write_t *req = (uv_write_t *) malloc(sizeof(uv_write_t));
+	uv_write(req, (uv_stream_t *) chn, &buf, 1, response_write_completion);
 }
 
 void send_response(channel_t *chn, Answer *answer) {
@@ -191,8 +192,9 @@ void send_response(channel_t *chn, Answer *answer) {
     
     printf("Response:\n'%s'\n", builder.buf);
     uv_buf_t buf = uv_buf_init(builder.buf, builder.curr);
-	 
-	uv_write(&chn->writereq, (uv_stream_t *) chn, &buf, 1, response_write_completion);
+	
+	uv_write_t *req = (uv_write_t *) malloc(sizeof(uv_write_t)); 
+	uv_write(req, (uv_stream_t *) chn, &buf, 1, response_write_completion);
     
 }
 

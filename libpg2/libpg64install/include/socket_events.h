@@ -12,98 +12,84 @@
 #include "uv_srv.h"
 
 
-#define CREATE_GAME "CREATE_TOPIC"
-#define JOIN_GAME   "JOIN_TOPIC"
-#define PLAY		"BROADCAST"
-
-
 #ifdef __cplusplus 
 extern "C" {
 #endif
 
-// command to connect to a group server 
-// for future requests
-// on a connection a list battleship games command is send
+
+extern unsigned int __USER_EVENTS;
+
+#define _RESPONSE_EVENT (__USER_EVENTS)
+#define _NOTIFICATION_EVENT (__USER_EVENTS+1)
+#define _TIMER_EVENT (__USER_EVENTS+2)
+#define _END_LOOP (__USER_EVENTS+3)
+
+
+// simplified api for group server communication
+
+/**
+ *  Command to connect to a group server for future requests
+ */
 session_t gs_connect(const char gs_ip_addr[], 
 					 const char user[],
-					 ResponseEventHandler on_response,
-					 MsgEventHandler on_msg);
- 
-							
+					 ResponseEventHandlerEx on_response,
+					 MsgEventHandlerEx on_msg,
+					 void *ctx);
+ 				
 
-/*
+/**
  * A request/response async pattern with tcp sockets for group server
  */
 void gs_request(session_t session, const char cmd[], const char args[]);
 
 
-
-// simplified api for group server communication
+/**
+ * get the session port for asynvhronous messaging receiving
+ */
 int session_get_msg_port(session_t);
 
-void  gs_end(session_t session);
+ 
+/**
+ * destroy the given session
+ */
+void gs_session_destroy(session_t session);
 
-
-void ge_get_games(session_t session);
-
-
-void gs_create_game(session_t session, char *name, int max_opponents);
-
-
-void gs_join_game(session_t session, char *name);
-
-
-// just the owner of the game invoke the this
-void gs_start_game(session_t session, char *opponnents_order);
-
-void gs_end_game(session_t session);
-
-void gs_play(session_t session);  
-
-
-/*
+/**
  * A request/response async pattern with tcp sockets
  */
-void sock_request(const char ip_addr[], 
+void tcp_request(const char ip_addr[], 
 					int ip_port, 
 					const char cmd[],
-					ResponseEventHandler on_response);
+					ResponseEventHandlerEx on_response);
 
-/*
- * Invite a peer to create a virtual communication channel
+
+/**
+ * Internal function to synchronize the saving
+ * of  a received group partner message
  */
-void peer_invite(const char ip_addr[], int ip_port, PeerEventHandler on_answer);
+void save_notification(session_t session);
 
-/*
- * accept a peer to create a virtual communication channel
+/**	
+ * Internal function to synchronize the reception of
+ * a received group partner message
+ */ 
+char* get_notification(session_t session);
+
+/**
+ * atomically check the state is closing or closed and if  not set to closing
  */
-void peer_accept(PeerEventHandler on_invite);
+bool try_close_session(session_t session);
 
-
-/*
- * send to peer.
- * For now, it is a synchronous operation, 
- * If we face problems, we have to turn it asynchronous, too!
+/**
+ * internal function to send the response to the graph loop
+ * for the given request
  */
-
-int  peer_sendto(PeerSock other, char msg[]);
-
-
-
-/*
- * subscribe a stream of peer messages
- */
-void start_receive(PeerSock other, ReadEventHandler on_read);
-
-/*
- * peer_end.
- * For now, it corersponds just to the undelying socket close
- */
-void peer_end(PeerSock peer);
-				  
-
-
 void send_graph_response(msg_request_t *msg);
+
+/**
+ * internal function to send the message to the graph loop
+ * from the partner of the given group session
+ */
 void send_graph_notification(session_t session);
  
 #ifdef __cplusplus 

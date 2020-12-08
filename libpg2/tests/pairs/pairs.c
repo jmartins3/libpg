@@ -1,53 +1,11 @@
 #include <stdio.h>
-#include "pg/graphics.h"
-#include "pg/events.h"
-#include "clock.h"
-#include "counter.h"
 #include <stdbool.h>
 
+#include "pg/pglib.h"
+#include "pairs.h"
 
-#define CARD_WIDTH		73
-#define CARD_HEIGHT 	97
-#define CARD_BORDER_X	10
-#define CARD_BORDER_Y	5
-
-#define NLINES			4
-#define NCOLS			6
-
-#define BOARD_X			66
-#define BOARD_Y			460
-#define BOARD_WIDTH    (CARD_BORDER_X + (CARD_BORDER_X + CARD_WIDTH)*NCOLS)
-#define BOARD_HEIGHT   (CARD_BORDER_Y + (CARD_BORDER_Y + CARD_HEIGHT)*NLINES)
-
-#define NVALUES (NLINES*NCOLS)
-#define NPAIRS (NVALUES/2)
-
-
-
-#define VISIBLE 1
-#define HIDDEN  2
-#define REMOVED 3
-
-struct location {
-	int line;
-	int col;
-};
-typedef struct location Location;
-
-
-struct card {
-	int value;
-	int state;
-};
-typedef struct card Card;
-
-struct pairs_game {
-	Card cards[NLINES][NCOLS];
-	int remaining;
-	Location first;
-};
-typedef struct pairs_game PairsGame;
-
+#define GRAPH_WIDTH 1024
+#define GRAPH_HEIGHT 768
 
 // globals
 char cardNames[][30] = {
@@ -56,8 +14,10 @@ char cardNames[][30] = {
 	"d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "dt", "da", "dj", "dk", "dq",
 	"s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "st", "sa", "sj", "sk", "sq"
 };
+
+
 PairsGame game;
-Clock clock;
+Clock clk;
 Counter counter;
 bool to_hide;
 Location hide1, hide2;
@@ -66,19 +26,10 @@ bool game_end;
 
 Location remove1,remove2;
 
-struct rem_anim {
-	int width, height;
-	int line, col;
-	bool stopped;
-};
-typedef struct rem_anim RemAnim;
+RemAnim ranim1, ranim2;
 
-#define BASE_TIME 50
-#define HIDE_TIME 2000
 
-#define c_brown  graph_rgb(148, 79, 58)
-#define c_dark_brown  graph_rgb(75, 40, 30) 
-#define BACK_COLOR graph_rgb(35, 35, 35) 
+
 
 Card create_card(int value) {
 	Card card;
@@ -88,7 +39,6 @@ Card create_card(int value) {
 	return card;
 }
 
-RemAnim ranim1, ranim2;
 
 
 RemAnim create_anim(int line, int col) {
@@ -99,14 +49,16 @@ RemAnim create_anim(int line, int col) {
 	return ra;
 }
 
+
+int rand_between(int li, int ls) {
+	return (rand() % (ls-li)) + li;
+}
+
+
 void show_vitory() {
 	char msg[120];
 	sprintf(msg, "You win in %d moves!", counter.val);
 	graph_text(120, 230, graph_rgb(200,200,200), msg, LARGE_FONT);
-}
-
-int rand_between(int li, int ls) {
-	return (rand() % (ls-li)) + li;
 }
 
 void show_card_aux(int line, int col, int w, int h) {
@@ -175,8 +127,8 @@ void build_board() {
 	
 	game.first.line =-1;
 	game.remaining = NVALUES;
-	clock = create_clock(10,30, c_orange, BACK_COLOR);
-	counter = create_counter(560,30, c_orange, BACK_COLOR);
+	clk_create(&clk, 10,30, MEDIUM_CLOCK,  c_orange, BACK_COLOR);
+	ct_create(&counter, 560,30, 0, "Jogadas: ", MEDIUM_FONT);
 	
 	
 }
@@ -204,8 +156,8 @@ void draw_board() {
 			 show_card(l,c);
 		}
 	}
-	draw_counter(counter);
-	draw_clock(clock);
+	ct_show(&counter);
+	clk_show(&clk);
 }
 
 int get_value(Location l) {
@@ -235,8 +187,8 @@ void hide_pair(Location l1, Location l2) {
 void play(Location l) {
 	if (game.cards[l.line][l.col].state != HIDDEN || to_hide || !ranim1.stopped ||
 	 !ranim2.stopped) return;
-	counter = inc(counter);
-	draw_counter(counter);
+	ct_inc(&counter);
+	ct_show(&counter);
 
 	game.cards[l.line][l.col].state = VISIBLE;
 	if (game.first.line == -1) {
@@ -282,8 +234,8 @@ void timerHandler() {
 		ranim2 = step_anim(ranim2);
 	++ticks;
 	if (ticks == 20) {
-		clock = tick(clock);
-		draw_clock(clock);
+		clk_tick(&clk);
+		clk_show(&clk);
 		ticks=0;
 	}
 }
@@ -292,14 +244,15 @@ void timerHandler() {
 void keyHandler(KeyEvent ke) {
 	if (ke.state == KEY_PRESSED) {
 		if (game.remaining == 0) graph_exit();
-		/*
+	 
 		else {
 			if (ke.keysym >= '1' && ke.keysym <= '9') {
 				char name[100];
 				sprintf(name, "screen%c.jpg", ke.keysym);
 				graph_save_screen(name);
 			}
-		*/	
+		}
+		 
 	}
 }
 

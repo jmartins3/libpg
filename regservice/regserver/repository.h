@@ -53,11 +53,18 @@ typedef struct user {
 	int  number;
 	int nthemes;					// total themes created
 	int ntopics;					// total topics created
+
 	int njoins;						// total joins on topics
 } user_t;
 
-
- 
+typedef struct user_session {
+	// must be the first field!!
+	user_t *user;
+	uv_tcp_t *chn;
+	// list of transient topics created in the current user session	
+	LIST_ENTRY transient_created_topics;
+	LIST_ENTRY transient_joined_topics;	
+} user_session_t;
 
 typedef struct theme {
 	LIST_ENTRY link;				// the link node
@@ -74,6 +81,8 @@ typedef struct topic {
 	char name[MAX_TOPIC_NAME+1];	// topic name
 	theme_t *belong_theme;
 	user_t *owner_user;
+	bool is_persistent;				// for now all the topics are non
+									// persistent
 	int njoiners;					// total topic joiners
 	int limit;						// max topic joiners
 	LIST_ENTRY joiners;				// topic joiners
@@ -82,7 +91,11 @@ typedef struct topic {
 
 typedef struct topic_joiner {
 	LIST_ENTRY link;				// the link node
-	user_t *joiner;
+	union {
+		user_t *joiner;
+		user_session_t *session; 	// for transient topics
+		void *content;
+	};
 	topic_t *topic;
 	int msg_port;					// user udp port  for messaging
 	struct sockaddr_in sock_addr;	// user ip address 
@@ -123,16 +136,20 @@ int themes_collection(names_result_t *res);
 topic_t * topic_search(char *theme, char *topic);
  
 	 
-int topic_create(char *theme_name, char *name, struct sockaddr_in *sock_addr, user_t *creator, char *old);
+int topic_create(char *theme_name, char *name, struct sockaddr_in *sock_addr, 
+				user_session_t *creator, char *old);
  
 	 
-int topic_remove(char *theme_name, char *name, user_t* remover);
+int topic_remove(char *theme_name, char *name, user_session_t* remover);
+
+int topic_destroy(char *theme_name, char *name, user_session_t* remover);
 
 
-int topic_join(char *theme_name, char *name, struct sockaddr_in *sock_addr,  user_t *joining_user, int *njoiners);
+int topic_join(char *theme_name, char *name, struct sockaddr_in *sock_addr,  
+		user_session_t *joining_user, int *njoiners);
 	 
 
-int topic_leave(char *theme_name, char *name, user_t *leaving_user, int *njoiners);
+int topic_leave(char *theme_name, char *name, user_session_t *leaving_user, int *njoiners);
 	 
 int topics_collection(char *theme_name, names_result_t *res);
 
@@ -141,6 +158,21 @@ int topic_joiners(char *theme_name, char *topic_name, joiner_info_t **joiners, i
 int topic_owner_info(char *theme_name, char *name, joiner_info_t *owner_info);
 
 int topic_joiner_search(char *theme_name, char *name, user_t *sender, char *user_dest, joiner_info_t *dest_info );
+
+
+#ifdef __cplusplus 
+extern "C" {
+#endif
+
+void topic_leave2(topic_t *topic, user_t *leaving_user);
+
+void topic_remove2(topic_t *topic, user_t* remover);
+
+#ifdef __cplusplus 
+}
+#endif
+
+
 //
 // users
 //

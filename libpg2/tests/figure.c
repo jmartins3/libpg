@@ -1,5 +1,5 @@
 // ficheiro de include necessário
-#include "pg/graphics.h"
+#include "pg/pglib.h"
 
 int main() {
 	// chamada necessária antes da iniciação da biblioteca

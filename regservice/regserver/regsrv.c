@@ -40,6 +40,10 @@ void on_close(uv_handle_t* handle) {
 		uv_close((uv_handle_t* ) &server, on_close_server);
 }
 
+void on_shutdown(uv_shutdown_t*req, int status) {
+	uv_close((uv_handle_t*) req->handle, on_close);
+}
+	
 void stop_server() {
 	terminated = true;
 }
@@ -50,7 +54,10 @@ static void read_completion(uv_stream_t *stream, ssize_t nread, const uv_buf_t *
     if (nread > 0) {
 		chn_process(channel, nread);
     }
-    else if (nread == UV_EOF) uv_close((uv_handle_t*) channel, on_close);
+    else if (nread <= UV_EOF) {
+		uv_shutdown_t *req = (uv_shutdown_t *) malloc(sizeof(uv_shutdown_t));
+		uv_shutdown(req, stream, on_shutdown);
+	}
         
 }
 	

@@ -13,7 +13,12 @@
 #include 	<stdbool.h>
 #include 	<signal.h>
 #include 	"../include/audio.h"
-#include  "../include/socket_events.h"
+#include 	"../include/list.h"
+#include  	"../include/socket_events.h"
+
+#ifndef STATUS_OK
+#define STATUS_OK 201
+#endif
 
 using namespace std;
 
@@ -25,6 +30,10 @@ using namespace std;
 #define NTICKSREPEAT 	6	// 150 ms
 
 
+unsigned int __USER_EVENTS;
+
+// list of app close listeners
+
 
 static map<uint, KeyEvent> pressedKeys;
 
@@ -34,7 +43,7 @@ static KeyEventHandler keyHandler;
 static MouseEventHandler mouseHandler;
 static TimerEventHandler timerHandler;
 
-// SDL timer allocated
+// SDL allocated timer 
 static SDL_TimerID my_timer_id;
 
 
@@ -77,25 +86,10 @@ static void convertMouseMotionEvent(SDL_MouseMotionEvent *msdl, MouseEvent *me) 
 	
 }
 
-static ResponseEventHandlerExt forced_response_handler;
 
-static MsgEventHandlerExt forced_msg_handler;
-
-
-
-comm_cb_t gs_force_callbacks(ResponseEventHandlerExt on_response, MsgEventHandlerExt on_msg) {
-	struct comm_cb ccb = {
-		forced_response_handler,
-		forced_msg_handler
-	};
-	
-	forced_response_handler = on_response;
-	forced_msg_handler = on_msg;
-	return ccb;
-		
-}
 
 #define MAX_CLICK_PERIOD	20
+
 static MouseEvent lastMe;
 static clock_t lastTicks;
 static bool auto_repeat;
@@ -147,13 +141,14 @@ static uint my_callbackfunc(Uint32 interval, void *param)
     into the queue, and causes our callback to be called again at the
     same interval: */
 
-	
-    event.user.type = SDL_USEREVENT;
+	SDL_memset(&event, 0, sizeof(event));
+	  
+    event.user.type = _TIMER_EVENT;
     event.user.code = USER_BASETIME_EVENT;
     event.user.data1 = NULL;
     event.user.data2 = NULL;
 
-    event.type = SDL_USEREVENT;
+    event.type = _TIMER_EVENT;
     
     SDL_PushEvent(&event);
     return(interval);
@@ -222,79 +217,119 @@ void timebase_regist() {
 }
 
 
-static void dispatch_response_cb(session_t session, msg_request_t *msg) {
-	if (forced_response_handler != NULL)
-		forced_response_handler(msg->status, msg->resp, 
-				session != NULL ? session->context : NULL);
-	else
-		msg->on_response(msg->status, msg->resp);
+static void dispatch_response_cb(session_t session, msg_request_t *msg) {	 
+	msg->on_response(msg->status, msg->resp, session == NULL ? NULL: session->context);
 }
 
-static void dispatch_msg_cb(session_t session, const char *sender, const char *msg) {
-	if (forced_msg_handler != NULL)
-		forced_msg_handler(sender, msg, session->context);
-	else
-		session->on_msg(sender, msg);
+static void dispatch_msg_cb(session_t session, const char *msg) {
+	session->on_msg(msg, session->context);
 }
+
+
+static void prepare_dispatch_response(msg_request_t *msg) {
+	if (msg != NULL) {
+		
+		if (msg->session != NULL && msg->session->chn != NULL) {
+				msg->session->chn->msg = NULL;
+		}
+		// adjust status 
+#ifdef DEBUG
+		printfprintf("msg status = %d,msg='%s'\n", msg->status, msg->resp);
+#endif
+		if (msg->status == 0 || msg->status == STATUS_OK) { // no comm error
+			if (msg->resp == NULL) {
+				msg->session->state = Closed;
+				pthread_mutex_destroy(&msg->session->lock);
+				pthread_cond_destroy(&msg->session->empty);
+			}
+			else sscanf(msg->resp, "%d", &msg->status);
+			
+		
+		
+		}
+		dispatch_response_cb(msg->session, msg);
+		
+			 
+		if (msg->resp != NULL) free(msg->resp);
+		
+		if (msg->cmd != NULL) free(msg->cmd);
+	
+		free(msg);
+	}
+	
+}
+
+static void prepare_dispatch_notification(session_t session) {
+	
+	if (session != NULL && session->notification != NULL) {
+		if (session->state == Closed) {
+			printf("session notification after session closed!\n"); 
+		}
+		char* msg = get_notification(session);
+#ifdef DEBUG
+		printf("session notification = '%s'\n", msg);
+#endif
+		dispatch_msg_cb(session, msg);
+		free(msg);
+		 
+	}	 
+}
+
 		
 static bool process_user_event(SDL_Event *event) {
+	 if (event->user.code == REQUEST_RESPONSE_EVENT) {
+		msg_request_t *msg = (msg_request_t*) event->user.data1;
+		
+		prepare_dispatch_response(msg);
+	}
+	 
+	return true;
+					
+}
+
+static bool process_timer_event(SDL_Event *event) {
 	if (event->user.code == USER_BASETIME_EVENT) {
 		timebase_handler();
 		
 	}
-	else if (event->user.code == END_SESSION_EVENT) {
-		audio_close();
-		SDL_Quit();
-		return false;
-	}
-	else if (event->user.code == REQUEST_RESPONSE_EVENT) {
-		msg_request_t *msg = (msg_request_t*) event->user.data1;
-		
-		if (msg != NULL) {
-			if (msg->session != NULL && msg->session->chn != NULL) {
-					msg->session->chn->msg = NULL;
-					msg->session->chn->busy=false;
-			}
-			// adjust status 
-			if (msg->status == 0) { // no comm error
-				sscanf(msg->resp, "%d", &msg->status);
-				dispatch_response_cb(msg->session, msg);
-				 
-				if (msg->resp != NULL) free(msg->resp);
-				
-				if (msg->cmd != NULL) free(msg->cmd);
-			
-				free(msg);
-			
-			}
-		
-		}
-	}
-	else if (event->user.code == NOTIFICATION_EVENT) {
+	 
+	return true;
+					
+}
+
+
+static bool process_notication_event(SDL_Event *event) {
+#ifdef DEBUG
+ printf("notification event, user_code=%d!\n", event->user.code);
+#endif
+	if (event->user.code == NOTIFICATION_EVENT) {
 		session_t session = (session_t) event->user.data1;
 		 
-		if (session != NULL && session->notification != NULL) {
-			// TODO
-			char *line2 = session->notification;
-			printf("msg received:%s\n", session->notification);
-			while(*line2 !='\n') ++line2;
-			++line2;
-			char *sender = line2;
-			while(*line2 !=' ') ++line2;
-			*line2++ = 0;
-			while(*line2 !='\n') ++line2;
-			*line2++=0;
-			
-			dispatch_msg_cb(session, sender,line2);
-			free(session->notification);
-			session->notification = NULL;
-		}
-		 
-		
-		 
+		prepare_dispatch_notification(session);
+				 
 	}
 	return true;
 					
+}
+
+static void process_end_loop(SDL_Event *event) {
+	if (event->user.code == END_SESSION_EVENT) {
+		if (event->user.data1 != NULL)
+			printf("END SESSION EVENT on %s!\n", (char*) event->user.data1);
+		try {
+			audio_close();
+			if (event->user.data1 != NULL)
+				printf("audio closed on %s!\n", (char*) event->user.data1);
+			SDL_Quit();
+			if (event->user.data1 != NULL)
+				printf("SDL_Quit on %s!\n", (char*) event->user.data1);
+		}
+		catch(...) {
+			if (event->user.data1 != NULL)
+				printf("something went wrong on %s termination!\n", 
+							(char*) event->user.data1);
+		}
+	}
 }
 
 
@@ -312,58 +347,76 @@ void  graph_start() {
 	timebase_regist();
 	
 	while ( SDL_WaitEvent(&event)  && !__done) {
-		switch (event.type) {
-		 	case SDL_USEREVENT:
-				if (!process_user_event(&event)) return;
-				break;
-			case SDL_KEYDOWN:	
-				if (keyHandler != NULL) {
-					convertKeyEvent((SDL_KeyboardEvent*) &event, &keyEvent);
-					if ((it = pressedKeys.find(keyEvent.keyscan)) == pressedKeys.end()) {
-						pressedKeys[keyEvent.keyscan] = keyEvent;
-						keyHandler(keyEvent);
-					}
-				}
-				break;
-			case SDL_KEYUP:
-				if (keyHandler != NULL) {
-					convertKeyEvent((SDL_KeyboardEvent*) &event, &keyEvent);
-					if ((it = pressedKeys.find(keyEvent.keyscan)) != pressedKeys.end()) {
-						pressedKeys.erase(it);
-						keyHandler(keyEvent);
-					}
-				}
-				break;
-					
-			case SDL_MOUSEMOTION:
-				if (mouseHandler != NULL) {
-					convertMouseMotionEvent((SDL_MouseMotionEvent*) &event, &mouseEvent);
-					mouseHandler(mouseEvent);
-				}
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-			case SDL_MOUSEBUTTONUP:
-				if (mouseHandler != NULL) {
-					convertMouseButtonEvent((SDL_MouseButtonEvent*) &event, &mouseEvent);
-					mouseHandler(mouseEvent);
-				}
-				break;
-			case SDL_QUIT:
-				if (onEnd()) {
-					SDL_Quit();
-					return;
-				}
-				break;
-			 
-			default:
-				break;
+		if (event.type == _NOTIFICATION_EVENT) {
+			if (!process_notication_event(&event)) return;
+		}
+		else if (event.type == _RESPONSE_EVENT) {
+			if (!process_user_event(&event)) {
+				printf("battleship terminated!\n" );
+				return;
+			}
+		}
+		else if (event.type == _TIMER_EVENT) {
+			if (!process_timer_event(&event)) return;
+		}
+		else if (event.type == _END_LOOP) {
+			process_end_loop(&event);
+			return;
+		}
 			
+		else {
+			switch (event.type) {
+		  
+				case SDL_KEYDOWN:	
+					if (keyHandler != NULL) {
+						convertKeyEvent((SDL_KeyboardEvent*) &event, &keyEvent);
+						if ((it = pressedKeys.find(keyEvent.keyscan)) == pressedKeys.end()) {
+							pressedKeys[keyEvent.keyscan] = keyEvent;
+							keyHandler(keyEvent);
+						}
+					}
+					break;
+				case SDL_KEYUP:
+					if (keyHandler != NULL) {
+						convertKeyEvent((SDL_KeyboardEvent*) &event, &keyEvent);
+						if ((it = pressedKeys.find(keyEvent.keyscan)) != pressedKeys.end()) {
+							pressedKeys.erase(it);
+							keyHandler(keyEvent);
+						}
+					}
+					break;
+						
+				case SDL_MOUSEMOTION:
+					if (mouseHandler != NULL) {
+						convertMouseMotionEvent((SDL_MouseMotionEvent*) &event, &mouseEvent);
+						mouseHandler(mouseEvent);
+					}
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+				case SDL_MOUSEBUTTONUP:
+					if (mouseHandler != NULL) {
+						convertMouseButtonEvent((SDL_MouseButtonEvent*) &event, &mouseEvent);
+						mouseHandler(mouseEvent);
+					}
+					break;
+				case SDL_QUIT:
+					if (onEnd()) {
+						SDL_Quit();
+						return;
+					}
+					break;
+				 
+				default:
+					break;
+				
+			}
 		}
 		
 		graph_refresh();
 	 
 	}
-	
+	audio_close();
+	SDL_Quit();
 } 
 
  	 

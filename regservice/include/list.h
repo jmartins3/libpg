@@ -1,14 +1,6 @@
 /////////////////////////////////////////////////////////////////
 //
-// CCISEL 
-// 2007-2020
-//
-// UThread library:
-//   User threads supporting cooperative multithreading.
-//
-// Authors:
-//   Carlos Martins, João Trindade, Duarte Nunes, Jorge Martins
-// 
+// support a double linking queue
 // 
 
 #ifndef LIST_H
@@ -17,10 +9,10 @@
 
 #include "types.h"
 
-typedef struct list_entry  {
-	struct list_entry *flink;
-	struct list_entry *blink;
-} LIST_ENTRY, *PLIST_ENTRY;
+typedef struct list_entry_t  {
+	struct list_entry_t *flink;
+	struct list_entry_t *blink;
+} list_entry_t, *plist_entry_t;
 
 
 #ifndef container_of
@@ -34,7 +26,7 @@ typedef struct list_entry  {
 //
 // The attribute always_inline force inline even without compiling with optimizations
 __attribute__((always_inline))
-inline void init_list_head (PLIST_ENTRY listhead) {
+inline void init_list_head (plist_entry_t listhead) {
 	listhead->flink = listhead->blink = listhead;
 }
 
@@ -42,7 +34,7 @@ inline void init_list_head (PLIST_ENTRY listhead) {
 //
 // The attribute always_inline force inline even without compiling with optimizations
 __attribute__((always_inline))
-inline BOOL is_list_empty (LIST_ENTRY * listhead) {
+inline BOOL is_list_empty (list_entry_t * listhead) {
 	return (BOOL)(listhead->flink == listhead);
 }
 
@@ -51,9 +43,9 @@ inline BOOL is_list_empty (LIST_ENTRY * listhead) {
 //
 // The attribute always_inline force inline even without compiling with optimizations
 __attribute__((always_inline))
-inline BOOL remove_entry_list (PLIST_ENTRY entry) {
-	PLIST_ENTRY blink;
-	PLIST_ENTRY flink;
+inline BOOL remove_entry_list (plist_entry_t entry) {
+	plist_entry_t blink;
+	plist_entry_t flink;
 
 	flink = entry->flink;
 	blink = entry->blink;
@@ -67,9 +59,9 @@ inline BOOL remove_entry_list (PLIST_ENTRY entry) {
 //
 // The attribute always_inline force inline even without compiling with optimizations
 __attribute__((always_inline))
-inline PLIST_ENTRY remove_head_list (PLIST_ENTRY listhead) {
-	PLIST_ENTRY flink;
-	PLIST_ENTRY entry;
+inline plist_entry_t remove_head_list (plist_entry_t listhead) {
+	plist_entry_t flink;
+	plist_entry_t entry;
 
 	entry = listhead->flink;
 	flink = entry->flink;
@@ -83,9 +75,9 @@ inline PLIST_ENTRY remove_head_list (PLIST_ENTRY listhead) {
 //
 // The attribute always_inline force inline even without compiling with optimizations
 __attribute__((always_inline))
-inline PLIST_ENTRY remove_tail_list (PLIST_ENTRY listhead) {
-	PLIST_ENTRY blink;
-	PLIST_ENTRY entry;
+inline plist_entry_t remove_tail_list (plist_entry_t listhead) {
+	plist_entry_t blink;
+	plist_entry_t entry;
 
 	entry = listhead->blink;
 	blink = entry->blink;
@@ -98,9 +90,9 @@ inline PLIST_ENTRY remove_tail_list (PLIST_ENTRY listhead) {
 //
 // The attribute always_inline force inline even without compiling with optimizations
 __attribute__((always_inline))
-inline void insert_tail_list (PLIST_ENTRY listhead, PLIST_ENTRY entry)
+inline void insert_tail_list (plist_entry_t listhead, plist_entry_t entry)
 {
-	PLIST_ENTRY blink;
+	plist_entry_t blink;
 
 	blink = listhead->blink;
 	entry->flink = listhead;
@@ -113,8 +105,8 @@ inline void insert_tail_list (PLIST_ENTRY listhead, PLIST_ENTRY entry)
 //
 // The attribute always_inline force inline even without compiling with optimizations
 __attribute__((always_inline))
-inline void insert_head_list (PLIST_ENTRY listhead, PLIST_ENTRY entry) {
-	PLIST_ENTRY flink;
+inline void insert_head_list (plist_entry_t listhead, plist_entry_t entry) {
+	plist_entry_t flink;
 
 	flink = listhead->flink;
 	entry->flink = flink;

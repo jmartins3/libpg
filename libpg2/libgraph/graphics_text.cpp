@@ -112,7 +112,7 @@ static const byte letters[95][13] = {
 
 // Text functions
 
-static void graph_write(char *text, int x, int y, RGB color) {
+static void graph_write(const char *text, int x, int y, RGB color) {
 	stringColor(screen,  x, y-10, text,color);
 }
 	
@@ -129,7 +129,7 @@ static void graph_char(short x, short y, RGB color, char c, int fontsize) {
 			}
 			else {
 				if (pixel) 
-					graph_rect(x+2*c, y-2*l, 2, 2, color, true);
+					graph_rect(x+2*c, y-(2*l+1), 2, 2, color, true);
 			}
 		}
 	}
@@ -147,8 +147,8 @@ static void graph_char(short x, short y, RGB color, char c, int fontsize) {
 Size graph_font_size(int font_type) {
 	Size font_sizes[] = {
 		{8, 10},	// SMALL_FONT
-		{10, 13},	// MEDIUM_FONT
-		{20, 26}	// LARGE_FONT
+		{9, 13},	// MEDIUM_FONT
+		{18, 26}	// LARGE_FONT
 	};	
 	
 	switch(font_type) {
@@ -183,17 +183,25 @@ Size graph_chars_size(int nchars, int font_type) {
  * Retorna:
  * 		estrutura Size com as dimensões do texto
  */
-Size graph_text_size(char text[], int font_type) {
+Size graph_text_size(const char text[], int font_type) {
 	return graph_chars_size(strlen(text), font_type);
 }
 
+
+/**
+ * Usado para informar da cor maioritária na área da escrita
+ * que será considerada a cor de fundo
+ */
 typedef struct {
 	RGB maj_color;
 	int ncolors;
 } ColourStats;
 
 
-
+/**
+ * função auxiliar para detecter a cor maioritária
+ * na área onde se vai escrever texto e que será considera a cor de fundo
+ */
 static ColourStats graph_area_colors(short x0, short y0, Size sz) {
 	map<RGB, int> colors;
 	Rect r = { {x0,y0}, {sz.width, sz.height}};
@@ -229,29 +237,53 @@ static ColourStats graph_area_colors(short x0, short y0, Size sz) {
 	
 }
 
-/*
- *Os parâmetros são:  
+/** Os parâmetros são:  
  * x,y é o ponto de inicio; 
- * color é a cor da letra e bkgnd é a cor de fundo. c_none é para nenhuma cor.
+ * area: dimensão da região a escrever
+ * fore_color é a cor da letra e back_color é a cor de fundo. 
  * text[] é a string que se deseja escrever;
  * font_type indica a fonte a usar: SMALL, MEDIUM, LARGE
  */
-void graph_text( short x, short y, RGB color, char text[], int font_type ) {
-	Size area = graph_text_size(text, font_type );
-	ColourStats cs = graph_area_colors(x, y - area.height, area);
-	 
-	// use maj_color as background color
-	graph_rect(x, y - area.height, area.width, area.height, cs.maj_color, true);
-	
+static void do_graph_text(short x, short y, Size area, RGB fore_color, RGB back_color, const char text[], int font_type ) {
+	 	 
+	// use maj_color as background fore_color
+	graph_rect(x, y - area.height+1, area.width, area.height, back_color, true);
 	
 	if (font_type  == SMALL_FONT) {
-		graph_write(text, x, y, color);
+		graph_write(text, x, y, fore_color);
 		return;
 	}
+	
 	for(size_t i=0; i < strlen(text); ++i) {
-		graph_char(x,y, color, text[i], font_type );
-		x += (font_type  == MEDIUM_FONT ? 10 : 20);
+		graph_char(x,y, fore_color, text[i], font_type );
+		x += (font_type  == MEDIUM_FONT ? 9 : 18);
 	}
+}
+
+/** Os parâmetros são:  
+ * x,y é o ponto de inicio; 
+ * fore_color é a cor da letra e back_color é a cor de fundo. 
+ * text[] é a string que se deseja escrever;
+ * font_type indica a fonte a usar: SMALL, MEDIUM, LARGE
+ */
+void graph_text2( short x, short y, RGB fore_color, RGB back_color, const char text[], int font_type ) {
+	Size area = graph_text_size(text, font_type );
+	do_graph_text(x, y, area, fore_color, back_color, text, font_type);
+}
+
+
+
+/** Os parâmetros são:  
+ * x,y é o ponto de inicio; 
+ * fore_color é a cor da letra  
+ * text[] é a string que se deseja escrever;
+ * font_type indica a fonte a usar: SMALL, MEDIUM, LARGE
+ */
+void graph_text( short x, short y, RGB fore_color, const char text[], int font_type ) {
+	Size area = graph_text_size(text, font_type );
+	ColourStats cs = graph_area_colors(x, y - area.height+1, area);
+	
+	do_graph_text(x, y, area, fore_color, cs.maj_color, text, font_type);
 }
 
  

@@ -9,6 +9,7 @@
 #include "commands.h"
 #include "responses.h"
 #include "channel.h"
+#include "activeusers.h"
 
 typedef Answer (*CmdHandler)(void *cmd);
 
@@ -245,7 +246,30 @@ static int args_remove_theme(Cmd * _cmd, const char *line) {
 }
 
 static int args_remove_topic(Cmd * _cmd, const char *line) {
- 	CmdCreateTopic *cmd = (CmdCreateTopic *) _cmd;
+ 	CmdRemoveTopic *cmd = (CmdRemoveTopic *) _cmd;
+	if (_cmd->argline == 0) { // first line, authentication args
+		if ((_cmd->user=getuser(line)) == NULL) return -BAD_USER_AUTH;
+		_cmd->argline++;
+		return 1;
+	}
+	else if (_cmd->argline == 1) { // second line, new topic from theme
+		int istart = 0;
+		if ((istart = str_next(line, istart, cmd->theme, MAX_THEME_NAME)) < 0)
+			return -BAD_COMMAND_ARGS;
+		if ((istart = str_next(line, istart, cmd->topic, MAX_TOPIC_NAME)) < 0)
+			return -BAD_COMMAND_ARGS;
+		// check line termination
+		if (!check_line_termination(line, istart)) 
+			return -BAD_COMMAND_ARGS; 
+		_cmd->argline++;
+		return 1;
+	}
+	if (check_line_termination(line, 0)) return 0;
+	return -BAD_COMMAND;
+}
+
+static int args_destroy_topic(Cmd * _cmd, const char *line) {
+ 	CmdDestroyTopic *cmd = (CmdDestroyTopic *) _cmd;
 	if (_cmd->argline == 0) { // first line, authentication args
 		if ((_cmd->user=getuser(line)) == NULL) return -BAD_USER_AUTH;
 		_cmd->argline++;
@@ -422,6 +446,8 @@ ArgsReader cmd_args_reader(Cmd *cmd) {
 			return args_join_topic;
 		case LeaveTopic:
 			return args_leave_topic;
+		case DestroyTopic:
+			return args_destroy_topic;
 		case Broadcast:
 			return args_broadcast;
 		case Message:
@@ -473,6 +499,10 @@ Cmd *cmd_create(const char *cmd_name, channel_t *chn) {
 	else if (strcasecmp("REMOVE_TOPIC\n", cmd_name) == 0) {
 		cmd =  (Cmd *) calloc(1, sizeof(CmdRemoveTopic)); 
 		cmd->type = RemoveTopic;
+	}
+	else if (strcasecmp("DESTROY_TOPIC\n", cmd_name) == 0) {
+		cmd =  (Cmd *) calloc(1, sizeof(CmdDestroyTopic)); 
+		cmd->type = DestroyTopic;
 	}
 	else if (strcasecmp("JOIN_TOPIC\n", cmd_name) == 0) {
 		cmd =  (Cmd *) calloc(1, sizeof(CmdJoinTopic)); 
@@ -575,7 +605,9 @@ void cmd_create_topic(Cmd *_cmd) {
 		char owner[MAX_USER_NAME];
 		uv_tcp_getpeername((uv_tcp_t*) _cmd->chn, (struct sockaddr* ) &addr, &addr_len);
 		addr.sin_port = cmd->port;
-		int res = topic_create(cmd->theme, cmd->topic, &addr, _cmd->user, owner);
+		
+		user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
+		int res = topic_create(cmd->theme, cmd->topic, &addr, session, owner);
 		if (res != OPER_OK) {
 			Answer a = {.status = COMMAND_ERROR + res };
 			a.username = owner;
@@ -678,7 +710,9 @@ void cmd_remove_topic(Cmd *_cmd) {
 	if (_cmd->type != RemoveTopic) status = BAD_COMMAND; 
 	else {
 		CmdRemoveTopic *cmd = (CmdRemoveTopic *) _cmd;
-		int res = topic_remove(cmd->theme, cmd->topic, _cmd->user);
+			
+		user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
+		int res = topic_remove(cmd->theme, cmd->topic, session);
 		if (res != OPER_OK)
 			status = COMMAND_ERROR + res;
 	}
@@ -730,7 +764,9 @@ void cmd_join_topic(Cmd *_cmd) {
 		int njoiners;
 		uv_tcp_getpeername((uv_tcp_t*) _cmd->chn, (struct sockaddr* ) &addr, &addr_len);
 		addr.sin_port = cmd->port;
-		int res = topic_join(cmd->theme, cmd->topic, &addr, _cmd->user, &njoiners);
+		
+		user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
+		int res = topic_join(cmd->theme, cmd->topic, &addr, session, &njoiners);
 		printf("address %s,%d join to topic %s\n", 
 			inet_ntoa(addr.sin_addr), addr.sin_port, cmd->topic);
 		if (res != OPER_OK) send_status_response(_cmd->chn, COMMAND_ERROR + res);
@@ -749,8 +785,8 @@ void cmd_join_topic(Cmd *_cmd) {
 							owner_info.sock_addr.sin_addr.s_addr, owner_info.sock_addr.sin_port);
 				udp_send_t *send = (udp_send_t *) malloc(sizeof(uv_udp_send_t)+128);
 				// prepare notification message
-				int msg_size = sprintf(send->buffer, "ENTER_PARTNER\n%s %s %d\n\n", 
-					_cmd->user->name, cmd->topic, njoiners);
+				int msg_size = sprintf(send->buffer, "ENTER_PARTNER\n%s %s %s %d\n\n", 
+					_cmd->user->name, cmd->theme, cmd->topic, njoiners);
 			 
 				send->cmd = _cmd;
 				uv_buf_t buf;
@@ -766,25 +802,44 @@ void cmd_join_topic(Cmd *_cmd) {
 
 void leave_partner_cb(uv_udp_send_t *req , int status) {
 	udp_send_t *send = (udp_send_t *) req;
-	 
-	// check send error
-	if (status != 0) {
-		send_status_response(send->cmd->chn, UNREACHABLE_TOPIC_OWNER);
-		printf("free: leave_partner_cb\n"); inc_frees();
-		free(send);
-		return;
-	}
-	
-	/* free message resources */
-	
 	CmdLeaveTopic *cmd = (CmdLeaveTopic*) send->cmd;
-	Answer a = {.status = STATUS_OK };
-	a.njoiners = cmd->njoiners;
-	send_response(cmd->base.chn, &a);
+	
+	// check send error
+	
+	if (cmd->base.chn != NULL) {
+		if (status != 0) {
+			send_status_response(send->cmd->chn, UNREACHABLE_TOPIC_OWNER);
+			printf("free: leave_partner_cb\n"); inc_frees();
+			
+		}
+		else {
+			Answer a = {.status = STATUS_OK };
+			a.njoiners = cmd->njoiners;
+			send_response(cmd->base.chn, &a);
+		}
+	}
+		
+	/* free message resources */
 	printf("free: leave_partner_cb\n"); inc_frees();
 	free(send);
 }
 
+
+static void send_to_owner(CmdLeaveTopic *cmd, joiner_info_t *owner_info, int njoiners) {
+	printf("malloc: udp_send_t for leave_topic\n"); inc_mallocs();
+	printf("Owner info -> %s;%X:%d\n", owner_info->username,
+				owner_info->sock_addr.sin_addr.s_addr, owner_info->sock_addr.sin_port);
+	udp_send_t *send = (udp_send_t *) malloc(sizeof(uv_udp_send_t)+128);
+	int msg_size = sprintf(send->buffer, "LEAVE_PARTNER\n%s %s %s %d\n\n", 
+		cmd->base.user->name, cmd->theme, cmd->topic, njoiners);
+	 
+	send->cmd = &cmd->base;
+	uv_buf_t buf;
+	cmd->njoiners = njoiners;
+	buf.base = send->buffer;
+	buf.len = msg_size;
+	uv_udp_send(&send->req, &broadcaster, &buf,1, (struct sockaddr *)  &owner_info->sock_addr, leave_partner_cb);
+}
 
 /*
  * leave topic command
@@ -794,7 +849,9 @@ void cmd_leave_topic(Cmd *_cmd) {
 	else {
 		CmdLeaveTopic *cmd = (CmdLeaveTopic *) _cmd;
 		int njoiners;
-		int res = topic_leave(cmd->theme, cmd->topic, _cmd->user, &njoiners);
+			
+		user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
+		int res = topic_leave(cmd->theme, cmd->topic, session, &njoiners);
 		if (res != OPER_OK) send_status_response(_cmd->chn, COMMAND_ERROR + res);
 		else {
 			joiner_info_t owner_info;
@@ -802,20 +859,7 @@ void cmd_leave_topic(Cmd *_cmd) {
 			if ((res = topic_owner_info(cmd->theme, cmd->topic, &owner_info) ) != OPER_OK) 
 				send_status_response(_cmd->chn, COMMAND_ERROR + res);
 			else {
-				cmd->njoiners = njoiners;
-				printf("malloc: udp_send_t for leave_topic\n"); inc_mallocs();
-				printf("Owner info -> %s;%X:%d\n", owner_info.username,
-							owner_info.sock_addr.sin_addr.s_addr, owner_info.sock_addr.sin_port);
-				udp_send_t *send = (udp_send_t *) malloc(sizeof(uv_udp_send_t)+128);
-				int msg_size = sprintf(send->buffer, "LEAVE_PARTNER\n%s %s %d\n\n", 
-					_cmd->user->name, cmd->topic, njoiners);
-				 
-				send->cmd = _cmd;
-				uv_buf_t buf;
-				
-				buf.base = send->buffer;
-				buf.len = msg_size;
-				uv_udp_send(&send->req, &broadcaster, &buf,1, (struct sockaddr *)  &owner_info.sock_addr, leave_partner_cb);
+				send_to_owner(cmd, &owner_info, njoiners);
 			}
 		}
 			
@@ -828,12 +872,13 @@ void send_cb(uv_udp_send_t *req, int status) {
 	CmdBroadcast *cmd = (CmdBroadcast *) req->data;
 	cmd->send_partners++;
 	if (cmd->send_partners == cmd->total_partners) {
-		send_status_response(cmd->base.chn, STATUS_OK);
+		if (cmd->base.chn != NULL)
+			send_status_response(cmd->base.chn, STATUS_OK);
 		req_array_entry_t *entry = (req_array_entry_t*) req;
 		printf("free: broadcast_cb\n"); inc_frees();
 		free(entry- entry->idx);
 		
-		
+		free(cmd->joiners);
 	}
 }
 
@@ -846,8 +891,10 @@ void send_msg_cb(uv_udp_send_t *req, int status) {
 
 
 
-void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, int total) {
+void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, const char *action, int total) {
 	// TODO no send the message to the emmiter
+	
+	cmd->joiners = joiners;
 	printf("malloc: udp_send_t array for broadcast\n"); inc_mallocs();
 	cmd->reqs = (req_array_entry_t*) malloc(sizeof(req_array_entry_t)*total);
 	for (int i=0; i < total; ++i) {
@@ -855,8 +902,8 @@ void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, int total) {
 	}	
 	cmd->total_partners = total;
 	cmd->send_partners = 0;
-	int info_size = sprintf(cmd->send_info, "BROADCAST\n%s %s %s %d\n", 
-		cmd->base.user->name, cmd->theme, cmd->topic, total);
+	int info_size = sprintf(cmd->send_info, "%s\n%s %s %s %d\n", 
+		action, cmd->base.user->name, cmd->theme, cmd->topic, total);
 	// prepare message to partner p
 	uv_buf_t bufs[cmd->nlines+1];
 	bufs[0].base = cmd->send_info;
@@ -866,14 +913,39 @@ void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, int total) {
 		bufs[l].len = cmd->sz_lines[l-1];
 	}
 	for (int p = 0; p < total; p++) {
-		printf("Send broadcast to %s,%d\n", inet_ntoa(joiners[p].sock_addr.sin_addr), 
-		joiners[p].sock_addr.sin_port);
+		printf("Send broadcast to %s,%d\n", inet_ntoa(joiners[p].sock_addr.sin_addr), joiners[p].sock_addr.sin_port);
 		cmd->reqs[p].idx = p;
 		uv_udp_send(&cmd->reqs[p].req, &broadcaster, bufs, cmd->nlines + 1, (struct sockaddr *) &joiners[p].sock_addr, send_cb);
 	}
 	
 }
 
+
+void warn_topic_partners(topic_t *topic, joiner_info_t *joiners, int total) {
+	CmdBroadcast *cmd =  (CmdBroadcast *) calloc(1, sizeof(CmdBroadcast)); 
+	cmd->base.chn = NULL;
+	cmd->base.type = Broadcast;
+	cmd->base.user = topic->owner_user;
+	strcpy(cmd->theme, topic->belong_theme->name);
+	strcpy(cmd->topic, topic->name);
+	
+	cmd->nlines = 0;
+	
+	send_to_partners(cmd, joiners,  "TOPIC_DESTROYED", total);
+}
+
+
+void warn_topic_owner(topic_t *topic, joiner_info_t  *owner_info, int njoiners) {
+	CmdLeaveTopic *cmd =  (CmdLeaveTopic *) calloc(1, sizeof(CmdLeaveTopic)); 
+	cmd->base.type = LeaveTopic;
+	cmd->base.user = topic->owner_user;
+	cmd->base.chn = NULL;
+	
+	strcpy(cmd->theme, topic->belong_theme->name);
+	strcpy(cmd->topic, topic->name);
+	
+	send_to_owner(cmd, owner_info, njoiners);
+}
 
 static void topic_broadcast(CmdBroadcast *cmd, user_t *user) {
 	joiner_info_t *joiners = NULL;
@@ -883,7 +955,7 @@ static void topic_broadcast(CmdBroadcast *cmd, user_t *user) {
 		send_status_response(cmd->base.chn, COMMAND_ERROR + res);
 	else {
 		// now send the message to all the topic partners
-		send_to_partners(cmd, joiners, total);
+		send_to_partners(cmd, joiners, "BROADCAST", total);
 	}
 	
 }
@@ -926,7 +998,39 @@ void cmd_broadcast(Cmd *_cmd) {
 	 
 	 
 	topic_broadcast(cmd, _cmd->user);
-}	 
+}
+
+
+/*
+ * destroy topic command
+ */
+void cmd_destroy_topic(Cmd *_cmd) {
+	CmdDestroyTopic *cmd = (CmdDestroyTopic *) _cmd;
+
+	if (_cmd->type != DestroyTopic) {
+		send_status_response(cmd->base.chn, BAD_COMMAND);
+		return;
+	}
+	joiner_info_t *joiners = NULL;
+	int total = 0;
+	int res;
+	if ( (res = topic_joiners(cmd->theme, cmd->topic, &joiners, &total, _cmd->user)) != OPER_OK) {
+		send_status_response(cmd->base.chn, COMMAND_ERROR + res);
+		return;
+	}
+	
+		
+	user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
+	 
+	res = topic_destroy(cmd->theme, cmd->topic, session);
+	if (res != OPER_OK) {
+		send_status_response(cmd->base.chn, COMMAND_ERROR + res);
+		return;	
+	}
+	// now send the message to all the topic partners
+	send_to_partners(cmd, joiners, "TOPIC_DESTROYED", total);
+}
+	 
 
 /*
  * Stop server
@@ -977,6 +1081,8 @@ void cmd_exec(Cmd *cmd) {
 			cmd_broadcast(cmd); break;
 		case RemoveTopic:
 			cmd_remove_topic(cmd); break;
+		case DestroyTopic:
+			cmd_destroy_topic(cmd); break;
 		case Message:
 			cmd_message(cmd); break;
 		case ListUsers:

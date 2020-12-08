@@ -18,13 +18,19 @@
 
 struct channel;
 
-typedef enum sess_state { Created, Pending, Connected, SessionClosed } session_state_t;
+typedef enum sess_state { Created, Pending, Connected, Closing, Closed } session_state_t;
 
 typedef struct session {
-	struct channel*chn;
 	uv_udp_t msg_sock;
+	struct channel*chn;
+	
 	int msg_port;
+	
+	// stuff for partners message thread-safe access
 	char notification_buffer[NOTIFICATION_BUFFER_SIZE];
+	pthread_mutex_t lock;
+	pthread_cond_t empty;
+	
 	char *notification;
 	char sip[MAX_IP_ADDR];    // group service ip
 	char user[MAX_USER_NAME]; // user name
@@ -34,8 +40,10 @@ typedef struct session {
 	// context for extended callbacks
 	void *context;
 	// callbacks
-	ResponseEventHandler on_response;
-	MsgEventHandler on_msg;
+	ResponseEventHandlerEx on_response;
+	MsgEventHandlerEx on_msg;
+	
+	 
 } sess_t, *session_t;
 
 
@@ -52,7 +60,7 @@ typedef  void (*ReadEventHandler)(int status, char response[]);
 /*
  * messages for communication with libuv
  */
-typedef enum msg_type { GroupSrvConnect, GroupSrvCmd, BroadcastMsg, PrivateMsg, GenericRequest } msg_type_t;
+typedef enum msg_type { GroupSrvConnect, GroupSrvCmd, BroadcastMsg, PrivateMsg, GenericRequest, CloseChannel } msg_type_t;
 typedef enum response_type { Response, Notification } response_type_t;
 
 typedef struct msg_request {
@@ -67,10 +75,11 @@ typedef struct msg_request {
 	int ip_port;						// generic port destination
 	char *cmd;							// request text
 	// response
-	ResponseEventHandler on_response;	// response callback
+	ResponseEventHandlerEx on_response;	// response callback
 	int status;							// response status 
 	char *resp;							// response text
 	
+	unsigned long number;
 	// connection support on libuv
 	uv_connect_t req;
 } msg_request_t;

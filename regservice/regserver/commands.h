@@ -9,7 +9,7 @@
 
 
 enum command { Regist, Unregist, CreateTheme, CreateTopic, ListThemes, 
-			ListTopics, RemoveTheme, RemoveTopic, JoinTopic, Unknown,
+			ListTopics, RemoveTheme, RemoveTopic, DestroyTopic, JoinTopic, Unknown,
 			LeaveTopic, Broadcast, Message, ListUsers, Stop};
 
 typedef enum command  CmdType;
@@ -105,7 +105,8 @@ typedef struct cmd_broadcast {
 	req_array_entry_t *reqs;			// requests array
 	int total_partners;					// total partners to send (topic joiners - 1)
 	int send_partners;					// the msgs known as sended
-} CmdBroadcast;	
+	joiner_info_t *joiners;				// dinamically created joiners array
+} CmdBroadcast, CmdDestroyTopic;	
 
 typedef struct cmd_message {
 	Cmd base; 							// for command introspection
@@ -221,7 +222,12 @@ void cmd_leave_topic(Cmd *_cmd);
  * broadcast command
  */
 void cmd_broadcast(Cmd *_cmd);
-	 
+
+
+void warn_topic_partners(topic_t *topic, joiner_info_t *joiners, int total);
+
+void warn_topic_owner(topic_t *topic, joiner_info_t  *owner_info, int njoiners);
+
 /*
  * send a unicast message
  */

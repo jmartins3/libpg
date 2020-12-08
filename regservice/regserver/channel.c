@@ -11,7 +11,7 @@
 #include  "commands.h"
 #include "responses.h"
 #include "strutils.h"
-
+#include "activeusers.h"
 
 
 /*
@@ -163,7 +163,11 @@ channel_t * chn_create(uv_loop_t *loop) {
  */
 void chn_destroy(uv_handle_t *_chn) {
 	channel_t *chn = (channel_t*)  _chn;
-	cmd_destroy(chn->cmd);
+	user_session_t *session = find_session(&chn->socket);
+	
+	if (session != NULL) 
+		session_destroy(session);
+	
 	printf("free: channel\n"); inc_frees();
 	free(chn);
 }

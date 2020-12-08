@@ -1,32 +1,23 @@
-CPP=g++ 
-INC=/usr/local/include/SDL2
-CPPFLAGS=-c -g -I$(INC) -Wall
+
 
 CC=gcc
-CFLAGS=-c -g -Wall
+CFLAGS= -g -Wall
 
-all: showLetters sockets 4inline
+all: graphics_test eventstestnew figure eventstest
 
-showLetters: showLetters.o components.o utils.o
-	$(CPP) -o showLetters showLetters.o components.o utils.o -lpg -lm -luv
+
+graphics_test: graphics_test.o
+	$(CC) -o graphics_test $(CFLAGS)  graphics_test.o   -lpg   
 	
-showLetters.o: showLetters.cpp
-	$(CPP) $(CPPFLAGS) showLetters.cpp
-	
-components.o: components.c
-	$(CC) $(CFLAGS) components.c
+eventstestnew: eventstestnew.c
+	$(CC) -o eventstestnew  $(CFLAGS) eventstestnew.c -lpg
 
-utils.o: utils.c
-	$(CC) $(CFLAGS) utils.c
+eventstest: eventstest.c
+	$(CC) -o eventstest   $(CFLAGS) eventstest.c -lpg
 
-sockets: sockets.o
-	$(CC) -o sockets sockets.o   -lpg  -luv
-	
-sockets.o: sockets.c
-	$(CC) $(CFLAGS) sockets.c
 
-4inline: 4inline.c components.c utils.c
-	$(CPP) -o 4inline -Wall 4inline.c components.o utils.o -lpg -lm -luv
+figure: figure.c
+	$(CC)  -o figure $(CFLAGS) figure.c -lpg
 	
 clean:
-	rm -rf  *.o  
+	rm -rf  *.o  eventstestnew eventstest graphics_test  figure

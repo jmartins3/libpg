@@ -17,18 +17,9 @@ typedef unsigned int uint;
  *  communication events callback types
  */
 
-typedef  void (*ResponseEventHandler)(int status, const char response[]);
-typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
 
-typedef  void (*ResponseEventHandlerExt)(int status, const char response[], void * context);
-typedef  void (*MsgEventHandlerExt)(const char sender[], const char msg[], void * context);
-
-
-// wrapper for game server communication callbacks
-typedef struct comm_cb {
-	ResponseEventHandlerExt on_response;
-	MsgEventHandlerExt on_msg;
-} comm_cb_t;
+typedef  void (*ResponseEventHandlerEx)(int status, const char response[], void * context);
+typedef  void (*MsgEventHandlerEx)(const char msg[], void * context);
 
 
 
@@ -105,7 +96,7 @@ typedef void (*TimerEventHandler)();
 extern "C" {
 #endif
 
-comm_cb_t gs_force_callbacks(ResponseEventHandlerExt on_response, MsgEventHandlerExt on_msg);
+
 
 /*------------------------------------
  * regist the keyboard event handler

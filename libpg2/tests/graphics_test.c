@@ -1,10 +1,10 @@
-#include "pg/graphics.h"
+#include "pg/pglib.h"
 
 int main() {
 	graph_init();
  	
  	
- 	graph_write("Hello PG Graphics!", 10, 30, c_blue);
+ 	graph_text(10, 30, c_blue, "Hello PG Graphics!", LARGE_FONT );
 	graph_line(0,0,400, 400, c_green);
 	graph_pixel(600, 20, c_black);
 	graph_pixel(600, 21, c_black);
