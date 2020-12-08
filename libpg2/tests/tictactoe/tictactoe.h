@@ -5,7 +5,8 @@
  
  -----------------------------------------*/
 
- 
+#define GRAPH_WIDTH 640
+#define GRAPH_HEIGHT 480 
 
 /* O modelo */
 

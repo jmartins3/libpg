@@ -49,7 +49,7 @@ enum new_game_state {
 };
 
 #define ALL_STATES ( \
-	Connecting | GameCreation | WaitingPartner | JoiningGame | InGame | GameOver | \
+	Connecting | Connection | GameCreation | WaitingPartner | JoiningGame | InGame | GameOver | \
 	EndingSession | SessionClosed | Error )
 
 static session_t session;
@@ -194,8 +194,19 @@ bool check_valid(game_context_t *ctx,
 }
 
 void dispatch_resp(game_context_t *ctx, int status, const char resp[], int new_state) {
-	if (status != STATUS_OK) ctx->state = Error; else ctx->state = new_state;
-	if (ctx->on_resp != NULL) ctx->on_resp(status, resp);
+	char error_msg[100];
+	const char *r = resp;
+	
+	if (status != STATUS_OK) {
+		// remove the line terminators from response
+		str_next_line(resp, 0, error_msg, 100);
+		r = error_msg;
+	
+		ctx->state = Error; 
+	}
+	else ctx->state = new_state;
+	
+	if (ctx->on_resp != NULL) ctx->on_resp(status, r);
 }
 
 // internal requestors for group server
@@ -208,6 +219,14 @@ void create_game(session_t session, const char *game, int nplayers) {
 	ctx->pending_results++;
 	gs_request(session, CREATE_GAME, args);
 }
+
+void list_themes(session_t session) {
+ 	 
+	game_context_t *ctx = (game_context_t *) session->context;
+	ctx->pending_results++;
+	gs_request(session, LIST_THEMES, "\n\n");
+}
+
 
 void remove_game(session_t session, const char *game) {
 	char args[256];
@@ -478,8 +497,18 @@ static void on_response(int status, const char response[], void *_ctx) {
 
 	switch(game_get_state(ctx)) {
 		case Connecting:
-			 	
+			if (status != STATUS_OK) 
+				connection_abort(status, response, ctx);
+			else {
+				ctx->state = Connection;
+				list_themes(session);
+			}
+				
+			break;
+		case Connection:
+		 	
 			// forward response to application callback and change state to GameCreation
+			
 			dispatch_resp(ctx, status, response, GameCreation);
 			break;
 		case InGame:
@@ -541,7 +570,7 @@ static void on_response(int status, const char response[], void *_ctx) {
 #ifdef DEBUGC
 			printf("Session closed for %s!\n", ctx->username);
 #endif
-//			if (ctx->closing_window)
+			if (ctx->closing_window)
 				graph_exit();
 			break;
 		default:

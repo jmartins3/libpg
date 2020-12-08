@@ -12,7 +12,7 @@
 
 
 #include "pg/pglib.h"
- 
+#include "tictactoe.h" 
  
 
 /* O modelo */

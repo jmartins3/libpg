@@ -55,11 +55,11 @@ Clock mclock;
 
 
 void show_victory_message() {
-	mv_show_text(&msg, "I win!", ALIGN_CENTER);
+	mv_show_text(&status_msg, "I win!", ALIGN_CENTER);
 }
 
 void show_loose_message() {
-	mv_show_text(&msg, "I loose!", ALIGN_CENTER);
+	mv_show_text(&status_msg, "I loose!", ALIGN_CENTER);
 }
 
 void error(const char *msg) {
@@ -212,7 +212,9 @@ void process_play_result(int x, int y, int target) {
 bool process_creation_response(const char *resp) {
 	// get args
 	int rank; 
-		
+
+printf("creation_response: '%s'\n", resp);
+
 	int start = str_next_word(resp, 0, opponent_name, MAX_NAME_SIZE);
 	if (start != -1) start = str_next_int(resp, start, &rank);
 	

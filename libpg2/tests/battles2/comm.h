@@ -12,12 +12,13 @@
  
 // Command types
 
-#define CREATE_GAME "CREATE_TOPIC"
-#define JOIN_GAME   "JOIN_TOPIC"
-#define LEAVE_GAME   "LEAVE_TOPIC"
-#define PLAY		"BROADCAST"
-#define REMOVE_GAME "REMOVE_TOPIC"
-#define DESTROY_GAME "DESTROY_TOPIC"
+#define CREATE_GAME 		"CREATE_TOPIC"
+#define JOIN_GAME   		"JOIN_TOPIC"
+#define LEAVE_GAME   		"LEAVE_TOPIC"
+#define PLAY				"BROADCAST"
+#define REMOVE_GAME 		"REMOVE_TOPIC"
+#define DESTROY_GAME 		"DESTROY_TOPIC"
+#define LIST_THEMES			"LIST_THEMES"
 
 // Notification messages
 
@@ -27,6 +28,7 @@
 #define MESSAGE		  		"MESSAGE"
 #define TOPIC_DESTROYED	  	"TOPIC_DESTROYED"
 #define OPPONENT_LEAVE 		"OPPONENT_LEAVE"
+
 
 typedef  void (*ResponseEventHandler)(int status, const char response[]);
 typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
