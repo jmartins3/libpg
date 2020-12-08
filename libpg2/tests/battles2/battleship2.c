@@ -35,7 +35,7 @@ char username[MAX_NAME_SIZE];
 char opponent_name[MAX_NAME_SIZE];
 char game_name[MAX_NAME_SIZE];
 
-bool demo_mode = true;
+bool demo_mode = false;
 session_t game_session;
 state_t state;
 bool send_result;
@@ -329,14 +329,21 @@ void timer_handler() {
 void mouse_handler(MouseEvent me) {
 	if (me.type == MOUSE_BUTTON_EVENT && 
 		me.state == BUTTON_PRESSED) {
+			
+		if (me.button == BUTTON_LEFT) {
 #ifdef DEBUG
 		printf("do play at %d, %d, turn=%d, state=%d\n", me.x, me.y, turn, state);
 #endif
-		if (me.button == BUTTON_LEFT && turn == MY_TURN && state == InGame) {
-			play(me.x, me.y);
+			if (me.button == BUTTON_LEFT && turn == MY_TURN && state == InGame) {
+				play(me.x, me.y);
+			}
 		}
-	 
+		else {
+			graph_save_screen("screen.jpg");
+		}
+		 
 	}
+ 
 }
  
 
