@@ -7,8 +7,8 @@
 #include "racket.h"
 #include "ball.h"
 
-#define GRAPH_WIDTH 1024
-#define GRAPH_HEIGHT 756
+#define GRAPH_WIDTH 800
+#define GRAPH_HEIGHT 600
 
 #define BORDER_SIZE 	10
 #define BOARD_TOP		75

@@ -10,7 +10,7 @@ OBJS= libgraph/graphics.o libgraph/events.o libgraph/triangles.o \
 
 all:
 	cd libgraph; make
-	cd libjson; make
+	#cd libjson; make
 	g++ -o $(BIN)/libpg.so -shared -rdynamic $(OBJS) $(LIBS)
 	 
  	

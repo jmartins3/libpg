@@ -1,5 +1,7 @@
 #include "squash.h"
 
+#define RACKET_SOUND "media/baseball_hit.wav"
+
 static void ball_show(Ball *b) {
 	graph_circle(b->x, b->y, BALL_RADIUS, c_orange, true);
 }
@@ -74,7 +76,7 @@ void ball_move(Ball *b, Racket *r) {
 	
 	res = intersects(b, r);
 	if (res == 1) {
-		sound_play("baseball_hit.wav"); 
+		sound_play(RACKET_SOUND); 
 		ball_reverse_x(b);
 	}
 	else if (res == -1) {

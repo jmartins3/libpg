@@ -64,6 +64,7 @@ int  main() {
 	
 	// "myMouseEventHandler" function will process the mouse events
 	graph_regist_mouse_handler(myMouseEventHandler);
+	graph_regist_timer_handler(myTimerEventHandler, 50);
 	
 	graph_image("media/DSC_0033.JPG", 0, 0, GRAPH_WIDTH, GRAPH_HEIGHT);
 	

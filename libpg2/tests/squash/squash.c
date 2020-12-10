@@ -32,7 +32,7 @@ static void end_game() {
 }
 
 void loosePoint() {
-	suspend_ball = 30;
+	//suspend_ball = 30;
 	ball_setPos(&ball, 250, BORDER_SIZE+BOARD_TOP+2*BALL_RADIUS+1, false);
 	if (Counter_dec(&counter) == 0)
 		end_game();
@@ -79,10 +79,11 @@ void draw_board() {
 
  
 int main() {
-	if (graph_init() == -1) {
+	if (graph_init2("Squash Game", GRAPH_WIDTH, GRAPH_HEIGHT) == -1) {
 		printf("Error initializing events library!\n");
 		return (1);
 	}
+	graph_set_auto_repeat_off();
 	 
 	// regist callbacks
 	uint kup=SDLK_UP;
