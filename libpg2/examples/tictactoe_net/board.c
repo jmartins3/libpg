@@ -29,11 +29,11 @@ bool screen_to_board(int mx, int my, Point *p) {
 	int third_size_y = BOARD_HEIGHT/3+1;
 
 
-	int x = (mx -BOARD_LEFT_CORNER_X);
+	int x = (mx - BOARD_X);
 	if ( x < 0) return false;
 	x = x /third_size_x;
 
-	int y = (my -BOARD_LEFT_CORNER_Y);
+	int y = (my -BOARD_Y);
 	if ( y < 0) return false;
 	y = y /third_size_y;
 
@@ -117,17 +117,17 @@ void ttt_draw_board() {
 	
 	// draw board grid vertical lines
 #ifdef GRAPH_SIMPLE
-	graph_line(BOARD_LEFT_CORNER_X + third_size_x, BOARD_LEFT_CORNER_Y, 
-			   BOARD_LEFT_CORNER_X + third_size_x, BOARD_LEFT_CORNER_Y + BOARD_HEIGHT, 
+	graph_line(BOARD_X + third_size_x, BOARD_Y, 
+			   BOARD_X + third_size_x, BOARD_Y + BOARD_HEIGHT, 
 			   c_blue);
-	graph_line(BOARD_LEFT_CORNER_X + 2*third_size_x, BOARD_LEFT_CORNER_Y, 
-			   BOARD_LEFT_CORNER_X + 2*third_size_x, BOARD_LEFT_CORNER_Y + BOARD_HEIGHT, 
+	graph_line(BOARD_X + 2*third_size_x, BOARD_Y, 
+			   BOARD_X + 2*third_size_x, BOARD_Y + BOARD_HEIGHT, 
 			   c_blue);	
 #else
 	   
-	graph_rect(BOARD_LEFT_CORNER_X + third_size_x, BOARD_LEFT_CORNER_Y, 
+	graph_rect(BOARD_X + third_size_x, BOARD_Y, 
 			   GRID_WEIGHT, BOARD_HEIGHT, c_blue, true);
-	graph_rect(BOARD_LEFT_CORNER_X + 2*third_size_x, BOARD_LEFT_CORNER_Y, 
+	graph_rect(BOARD_X + 2*third_size_x, BOARD_Y, 
 			   GRID_WEIGHT, BOARD_HEIGHT, c_blue, true);
 #endif
 
@@ -135,17 +135,17 @@ void ttt_draw_board() {
 
 
 #ifdef GRAPH_SIMPLE
-	graph_line(BOARD_LEFT_CORNER_X, BOARD_LEFT_CORNER_Y+third_size_y, 
-			   BOARD_LEFT_CORNER_X+  BOARD_WIDTH, BOARD_LEFT_CORNER_Y+third_size_y, 
+	graph_line(BOARD_X, BOARD_Y+third_size_y, 
+			   BOARD_X+  BOARD_WIDTH, BOARD_Y+third_size_y, 
 			   c_blue);
-	graph_line(BOARD_LEFT_CORNER_X, BOARD_LEFT_CORNER_Y+2*third_size_y, 
-			   BOARD_LEFT_CORNER_X + BOARD_WIDTH, BOARD_LEFT_CORNER_Y +2*third_size_y, 
+	graph_line(BOARD_X, BOARD_Y+2*third_size_y, 
+			   BOARD_X + BOARD_WIDTH, BOARD_Y +2*third_size_y, 
 			   c_blue);
 #else
  
-	graph_rect(BOARD_LEFT_CORNER_X, BOARD_LEFT_CORNER_Y+third_size_y, 
+	graph_rect(BOARD_X, BOARD_Y+third_size_y, 
 			   BOARD_WIDTH, GRID_WEIGHT, c_blue, true);
-	graph_rect(BOARD_LEFT_CORNER_X, BOARD_LEFT_CORNER_Y + 2*third_size_y, 
+	graph_rect(BOARD_X, BOARD_Y + 2*third_size_y, 
 			   BOARD_WIDTH, GRID_WEIGHT, c_blue, true);
 #endif
 }
@@ -157,28 +157,28 @@ void draw_cross(int x, int y) {
 	if (x < 0 || x > 2 || y < 0 || y >2) return;
 
 #ifdef GRAPH_SIMPLE
-	graph_line(BOARD_LEFT_CORNER_X +  third_size_x *x + SQUARE_BORDER,
-				BOARD_LEFT_CORNER_Y + third_size_y *y + SQUARE_BORDER,
-				BOARD_LEFT_CORNER_X +  third_size_x*(x +1) - SQUARE_BORDER,
-				BOARD_LEFT_CORNER_Y + third_size_y*(y+1) - SQUARE_BORDER, 
+	graph_line(BOARD_X +  third_size_x *x + SQUARE_BORDER,
+				BOARD_Y + third_size_y *y + SQUARE_BORDER,
+				BOARD_X +  third_size_x*(x +1) - SQUARE_BORDER,
+				BOARD_Y + third_size_y*(y+1) - SQUARE_BORDER, 
 				c_blue);
 	
-	graph_line(BOARD_LEFT_CORNER_X +  third_size_x *x + SQUARE_BORDER,
-				BOARD_LEFT_CORNER_Y + third_size_y*(y+1) - SQUARE_BORDER,
-				BOARD_LEFT_CORNER_X + third_size_x*(x+1) - SQUARE_BORDER,
-				BOARD_LEFT_CORNER_Y + third_size_y *y + SQUARE_BORDER,
+	graph_line(BOARD_X +  third_size_x *x + SQUARE_BORDER,
+				BOARD_Y + third_size_y*(y+1) - SQUARE_BORDER,
+				BOARD_X + third_size_x*(x+1) - SQUARE_BORDER,
+				BOARD_Y + third_size_y *y + SQUARE_BORDER,
 				c_blue);
 	
 #else					
-	graph_paralelogram(BOARD_LEFT_CORNER_X + third_size_x*x + SQUARE_BORDER,
-					   BOARD_LEFT_CORNER_Y + third_size_y*y + SQUARE_BORDER,
+	graph_paralelogram(BOARD_X + third_size_x*x + SQUARE_BORDER,
+					   BOARD_Y + third_size_y*y + SQUARE_BORDER,
 					   third_size_x - 2* SQUARE_BORDER,
 					   third_size_y - 2* SQUARE_BORDER,
 					   
 					   SQUARE_WEIGHT, 
 					   c_red, true);
-	graph_paralelogram(BOARD_LEFT_CORNER_X + third_size_x*x + SQUARE_BORDER,
-					   BOARD_LEFT_CORNER_Y + third_size_y*y + + SQUARE_BORDER,
+	graph_paralelogram(BOARD_X + third_size_x*x + SQUARE_BORDER,
+					   BOARD_Y + third_size_y*y + + SQUARE_BORDER,
 					   third_size_x - 2* SQUARE_BORDER, 
 					   third_size_y - 2* SQUARE_BORDER,
 					   -SQUARE_WEIGHT,
@@ -195,16 +195,16 @@ void draw_circle(int x, int y) {
 	if (x < 0 || x > 2 || y < 0 || y >2) return;
 
 #ifdef GRAPH_SIMPLE
-	graph_circle(BOARD_LEFT_CORNER_X + third_size_x*x + third_size_x/2+SQUARE_WEIGHT/2,
-			     BOARD_LEFT_CORNER_Y + third_size_y*y + third_size_y/2+SQUARE_WEIGHT/2,
+	graph_circle(BOARD_X + third_size_x*x + third_size_x/2+SQUARE_WEIGHT/2,
+			     BOARD_Y + third_size_y*y + third_size_y/2+SQUARE_WEIGHT/2,
 			     third_size_x /2-2*SQUARE_WEIGHT, c_orange, false);
 	
 #else	     
-	graph_circle(BOARD_LEFT_CORNER_X + third_size_x*x + third_size_x/2+SQUARE_WEIGHT/2,
-			     BOARD_LEFT_CORNER_Y + third_size_y*y + third_size_y/2+SQUARE_WEIGHT/2,
+	graph_circle(BOARD_X + third_size_x*x + third_size_x/2+SQUARE_WEIGHT/2,
+			     BOARD_Y + third_size_y*y + third_size_y/2+SQUARE_WEIGHT/2,
 			     third_size_x /2-2*SQUARE_WEIGHT, c_orange, true);
-	graph_circle(BOARD_LEFT_CORNER_X + third_size_x*x + third_size_x/2+SQUARE_WEIGHT/2,
-			     BOARD_LEFT_CORNER_Y + third_size_y*y + third_size_y/2+SQUARE_WEIGHT/2,
+	graph_circle(BOARD_X + third_size_x*x + third_size_x/2+SQUARE_WEIGHT/2,
+			     BOARD_Y + third_size_y*y + third_size_y/2+SQUARE_WEIGHT/2,
 			     third_size_x / 2-3*SQUARE_WEIGHT, c_white, true);
 #endif	     
 	 	

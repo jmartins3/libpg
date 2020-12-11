@@ -32,8 +32,8 @@
 
 typedef int TTT_Board[3][3];
 
-#define BOARD_LEFT_CORNER_X	90
-#define BOARD_LEFT_CORNER_Y	60
+#define BOARD_X	90
+#define BOARD_Y	60
 
 #define GRID_WEIGHT	10
 #define SQUARE_BORDER 30
