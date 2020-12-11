@@ -5,6 +5,8 @@
 // error 
 
 #define STATUS_ERROR	-1
+#define STATUS_OK		201
+#define ERR_TOPIC_DUPLICATE 432
 
 
 // limits

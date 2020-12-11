@@ -4,5 +4,6 @@ reg_create_user 60000 john
 reg_create_user 1 admin
 reg_create_user 50000 jmartins
 reg_create_theme battleship jmartins
+reg_create_theme tictactoe jmartins
 
 

@@ -16,7 +16,7 @@
 #include <assert.h>
 
 
-#define GAME_TYPE "tic_tac_toe"
+#define GAME_TYPE "tictactoe"
 
 //#define DEBUGR
 
