@@ -8,9 +8,7 @@ OBJS= libgraph/graphics.o libgraph/events.o libgraph/triangles.o \
 	libgraph/socket_events.o libgraph/uv_srv.o  libgraph/components.o \
 	libgraph/comm.o libgraph/strutils.o
 
-prepare:
-	chmod 755 cr_bin
-	./cr_bin
+
 
 all:
 	cd libgraph; make
@@ -18,6 +16,10 @@ all:
 	g++ -o $(BIN)/libpg.so -shared -rdynamic $(OBJS) $(LIBS)
  	
 
+prepare:
+	chmod 755 cr_bin
+	./cr_bin
+	
  
 cleanall:
 	cd libgraph; make clean
