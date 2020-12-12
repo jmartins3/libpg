@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <map>
 
 #include "../include/list.h"
@@ -8,22 +9,20 @@
 using namespace std;
 
 
+#define DEBUG_SESSION
+
+
+extern "C" {
+bool verbose_mode = false;
+}
+
+
 typedef struct topic_entry {
-	LIST_ENTRY link;
+	list_entry_t link;
 	topic_t *topic;
 } topic_entry_t;
 
-/*
-namespace std {
-	template<> struct  less<uv_tcp_handler>
-	{
-		bool operator() (const uv_tcp_handler& lhs, const uv_tcp_handler& rhs) const
-		{
-			return lhs.addr.sin_port <= rhs.addr.sin_port;
-		}
-	};
-}
-*/
+ 
 
 typedef uv_tcp_t *uv_tcp_ptr_t;
 
@@ -40,8 +39,8 @@ namespace std {
 map<uv_tcp_ptr_t, user_session_t *> sessions;
 
  
-static bool remove_topic(LIST_ENTRY *list, topic_t *topic) {
-	for(LIST_ENTRY *curr = list->flink; curr != list; curr = curr->flink) {
+static bool remove_topic(list_entry_t *list, topic_t *topic) {
+	for(list_entry_t *curr = list->flink; curr != list; curr = curr->flink) {
 		topic_entry_t *entry = (topic_entry_t*) curr;
 		if (entry->topic == topic) {
 			remove_entry_list(curr);
@@ -64,9 +63,12 @@ static user_session_t *create_session(uv_tcp_ptr_t chn, user_t *user) {
 
 void session_destroy(user_session_t *session) {
 	// leave all joined topics
-	
-	printf("leave joined topics for %s\n", session->user->name);
-	for(LIST_ENTRY *curr = session->transient_joined_topics.flink; 
+
+#ifdef DEBUG_SESSION
+	if (verbose_mode)
+		printf("leave joined topics for %s\n", session->user->name);
+#endif
+	for(list_entry_t *curr = session->transient_joined_topics.flink; 
 				curr != &session->transient_joined_topics; curr = curr->flink) {
 		topic_entry_t *entry = (topic_entry_t*) curr;
 		topic_leave2(entry->topic, session->user);
@@ -74,8 +76,11 @@ void session_destroy(user_session_t *session) {
 	
 	// remove all created topics
 	// leave all joined topics
-	printf("destroy created topics for %s\n", session->user->name);
-	for(LIST_ENTRY *curr = session->transient_created_topics.flink; 
+#ifdef DEBUG_SESSION	
+	if (verbose_mode)
+		printf("destroy created topics for %s\n", session->user->name);
+#endif
+	for(list_entry_t *curr = session->transient_created_topics.flink; 
 				curr != &session->transient_created_topics; curr = curr->flink) {
 		topic_entry_t *entry = (topic_entry_t*) curr;
 		topic_remove2(entry->topic, session->user);
@@ -88,25 +93,37 @@ void session_destroy(user_session_t *session) {
 }
 
 void session_add_topic(user_session_t *session, topic_t *topic) {
-	printf("created transient topic %s for user %s\n", topic->name, session->user->name);
+#ifdef DEBUG_SESSION
+	if (verbose_mode)
+		printf("created transient topic %s for user %s\n", topic->name, session->user->name);
+#endif
 	topic_entry_t *entry = (topic_entry_t *) malloc(sizeof(topic_entry_t));
 	entry->topic = topic;
 	insert_tail_list(&session->transient_created_topics, &entry->link);
 }
 
 void session_remove_topic(user_session_t *session, topic_t *topic) {
-	printf("remove transient topic %s for user %s\n", topic->name, session->user->name);
+#ifdef DEBUG_SESSION
+	if (verbose_mode)
+		printf("remove transient topic %s for user %s\n", topic->name, session->user->name);
+#endif
 	remove_topic(&session->transient_created_topics, topic);
 }
 
 void session_leave_topic(user_session_t *session, topic_t *topic) {
-	printf("leave joined topic %s for user %s\n", topic->name, session->user->name);
+#ifdef DEBUG_SESSION
+	if (verbose_mode)
+		printf("leave joined topic %s for user %s\n", topic->name, session->user->name);
+#endif
 	remove_topic(&session->transient_joined_topics, topic);
 }
 
 
 void session_join_topic(user_session_t *session, topic_t *topic) {
-	printf("topic %s joined for user %s\n", topic->name, session->user->name);
+#ifdef DEBUG_SESSION
+	if (verbose_mode)
+		printf("topic %s joined for user %s\n", topic->name, session->user->name);
+#endif
 	topic_entry_t *entry = (topic_entry_t *) malloc(sizeof(topic_entry_t));
 	entry->topic = topic;
 	insert_tail_list(&session->transient_joined_topics, &entry->link);

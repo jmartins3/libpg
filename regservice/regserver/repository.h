@@ -47,7 +47,7 @@
 #define INCONSISTENT_DB			31
 
 typedef struct user {
-	LIST_ENTRY link;				// the link node
+	list_entry_t link;				// the link node
 	char name[MAX_USER_NAME];
 	char passwd_hash[PASSWD_HASH_SIZE];
 	int  number;
@@ -62,14 +62,14 @@ typedef struct user_session {
 	user_t *user;
 	uv_tcp_t *chn;
 	// list of transient topics created in the current user session	
-	LIST_ENTRY transient_created_topics;
-	LIST_ENTRY transient_joined_topics;	
+	list_entry_t transient_created_topics;
+	list_entry_t transient_joined_topics;	
 } user_session_t;
 
 typedef struct theme {
-	LIST_ENTRY link;				// the link node
+	list_entry_t link;				// the link node
 	char name[MAX_THEME_NAME+1];	// theme name
-	LIST_ENTRY topics;				// topics list
+	list_entry_t topics;				// topics list
 	int ntopics;					// topics number
 	user_t *owner_user;				// theme owner
 } theme_t;
@@ -77,7 +77,7 @@ typedef struct theme {
 
  
 typedef struct topic {
-	LIST_ENTRY link;				// the link node
+	list_entry_t link;				// the link node
 	char name[MAX_TOPIC_NAME+1];	// topic name
 	theme_t *belong_theme;
 	user_t *owner_user;
@@ -85,12 +85,12 @@ typedef struct topic {
 									// persistent
 	int njoiners;					// total topic joiners
 	int limit;						// max topic joiners
-	LIST_ENTRY joiners;				// topic joiners
+	list_entry_t joiners;				// topic joiners
 } topic_t;
 
 
 typedef struct topic_joiner {
-	LIST_ENTRY link;				// the link node
+	list_entry_t link;				// the link node
 	union {
 		user_t *joiner;
 		user_session_t *session; 	// for transient topics
@@ -102,7 +102,7 @@ typedef struct topic_joiner {
 } topic_joiner_t;
 
 
-typedef int (*cmp_node) (LIST_ENTRY *n1, void *val);	
+typedef int (*cmp_node) (list_entry_t *n1, void *val);	
 
 typedef struct names_result {
 	int nresults;	// number of names in collection

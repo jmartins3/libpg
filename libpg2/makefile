@@ -5,14 +5,14 @@ LIBS= -lpthread -Wl,-rpath,/usr/local/lib -lSDL2_gfx -lSDL2_image  -lSDL2_mixer 
 
 OBJS= libgraph/graphics.o libgraph/events.o libgraph/triangles.o \
 	libgraph/audio.o  libgraph/graphics_text.o libgraph/hooks.o \
-	libgraph/socket_events.o libgraph/uv_srv.o  libgraph/components.o
+	libgraph/socket_events.o libgraph/uv_srv.o  libgraph/components.o \
+	libgraph/comm.o libgraph/strutils.o
 
 
 all:
 	cd libgraph; make
 	#cd libjson; make
 	g++ -o $(BIN)/libpg.so -shared -rdynamic $(OBJS) $(LIBS)
-	 
  	
 
  
@@ -25,3 +25,9 @@ clean:
 	rm -rf *.so		
 
 
+deploy:
+	rm -rf libpg64install/include/*
+	cp include/* libpg64install/include/
+	cp bin/libpg.so libpg64install
+	cd libpg64install; sudo ./libinstall
+	

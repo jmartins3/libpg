@@ -72,3 +72,5 @@ bool winner(int player);
 bool screen_to_board(int mx, int my, Point *p);
 
 bool ttt_play(int x, int y, int piece);
+
+void ttt_create_board(RGB bc);

@@ -307,6 +307,6 @@ void sound_stop();
 #define	c_blue			graph_rgb(0, 0, 255)
 #define	c_orange		graph_rgb(255, 146, 36)
 #define c_yellow		graph_rgb(255, 255, 0)
-#define c_transparent	graph_transparent()
+#define c_transparent	((RGB) 0)
 
 #endif

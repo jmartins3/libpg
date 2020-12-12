@@ -3,8 +3,8 @@ INC=/usr/local/include/SDL2
 
 CPPFLAGS=-c -g -I$(INC) -Wall   -fPIC
 
-all: graphics.o  events.o audio.o triangles.o graphics_text.o hooks.o socket_events.o \
-	uv_srv.o components.o
+all: graphics.o  events.o audio.o triangles.o graphics_text.o comm.o hooks.o socket_events.o \
+	uv_srv.o components.o strutils.o
 
 triangles.o: triangles.cpp
 	$(CPP) $(CPPFLAGS) triangles.cpp
@@ -15,6 +15,12 @@ graphics.o: graphics.cpp
 events.o: events.cpp
 	$(CPP) $(CPPFLAGS) events.cpp
 
+comm.o: comm.cpp
+	$(CPP) $(CPPFLAGS) comm.cpp
+	
+strutils.o: strutils.cpp
+	$(CPP) $(CPPFLAGS) strutils.cpp
+	
 audio.o: audio.cpp
 	$(CPP) $(CPPFLAGS) audio.cpp
 

@@ -16,6 +16,10 @@
 #define GROUP_SERVER_PORT	60000
 
 
+//#define DEBUG_CMDS
+//#define DEBUG_END
+//#define DEBUG_EVENTS
+
 // last received message number
 static unsigned long msg_number = 0;
 
@@ -44,7 +48,7 @@ static msg_request_t *mr_gs_cmd(session_t session, const char cmd[])  {
 		return NULL;
 	}
 	msg_request_t *mr=  mr_create(GroupSrvCmd, cmd, session->on_response);
-#ifdef DEBUG
+#ifdef DEBUG_CMDS
 	printf("cmd send: '%s'\n", cmd);
 #endif
 	mr->session = session;
@@ -119,7 +123,9 @@ void gs_session_destroy(session_t session) {
 	if (!try_close_session(session)) return;
 	session->state = Closing;
 	mr->session=session;
+#ifdef DEBUG_END
 	printf("exec session destroy for %s!\n", session->user);
+#endif
 	exec_request(mr);
 }
 					
@@ -148,7 +154,9 @@ void gs_request(session_t session, const char cmd[], const char args[]) {
 	char authcmd[1024];
 	
 	if (session->state >= Closing) {
+#ifdef DEBUG_END
 			printf("try send cmd with session state %d: '%s'\n", session->state, cmd);
+#endif
 			session->on_response(-5, "Session closing or closed!", session->context);
 			return;
 	}
@@ -248,7 +256,9 @@ void send_graph_response(msg_request_t *msg) {
     event.type = _RESPONSE_EVENT;
     
     while (0 >= SDL_PushEvent(&event)) {
+#ifdef DEBUG_EVENTS
 		printf("error pushing event!\n");
+#endif
 		SDL_Delay(2);
 	}
 }
@@ -269,7 +279,9 @@ void send_graph_notification(session_t session) {
     
    
     while (0 >= SDL_PushEvent(&event)) {
+#ifdef DEBUG_EVENTS
 		printf("error pushing event!\n");
+#endif
 		SDL_Delay(2);
 	}
 } 

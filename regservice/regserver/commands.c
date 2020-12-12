@@ -11,6 +11,10 @@
 #include "channel.h"
 #include "activeusers.h"
 
+
+#define DEBUG_MEM
+#define DEBUG_ADDRESS
+
 typedef Answer (*CmdHandler)(void *cmd);
 
 #define UDP_SENDER_PORT 30001
@@ -19,6 +23,8 @@ typedef Answer (*CmdHandler)(void *cmd);
 static uv_udp_t broadcaster; 
 
 static int nmallocs, nfrees;
+
+extern  bool verbose_mode;
 
 void inc_mallocs() {
 	nmallocs++;
@@ -530,14 +536,22 @@ Cmd *cmd_create(const char *cmd_name, channel_t *chn) {
 	}
 	if (cmd != NULL) {
 		cmd->chn = chn;
-		printf("malloc: create command\n"); inc_mallocs();
+#ifdef DEBUG_MEM
+		if (verbose_mode) 
+			printf("malloc: create command\n"); 
+		inc_mallocs();
+#endif
 	}
 	return cmd;
 }
 				
 void cmd_destroy(Cmd *cmd) {
 	if (cmd != NULL) {
-		printf("free: cmd_destroy\n"); inc_frees();
+#ifdef DEBUG_MEM
+		if (verbose_mode) 
+			printf("free: cmd_destroy\n"); 
+		inc_frees();
+#endif
 		free(cmd);
 	}
 }
@@ -608,12 +622,7 @@ void cmd_create_topic(Cmd *_cmd) {
 		
 		user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
 		int res = topic_create(cmd->theme, cmd->topic, &addr, session, owner);
-		if (res != OPER_OK) {
-			Answer a = {.status = COMMAND_ERROR + res };
-			a.username = owner;
-			send_response(_cmd->chn, &a);
-			return;
-		}
+		if (res != OPER_OK) status = COMMAND_ERROR + res;	 
 	}
 	send_status_response(_cmd->chn, status);
 }
@@ -735,7 +744,11 @@ void enter_partner_cb(uv_udp_send_t *req , int status) {
 	// check send error
 	if (status != 0) {
 		send_status_response(send->cmd->chn, UNREACHABLE_TOPIC_OWNER);
-		printf("free: enter_partner_cb\n"); inc_frees();
+#ifdef DEBUG_MEM
+		if (verbose_mode) 
+			printf("free: enter_partner_cb\n"); 
+		inc_frees();
+#endif
 		free(send);
 	}
 	
@@ -743,8 +756,11 @@ void enter_partner_cb(uv_udp_send_t *req , int status) {
 	Answer a = {.status = STATUS_OK };
 	a.njoiners = cmd->njoiners;
 	send_response(cmd->base.chn, &a);
-	
-	printf("free: enter_partner_cb\n"); inc_frees();
+#ifdef DEBUG_MEM
+	if (verbose_mode) 
+		printf("free: enter_partner_cb\n"); 
+	inc_frees();
+#endif
 	free(send);
 }
 
@@ -767,8 +783,11 @@ void cmd_join_topic(Cmd *_cmd) {
 		
 		user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
 		int res = topic_join(cmd->theme, cmd->topic, &addr, session, &njoiners);
-		printf("address %s,%d join to topic %s\n", 
-			inet_ntoa(addr.sin_addr), addr.sin_port, cmd->topic);
+#ifdef DEBUG_ADDRESS
+		if (verbose_mode)  
+			printf("address %s,%d join to topic %s\n", 
+					inet_ntoa(addr.sin_addr), addr.sin_port, cmd->topic);
+#endif
 		if (res != OPER_OK) send_status_response(_cmd->chn, COMMAND_ERROR + res);
 		else {
 		
@@ -778,11 +797,16 @@ void cmd_join_topic(Cmd *_cmd) {
 				send_status_response(_cmd->chn, COMMAND_ERROR + res);
 			else {
 				cmd->njoiners = njoiners;
-				
-				printf("malloc: udp_send_t for join_topic\n"); inc_mallocs();
-				
-				printf("Owner info -> %s;%X:%d\n", owner_info.username,
+#ifdef DEBUG_MEM			
+				if (verbose_mode)  
+					printf("malloc: udp_send_t for join_topic\n"); 
+				inc_mallocs();
+#endif
+#ifdef DEBUG_ADDRESS				
+				if (verbose_mode) 
+					printf("Owner info -> %s;%X:%d\n", owner_info.username,
 							owner_info.sock_addr.sin_addr.s_addr, owner_info.sock_addr.sin_port);
+#endif
 				udp_send_t *send = (udp_send_t *) malloc(sizeof(uv_udp_send_t)+128);
 				// prepare notification message
 				int msg_size = sprintf(send->buffer, "ENTER_PARTNER\n%s %s %s %d\n\n", 
@@ -809,7 +833,11 @@ void leave_partner_cb(uv_udp_send_t *req , int status) {
 	if (cmd->base.chn != NULL) {
 		if (status != 0) {
 			send_status_response(send->cmd->chn, UNREACHABLE_TOPIC_OWNER);
-			printf("free: leave_partner_cb\n"); inc_frees();
+#ifdef DEBUG_MEM
+			if (verbose_mode) 
+				printf("free: leave_partner_cb\n"); 
+			inc_frees();
+#endif
 			
 		}
 		else {
@@ -820,15 +848,26 @@ void leave_partner_cb(uv_udp_send_t *req , int status) {
 	}
 		
 	/* free message resources */
-	printf("free: leave_partner_cb\n"); inc_frees();
+#ifdef DEBUG_MEM
+	if (verbose_mode) 
+		printf("free: leave_partner_cb\n"); 
+	inc_frees();
+#endif
 	free(send);
 }
 
 
 static void send_to_owner(CmdLeaveTopic *cmd, joiner_info_t *owner_info, int njoiners) {
-	printf("malloc: udp_send_t for leave_topic\n"); inc_mallocs();
-	printf("Owner info -> %s;%X:%d\n", owner_info->username,
+#ifdef DEBUG_MEM
+	if (verbose_mode) 
+		printf("malloc: udp_send_t for leave_topic\n"); 
+	inc_mallocs();
+#endif
+#ifdef DEBUG_ADDRESS
+	if (verbose_mode) 
+		printf("Owner info -> %s;%X:%d\n", owner_info->username,
 				owner_info->sock_addr.sin_addr.s_addr, owner_info->sock_addr.sin_port);
+#endif
 	udp_send_t *send = (udp_send_t *) malloc(sizeof(uv_udp_send_t)+128);
 	int msg_size = sprintf(send->buffer, "LEAVE_PARTNER\n%s %s %s %d\n\n", 
 		cmd->base.user->name, cmd->theme, cmd->topic, njoiners);
@@ -875,7 +914,11 @@ void send_cb(uv_udp_send_t *req, int status) {
 		if (cmd->base.chn != NULL)
 			send_status_response(cmd->base.chn, STATUS_OK);
 		req_array_entry_t *entry = (req_array_entry_t*) req;
-		printf("free: broadcast_cb\n"); inc_frees();
+#ifdef DEBUG_MEM
+		if (verbose_mode) 
+			printf("free: broadcast_cb\n"); 
+		inc_frees();
+#endif
 		free(entry- entry->idx);
 		
 		free(cmd->joiners);
@@ -895,7 +938,11 @@ void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, const char *act
 	// TODO no send the message to the emmiter
 	
 	cmd->joiners = joiners;
-	printf("malloc: udp_send_t array for broadcast\n"); inc_mallocs();
+#ifdef DEBUG_MEM
+	if (verbose_mode) 
+		printf("malloc: udp_send_t array for broadcast\n"); 
+	inc_mallocs();
+#endif
 	cmd->reqs = (req_array_entry_t*) malloc(sizeof(req_array_entry_t)*total);
 	for (int i=0; i < total; ++i) {
 		cmd->reqs[i].req.data = cmd;
@@ -913,7 +960,11 @@ void send_to_partners(CmdBroadcast *cmd, joiner_info_t *joiners, const char *act
 		bufs[l].len = cmd->sz_lines[l-1];
 	}
 	for (int p = 0; p < total; p++) {
-		printf("Send broadcast to %s,%d\n", inet_ntoa(joiners[p].sock_addr.sin_addr), joiners[p].sock_addr.sin_port);
+#ifdef DEBUG_ADDRESS
+		if (verbose_mode) 
+			printf("Send broadcast to %s,%d\n", 
+				inet_ntoa(joiners[p].sock_addr.sin_addr), joiners[p].sock_addr.sin_port);
+#endif
 		cmd->reqs[p].idx = p;
 		uv_udp_send(&cmd->reqs[p].req, &broadcaster, bufs, cmd->nlines + 1, (struct sockaddr *) &joiners[p].sock_addr, send_cb);
 	}

@@ -7,8 +7,8 @@ CFLAGS=-c -g -std=c99 -Wall
 
 all: btship2   
 
-btship2: battleship2.o board.o  comm.o strutils.o
-	$(CC) -o btship2  battleship2.o board.o   comm.o strutils.o -lpg  -lm
+btship2: battleship2.o board.o  strutils.o
+	$(CC) -o btship2  battleship2.o board.o  strutils.o -lpg  -lm
 
  
 	

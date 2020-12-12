@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ $# -ne 2  -a  $# -ne 3  ]
+then
+	echo "usage: launch_server <user1> <user2>"
+	exit 1
+fi
+
+verbose=""
+
+if [ $# -ne 2 ]
+then
+	verbose="-v"
+fi
+
+
+echo $0
+echo $1 
+echo $2
+
+
+(cd ~/src/libpg/regservice/regclients; sleep 3; reg_init $1 $2) &
+
+(cd ~/src/libpg/regservice/regserver; regsrv $verbose)

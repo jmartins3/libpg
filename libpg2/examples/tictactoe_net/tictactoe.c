@@ -13,10 +13,13 @@
 
 #include "pg/pglib.h"
 #include "strutils.h"
-#include "comm.h"
+
 #include "tictactoe.h" 
 
-#define DEBUGN
+#define GAME_TYPE	"tictactoe"
+
+// #define DEBUG_MSG
+
 
 	
 #define WINDOW_TITLE "Tic-Tac-Toe"
@@ -62,12 +65,18 @@ int turn;								// active player
 
 
 void show_victory_message() {
-	mv_show_text(&status_msg, "I win!", ALIGN_CENTER);
+	mv_show_text(&status_msg, "You win!", ALIGN_CENTER);
 }
 
 void show_loose_message() {
-	mv_show_text(&status_msg, "I loose!", ALIGN_CENTER);
+	mv_show_text(&status_msg, "You loose!", ALIGN_CENTER);
 }
+
+
+void show_draw_message() {
+	mv_show_text(&status_msg, "draw!", ALIGN_CENTER);
+}
+
 
 void error(const char *msg) {
 	printf("error: %s\n", msg);
@@ -95,7 +104,7 @@ void do_play(int x, int y) {
 	char args[32];
 	sprintf(args, "%s %d %d\n", PLAY_MSG, x, y);
 	
-	bs_play(game_session, args);
+	srv_play(game_session, args);
 }
 
 
@@ -104,12 +113,12 @@ void process_opponent_shot(int x, int y) {
 
 	nplays++;
 	if (winner(other_piece)) {
-		printf("player with %s won!\n", other_piece == CROSS ? "cross" : "ball");
+		show_loose_message();
 		state = GameOver;
 	
 	}
 	else if (nplays == 9) {	
-		printf("draw!\n");
+		show_draw_message();
 		state = GameOver;
 		 
 	}
@@ -122,20 +131,20 @@ bool process_creation_response(const char *resp) {
 	// get args
 	int rank; 
 
-printf("creation_response: '%s'\n", resp);
+ 
 
 	int start = str_next_word(resp, 0, opponent_name, MAX_NAME_SIZE);
 	if (start != -1) start = str_next_int(resp, start, &rank);
 	
 	if (start == -1) { error(BAD_CREATION_MSG); return false;  }
 	if (rank == 1) {
-		printf("%s start the game\n", username);
+		 
 		turn = MY_TURN;
 		my_piece = CROSS;
 		other_piece = BALL;
 	}
 	else {
-		printf("The opponent start the game\n");
+		 
 		turn = OPPON_TURN;
 		my_piece = BALL;
 		other_piece = CROSS;
@@ -147,11 +156,11 @@ printf("creation_response: '%s'\n", resp);
 
 
 void on_msg(const char sender[], const char msg[]) {
-#ifdef DEBUGN	
+#ifdef DEBUG_MSG	
 	printf("msg received from group joiner %s: %s\n", sender, msg);
 #endif
 	if (state != InGame || turn != OPPON_TURN) {
-printf("state=%d, turn=%d\n", state, turn);
+ 
 		error(BAD_STATE_MSG); return;
 	}
 	char msg_type[MAX_RESP_TYPE_SIZE] = {0};
@@ -163,9 +172,13 @@ printf("state=%d, turn=%d\n", state, turn);
 	if (start != -1) start = str_next_int(msg, start, &y);
 	
 	if (start == -1 ) {
-		 error("Invalid message received!\n"); return;
+#ifdef DEBUG_MSG
+		 error("Invalid message received!\n"); 
+#endif
+		 return;
+		
 	}
-#ifdef DEBUG
+#ifdef DEBUG_MSG
 	printf("msg received: type='%s', x= '%c', y=%d\n", msg_type, x, y);
 #endif
 	if (strcmp(PLAY_MSG, msg_type) == 0) 	
@@ -176,16 +189,16 @@ printf("state=%d, turn=%d\n", state, turn);
 void on_response(int status, const char response[]) {
 	if (status != STATUS_OK) {
 		error(response);
-		printf("error %d: %s\n", status, response);
+	 
 		mv_show_text(&status_msg, response, ALIGN_LEFT);
-		bs_close_session(game_session);
+		srv_close_session(game_session);
 		return;
 		
 	}
 	switch(state) {
 		case Start: // connected, now the game creation
 				state = CreateGame;
-				bs_new_game(game_session, game_name);
+				srv_new_game(game_session, GAME_TYPE, game_name);
 				break;
 		case CreateGame:
 				if (process_creation_response(response)) {
@@ -198,8 +211,7 @@ void on_response(int status, const char response[]) {
 		case InGame:
 				break;	
 		case GameOver:
-				printf("end game!\n");
-			
+			 
 				break;
 		default:
 			break;
@@ -223,12 +235,12 @@ void mouse_handler(MouseEvent me) {
 			do_play(bp.x, bp.y);
 			nplays++;
 			if (winner(my_piece)) {
-				printf("player with %s won!\n", my_piece == CROSS ? "cross" : "ball");
+				show_victory_message();
 				state = GameOver;
 			
 			}
 			else if (nplays == 9) {	
-				printf("draw!\n");
+				show_draw_message();
 				state = GameOver;
 				 
 			}
@@ -244,7 +256,8 @@ void prepare_game() {
  	// draw background
 	graph_rect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT,  BACK_COLOR, true);
 	
-	ttt_draw_board();
+	ttt_create_board(BACK_COLOR);
+	ttt_draw_board(BACK_COLOR);
 		
 	 	
 	 
@@ -263,24 +276,24 @@ int main() {
 	
 	char server_ip[MAX_NAME_SIZE];
 	
-	printf("enter tic-tac-toe...\n");
+	 
 	if (get_args(username, server_ip, game_name) != 3) {
 		printf("usage: tictactoe <username> <server_addr> <game_name>\n");
 		return 1;
 	}
 	
-	printf("tic_tac_toe initiated for %s\n", username);	
+	 
 	graph_init2(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
 	graph_regist_mouse_handler(mouse_handler);
 	
 	prepare_game(); 
 	
-	printf("tic_tac_toe created for %s\n", username);	 
-	game_session = bs_connect(server_ip, username, on_response, on_msg);
-	printf("tic_tac_toe started for %s\n", username);
+	 
+	game_session = srv_connect(server_ip, username, on_response, on_msg);
+	 
 	graph_start();
-	printf("tic_tac_toe terminated for %s!\n" , username);
+ 
 	return 0;
 }
 

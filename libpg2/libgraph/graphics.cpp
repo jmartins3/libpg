@@ -11,7 +11,10 @@
 
 #include 	"../include/socket_events.h"
 #include 	"../include/uv_srv.h"
- 
+
+
+// #define DEBUG_START
+
  /* defualt graph Window Dimensions */
 
 #define GRAPH_WIDTH  1024
@@ -48,7 +51,7 @@ static int internal_init(const char title[], bool with_timer, int width, int hei
  
     __USER_EVENTS = SDL_RegisterEvents(4);	
 	if (__USER_EVENTS == (unsigned int) -1) {
-		printf("Can't regist new event type\n");
+		printf("SDL initialization error: %s\n", SDL_GetError());
 		return  -1;	
 	}		 
 	
@@ -112,7 +115,7 @@ void graph_end_capture2(ScrArea area) {
 
 RGB graph_get_pixel2(ScrArea area, int x, int y) {
 	if (area == NULL) {
-		printf("NULL area!\n");
+		 
 		return c_red;
 	}
 	RGB* pixels = (RGB*) area->pixels;
@@ -257,10 +260,15 @@ int graph_init2(const char title[], int width, int height) {
 	clip.w = width;
 	clip.h = height;	
 	SDL_RenderSetViewport(screen, &clip);
+#ifdef DEBUG_START
 	printf("start server!\n");
+#endif
+
 	start_server();
 	
+#ifdef DEBUG_START	
 	printf("server started!\n");
+#endif
 	 
 	return 0;
 }

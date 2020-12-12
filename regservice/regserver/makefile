@@ -22,6 +22,10 @@ regsrv:	$(REGSERVER_OBJS) $(REGSERVER_CPPOBJS)
 sessions_test: $(SESSION_TEST_CPPOBJS)
 	$(CPP) -o sessions_test $(SESSION_TEST_CPPOBJS) -pthread -luv
 
+
+install:
+	cp regsrv /home/isel/src/libpg/libpg2/libpg64install
+	
 # Compile rule	
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

@@ -7,11 +7,13 @@
 #include <assert.h>
 
 //#define DEBUG_OUTR
-
 //#define DEBUG_OUTW
-
 //#define DEBUG_OUTN
-
+//#define DEBUG_OUTC
+//#define DEBUG_END
+//#define DEBUG_CMDS
+//#define DEBUG_SEQ
+ 
 
 #ifndef STATUS_OK
 #define STATUS_OK 201
@@ -26,9 +28,7 @@ static uv_sem_t server_started;
 // just for maintaining loop
 static uv_tcp_t server;			// connection libuv socket
 
-// #define DEBUG_OUT2
-// #define DEBUG_OUT1
-// #define DEBUG_OUT 
+
 
 
 static unsigned long old_number;
@@ -66,12 +66,14 @@ void on_close(uv_handle_t* handle) {
  
 	channel_t * chn = (channel_t*) handle;
 	if (chn->session != NULL) {
+#ifdef DEBUG_END
 		printf("on session close for %s\n", chn->session->user);
+#endif
 		chn->session->chn = NULL;
 	    
 		chn->msg->status = STATUS_OK;
 		chn->msg->resp = NULL;
-			++old_number;
+		++old_number;
 		send_graph_response(chn->msg);
 		 
 	}
@@ -142,7 +144,7 @@ static void channel_set_invalid(channel_t *chn) {
 
 void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 
-#ifdef DEBUG_OUT1	
+#ifdef DEBUG_OUTR
 	printf("read completion on thread %ld.\n", pthread_self());	
 #endif
 	channel_t *chn = (channel_t*) client;
@@ -158,7 +160,9 @@ void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 	printf("read msg: '%s'.\n", chn->buffer);	
 #endif
 			if (old_number +1 != msg->number) {
+#ifdef DEBUG_SEQ
 					printf("old_number=%ld, msg_number=%ld\n", old_number, msg->number);
+#endif
 				
 			}
 			assert(++old_number == msg->number);
@@ -178,7 +182,7 @@ void on_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
 				msg->resp = strdup(chn->buffer);
 			}
 			else {
-				msg->status = nread;
+				msg->status = -1;
 				msg->resp = strdup("Communication error");
 
 			}
@@ -205,7 +209,7 @@ void on_connect(uv_connect_t* connection, int status)
 	
 	msg_request_t *msg = (msg_request_t *) chn->msg;
 	if (status != 0) { 
-#ifdef  DEBUG_OUT
+#ifdef  DEBUG_OUTC
 		printf("error %d on connection.\n", status); 
 #endif
 		
@@ -222,9 +226,9 @@ void on_connect(uv_connect_t* connection, int status)
 	}
 	else {
 		if (chn->session != NULL) chn->session->state = Connected;
-//#ifdef DEBUG_OUT
-		printf("connecttion done for %s!\n", msg->session->user);
-//#endif
+#ifdef DEBUG_OUTC
+		printf("connection done for %s!\n", msg->session->user);
+#endif
 		uv_read_start((uv_stream_t *) chn, alloc_buffer, on_read);
 		if (msg->cmd == NULL) {
 			msg->status = 201;
@@ -307,7 +311,7 @@ static void connect_to(msg_request_t *msg ) {
 void async_cb(uv_async_t * async)
 {
 	msg_request_t *msg = (msg_request_t*) async->data;
-#ifdef DEBUG_OUT
+#ifdef DEBUG_CMDS
 	printf("do exec_request  on thread %ld\n", pthread_self());
 	printf("old_number=%ld, msg_number=%ld\n", old_number, msg->number);
 #endif
@@ -317,7 +321,9 @@ void async_cb(uv_async_t * async)
 	switch(msg->type) {
 		case CloseChannel: {
 			msg->session->chn->msg = msg;
+#ifdef DEBUG_END
 		    printf("Close done!\n");
+#endif
 		  	uv_udp_recv_stop(&msg->session->msg_sock);
 		  	uv_shutdown_t *req = (uv_shutdown_t *) malloc(sizeof(uv_shutdown_t));
 			uv_shutdown(req, (uv_stream_t*) msg->session->chn, on_shutdown);
@@ -352,7 +358,7 @@ void exec_request(msg_request_t *req) {
 	if (req == NULL) return;
 	
 	async_handle.data = req;
-#ifdef DEBUG_OUT
+#ifdef DEBUG_CMDS
 	printf("start exec_request  on thread %ld\n", pthread_self());
 #endif
 	

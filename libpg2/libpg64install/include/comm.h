@@ -2,15 +2,8 @@
 #pragma once 
 
 
-// error 
 
-#define STATUS_ERROR	-1
-#define STATUS_OK		201
-#define ERR_TOPIC_DUPLICATE 432
 
-// limits
-#define MAX_NAME_SIZE	32
- 
 // Command types
 
 #define CREATE_GAME 		"CREATE_TOPIC"
@@ -29,10 +22,18 @@
 #define MESSAGE		  		"MESSAGE"
 #define TOPIC_DESTROYED	  	"TOPIC_DESTROYED"
 #define OPPONENT_LEAVE 		"OPPONENT_LEAVE"
-
+#define OPPONENT_ENTER 		"OPPONENT_ENTER"
+#define GAME_DESTROYED		"GAME_DESTROYED"
 
 typedef  void (*ResponseEventHandler)(int status, const char response[]);
 typedef  void (*MsgEventHandler)(const char sender[], const char msg[]);
+
+
+
+
+#ifdef __cplusplus 
+extern "C" {
+#endif
 
 
 /**
@@ -43,7 +44,7 @@ int get_args(char user[], char srv_addr[], char game[]);
 /**
  * game server connection   
  */
-session_t bs_connect(const char gs_ip_addr[], 
+session_t srv_connect(const char gs_ip_addr[], 
 					 const char user[],
 					 ResponseEventHandler on_resp,
 					 MsgEventHandler on_msg);
@@ -51,19 +52,19 @@ session_t bs_connect(const char gs_ip_addr[],
 /**
  * do our play
  */
-void bs_play(session_t session, const char args[]);
+void srv_play(session_t session, const char args[]);
 
 
 /**
  * send the result for our opponent play
  */
-void bs_send_result(session_t game_session, const char args[]);
+void srv_send_result(session_t game_session, const char args[]);
 
 
 /**
  * game creation operation exported by comm layer
  */
-void bs_new_game(session_t session, const char *game);
+void srv_new_game(session_t session, const char game_type[], const char game_name[]);
 	
 
 
@@ -71,10 +72,16 @@ void bs_new_game(session_t session, const char *game);
 /**
  * terminate game
  */
-void bs_end_game(session_t session);
+void srv_end_game(session_t session);
 
 				 
 /**
  * terminate session
  */
-void bs_close_session(session_t session);
+void srv_close_session(session_t session);
+
+
+
+#ifdef __cplusplus 
+}	
+#endif

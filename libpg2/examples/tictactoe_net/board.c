@@ -11,18 +11,16 @@
 #include <math.h>
 
 #include "pg/pglib.h"
-#include "comm.h"
-#include "tictactoe.h" 
- 
+
 #include "tictactoe.h" 
  
 
-
+ 
 
 
 static TTT_Board theBoard;
 
-
+static RGB back_color;
 
 bool screen_to_board(int mx, int my, Point *p) {
 	int third_size_x = BOARD_WIDTH/3+1;
@@ -108,6 +106,9 @@ static void graph_paralelogram(int xc, int yc, int w, int h, int x0, RGB color, 
 	}
 } 
 
+void ttt_create_board(RGB bc) {
+	back_color = bc;
+}
 
 void ttt_draw_board() {
 	
@@ -205,7 +206,7 @@ void draw_circle(int x, int y) {
 			     third_size_x /2-2*SQUARE_WEIGHT, c_orange, true);
 	graph_circle(BOARD_X + third_size_x*x + third_size_x/2+SQUARE_WEIGHT/2,
 			     BOARD_Y + third_size_y*y + third_size_y/2+SQUARE_WEIGHT/2,
-			     third_size_x / 2-3*SQUARE_WEIGHT, c_white, true);
+			     third_size_x / 2-3*SQUARE_WEIGHT, back_color, true);
 #endif	     
 	 	
 }

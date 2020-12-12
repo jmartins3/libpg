@@ -11,10 +11,26 @@
 
 #define NOTIFICATION_BUFFER_SIZE 4096
 
-#define MAX_IP_ADDR 16
-#define MAX_USER_NAME 32
-#define MAX_USER_PASS 32
 
+
+
+// limits
+
+#define MAX_NAME_SIZE		31
+#define MAX_SIZE_IP_ADDR	15
+#define MAX_IP_ADDR MAX_SIZE_IP_ADDR
+#define MAX_USER_NAME MAX_NAME_SIZE
+#define MAX_USER_PASS MAX_NAME_SIZE
+
+// status codes
+
+#define COMM_ERROR			-1
+#define SERVER_ERROR		500
+#define STATUS_OK			201
+#define UNKNOWN_USER 		403
+#define CONNECTION_ERR		-111
+#define ERR_TOPIC_DUPLICATE 432
+#define UNKNOWN_GAME_TYPE   461
 
 struct channel;
 

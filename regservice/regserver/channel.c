@@ -14,6 +14,12 @@
 #include "activeusers.h"
 
 
+#define DEBUG_CMDS
+#define DEBUG_MEM
+
+
+extern bool verbose_mode;
+
 /*
  * channel related functions
  */
@@ -96,10 +102,16 @@ void chn_process(channel_t *chn, int nread) {
 			chn->reader	 = cmd_args_reader(cmd);
 			chn->state = GetParms;
 		}
-		printf("command %s received!\n", chn->line);
+#ifdef DEBUG_CMDS
+		if (verbose_mode)
+			printf("command %s received!\n", chn->line);
+#endif
 	}
 	while (chn->state == GetParms && chn_trygetline(chn) ) {
-		printf("args received: %s\n", chn->line);
+#ifdef DEBUG_CMDS
+		if (verbose_mode)
+			printf("args received: %s\n", chn->line);
+#endif
 		// TODO abort command processing in case of an argument error
 		
 		if (check_empty_line(chn->line)) {
@@ -143,7 +155,11 @@ void chn_process(channel_t *chn, int nread) {
  * 		uv_tcp_t server: the listen socket
  */
 channel_t * chn_create(uv_loop_t *loop) {
-	printf("malloc: channel for chn_create\n"); inc_mallocs();
+#ifdef DEBUG_MEM
+	if (verbose_mode)
+		printf("malloc: channel for chn_create\n"); 
+	inc_mallocs();
+#endif
 	channel_t *chn = (channel_t*) malloc(sizeof(channel_t));
 	if (chn == NULL) return NULL;
 	bzero(chn, sizeof(channel_t));
@@ -167,8 +183,11 @@ void chn_destroy(uv_handle_t *_chn) {
 	
 	if (session != NULL) 
 		session_destroy(session);
-	
-	printf("free: channel\n"); inc_frees();
+#ifdef DEBUG_MEM
+	if (verbose_mode)
+		printf("free: channel\n"); 
+	inc_frees();
+#endif
 	free(chn);
 }
 

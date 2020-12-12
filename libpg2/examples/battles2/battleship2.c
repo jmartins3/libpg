@@ -8,9 +8,19 @@
 #include "battleship2.h"
 #include "board.h"
 #include "strutils.h"
-#include "comm.h"
+
 #include <unistd.h>
-	
+
+
+// DEBUG
+
+// #define DEBUG_START
+// #define DEBUG_END
+// #define DEBUG_GAME
+// #define DEBUG_MSG
+
+#define GAME_TYPE "battleship2"
+
 #define WINDOW_TITLE "Battleship"
 
 
@@ -35,7 +45,7 @@ char username[MAX_NAME_SIZE];
 char opponent_name[MAX_NAME_SIZE];
 char game_name[MAX_NAME_SIZE];
 
-bool demo_mode = false;
+bool demo_mode = true;
 session_t game_session;
 state_t state;
 bool send_result;
@@ -92,7 +102,7 @@ void do_play(char *game, int x, int y) {
 	char letter = x + 'A';
 	sprintf(args, "%s %c %d\n", SHOT, letter, y+1);
 	
-	bs_play(game_session, args);
+	srv_play(game_session, args);
 }
 
 
@@ -101,7 +111,7 @@ void do_send_result(char *game, int x, int y, int target) {
 	char letter = x + 'A';
 	sprintf(args, "%s %c %d %d\n", RESULT, letter, y+1, target);
 	send_result = true;
-	bs_send_result(game_session, args);
+	srv_send_result(game_session, args);
 }
 
 /**
@@ -173,10 +183,12 @@ void process_opponent_shot(int x, int y) {
 	 show_curr_player();
 	
 	 if (battle.total_injuries == battle.total_parts) {
+#ifdef DEBUG_END
 		 printf("%s loose!\n", username);
+#endif
 		state = GameOver;
 		show_loose_message();
-		bs_close_session(game_session);
+		srv_close_session(game_session);
 	 }
 	
 }
@@ -196,10 +208,13 @@ void process_play_result(int x, int y, int target) {
 				++battle.total_hits;
 				
 				if (battle.total_hits == battle.total_parts) {
+#ifdef DEBUG_END
 					printf("%s win!\n", username);
-					state = GameOver;
-					bs_close_session(game_session);
+#endif
+					
 					show_victory_message();
+					state = GameOver;
+					srv_close_session(game_session);
 					return;
 				}
 			}
@@ -213,18 +228,22 @@ bool process_creation_response(const char *resp) {
 	// get args
 	int rank; 
 
-printf("creation_response: '%s'\n", resp);
+
 
 	int start = str_next_word(resp, 0, opponent_name, MAX_NAME_SIZE);
 	if (start != -1) start = str_next_int(resp, start, &rank);
 	
 	if (start == -1) { error(BAD_CREATION_MSG); return false;  }
 	if (rank == 1) {
+#ifdef DEBUG_START
 		printf("%s start the game\n", username);
+#endif
 		turn = MY_TURN;
 	}
 	else {
+#ifdef DEBUG_START
 		printf("The opponent start the game\n");
+#endif
 		turn = OPPON_TURN;
 	}
 	state = InGame;
@@ -234,11 +253,13 @@ printf("creation_response: '%s'\n", resp);
 
 
 void on_msg(const char sender[], const char msg[]) {
-#ifdef DEBUGN	
+#ifdef DEBUG_MSG
 	printf("msg received from group joiner %s: %s\n", sender, msg);
 #endif
 	if (state != InGame || turn != OPPON_TURN) {
+#ifdef DEBUG_MSG	
 printf("state=%d, turn=%d\n", state, turn);
+#endif
 		error(BAD_STATE_MSG); return;
 	}
 	char msg_type[MAX_RESP_TYPE_SIZE] = {0};
@@ -253,7 +274,7 @@ printf("state=%d, turn=%d\n", state, turn);
 	if (start == -1 ) {
 		 error("Invalid message received!\n"); return;
 	}
-#ifdef DEBUG
+#ifdef DEBUG_MSG
 	printf("msg received: type='%s', letter= '%c', num=%d\n", msg_type, letter, num);
 #endif
 	if (strcmp(SHOT, msg_type) == 0) 	
@@ -271,16 +292,16 @@ printf("state=%d, turn=%d\n", state, turn);
 void on_response(int status, const char response[]) {
 	if (status != STATUS_OK) {
 		error(response);
-		printf("error %d: %s\n", status, response);
+	 
 		mv_show_text(&status_msg, response, ALIGN_LEFT);
-		bs_close_session(game_session);
+		srv_close_session(game_session);
 		return;
 		
 	}
 	switch(state) {
 		case Start: // connected, now the game creation
 				state = CreateGame;
-				bs_new_game(game_session, game_name);
+				srv_new_game(game_session, GAME_TYPE, game_name);
 				break;
 		case CreateGame:
 				if (process_creation_response(response)) {
@@ -298,7 +319,9 @@ void on_response(int status, const char response[]) {
 				 }
 				break;	
 		case GameOver:
+#ifdef DEBUG_END
 				printf("end game!\n");
+#endif
 			
 				break;
 		default:
@@ -331,7 +354,7 @@ void mouse_handler(MouseEvent me) {
 		me.state == BUTTON_PRESSED) {
 			
 		if (me.button == BUTTON_LEFT) {
-#ifdef DEBUG
+#ifdef DEBUG_GAME
 		printf("do play at %d, %d, turn=%d, state=%d\n", me.x, me.y, turn, state);
 #endif
 			if (me.button == BUTTON_LEFT && turn == MY_TURN && state == InGame) {
@@ -380,19 +403,24 @@ int main(int argc, char *argv[]) {
 
 	random_auto_play_init();
 	srand(time(NULL) + getpid());
-	
+
+#ifdef DEBUG_START
 	printf("battleship initiated for %s\n", username);	
+#endif
 	graph_init2(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
 	graph_regist_mouse_handler(mouse_handler);
 	graph_regist_timer_handler(timer_handler, 50);
 	
 	prepare_board(); 
-	
-	printf("battleship created for %s\n", username);	 
-	game_session = bs_connect(server_ip, username, on_response, on_msg);
+	 
+	game_session = srv_connect(server_ip, username, on_response, on_msg);
+#ifdef DEBUG_START
 	printf("battleship started for %s\n", username);
+#endif
 	graph_start();
+#ifdef DEBUG_END
 	printf("battleship terminated for %s!\n" , username);
+#endif
 	return 0;
 }

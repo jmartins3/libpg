@@ -6,7 +6,13 @@
 
 #include "../include/reg_service.h"
 #include "channel.h"
- 
+
+
+extern bool verbose_mode;
+
+#define DEBUG_C
+#define DEBUG_R
+#define DEBUG_CLOSE
 
 #define DEFAULT_BACKLOG 128
 
@@ -33,7 +39,10 @@ void on_close_server(uv_handle_t* handle) {
 }
 
 void on_close(uv_handle_t* handle) {
-	fprintf(stderr, "close handle %p\n", handle);
+#ifdef DEBUG_CLOSE
+	if (verbose_mode)
+		fprintf(stderr, "close handle %p\n", handle);
+#endif
     chn_destroy(handle);
     active_count--;
     if (active_count == 0 && terminated)
@@ -49,7 +58,10 @@ void stop_server() {
 }
 
 static void read_completion(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf) {
-	printf("read completed!\n");
+#ifdef DEBUG_R
+	if (verbose_mode)
+		printf("read completed!\n");
+#endif
 	channel_t *channel = (channel_t *) stream;
     if (nread > 0) {
 		chn_process(channel, nread);
@@ -63,14 +75,20 @@ static void read_completion(uv_stream_t *stream, ssize_t nread, const uv_buf_t *
 	
 void on_new_connection(uv_stream_t *server, int status) {
     if (status < 0) {
-        fprintf(stderr, "New connection error %s\n", uv_strerror(status));
+#ifdef DEBUG_C
+	if (verbose_mode)
+		fprintf(stderr, "New connection error %s\n", uv_strerror(status));
+#endif
         // error!
         return;
     }
 	
     channel_t *chn = chn_create(&loop);
     if (!terminated && uv_accept(server, (uv_stream_t*) chn) == 0) {
+#ifdef DEBUG_C
+	if (verbose_mode)
 		printf("start connection with new client!\n");
+#endif
         uv_read_start((uv_stream_t*) chn, alloc_buffer, read_completion);
         active_count++;
     }
@@ -97,6 +115,10 @@ int main(int argc, char *argv[]) {
  	
 	int r;
 	
+	if (argc == 2)  {
+		printf("verbose_mode!\n");
+		verbose_mode = true;
+	}
  
 	if ((r=server_init("0.0.0.0", REG_SERVER_PORT)) != 0) {
 		fprintf(stderr, "Listen error %s\n", uv_strerror(r));

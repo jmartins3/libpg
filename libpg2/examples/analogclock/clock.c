@@ -11,7 +11,7 @@
 #include "analogclock.h"
 
 
-Point hoursPos[60];
+Point hoursPos[12];
 Point secsPos[60];
 Point minutsPos[60];
 
@@ -91,11 +91,14 @@ void myTimerHandler() {
 int main() {
 	graph_init();
 	
+	hours = 3;
+	minuts = 40;
+	secs = 30;
 	graph_regist_timer_handler(myTimerHandler, 1000);
 	
 	calculatePositions(secsPos, RADIUS-2, 60);
 	calculatePositions(minutsPos, RADIUS-15, 60);
-	calculatePositions(hoursPos, RADIUS-20, 60);
+	calculatePositions(hoursPos, RADIUS-20, 12);
 	
 	drawInitialClock();
 	

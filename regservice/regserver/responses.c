@@ -1,5 +1,6 @@
 
 #include <uv.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include "../include/list.h"
 #include "commands.h"
@@ -29,6 +30,11 @@ typedef struct {
 
 // general errors
 #define INCONSISTENT_DB			31
+
+#define DEBUG_W
+#define DEBUG_MEM
+
+extern bool verbose_mode;
 
 
 error_desc_t errors[] = {
@@ -92,16 +98,25 @@ typedef struct content_builder {
 void response_write_completion(uv_write_t *req, int status) {
 	channel_t * chn = (channel_t*) req->handle;
 	if (status) {
-		fprintf(stderr, "write response error %s\n", uv_strerror(status));
+#ifdef DEBUG_W
+		if (verbose_mode)
+			fprintf(stderr, "write response error %s\n", uv_strerror(status));
+#endif
 		
 	}
 
-
-	printf("free: command\n"); inc_frees();
+#ifdef DEBUG_MEM
+	if (verbose_mode)
+		printf("free: command\n"); 
+	inc_frees();
+#endif
 	free(chn->cmd);
 	chn->cmd= NULL;
 	free(req);
-	printf("response completed!\n");
+#ifdef DEBUG_W	
+	if (verbose_mode)
+		printf("response completed!\n");
+#endif
   
 }
 
@@ -144,7 +159,11 @@ static void build_response_content(ResponseBuilder *builder, Cmd *cmd, Answer *a
 		case ListUsers:
 			build_list_response(builder, cmd, answer);
 			// free response buffer
-			printf("free: buffer_list\n"); inc_frees();
+#ifdef DEBUG_MEM
+			if (verbose_mode)
+				printf("free: buffer_list\n"); 
+			inc_frees();
+#endif
 			free(answer->names.buffer);
 			break;
 		case JoinTopic:
@@ -168,8 +187,11 @@ static void build_response_terminator(ResponseBuilder *builder )  {
 void send_status_response(channel_t *chn, int status) {
 
 	ResponseBuilder builder = { .curr = 0 };
-     
-    printf("send response status: %d\n", status);
+
+#ifdef DEBUG_W    
+    if (verbose_mode)
+		printf("send response status: %d\n", status);
+#endif
     build_response_status(&builder, status);
   
   	build_response_terminator(&builder);
@@ -182,15 +204,20 @@ void send_status_response(channel_t *chn, int status) {
 
 void send_response(channel_t *chn, Answer *answer) {
 	ResponseBuilder builder = { .curr = 0 };
-	
-	printf("send response status: %d\n", answer->status);
+#ifdef DEBUG_W 	
+	if (verbose_mode)
+		printf("send response status: %d\n", answer->status);
+#endif
     build_response_status(&builder, answer->status);
     
     build_response_content(&builder, chn->cmd, answer);
 	
     build_response_terminator(&builder);
-    
-    printf("Response:\n'%s'\n", builder.buf);
+ 
+#ifdef DEBUG_W   
+    if (verbose_mode)
+		printf("Response:\n'%s'\n", builder.buf);
+#endif
     uv_buf_t buf = uv_buf_init(builder.buf, builder.curr);
 	
 	uv_write_t *req = (uv_write_t *) malloc(sizeof(uv_write_t)); 

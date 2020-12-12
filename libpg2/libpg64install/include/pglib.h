@@ -18,6 +18,7 @@
 #include "events.h"
 #include "socket_events.h"
 #include "audio.h"
+#include "comm.h"
 
 #endif
 

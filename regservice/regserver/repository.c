@@ -12,13 +12,15 @@
 
 static int nthemes;
 static int nusers;
-static LIST_ENTRY themes;	// themes collection
-static LIST_ENTRY users;	// users collection
+static list_entry_t themes;	// themes collection
+static list_entry_t users;	// users collection
 
+
+#define DEBUG_MEM
 
 static void topic_internal_destroy(topic_t *topic);
 
-
+extern bool verbose_mode;
 
 
 //
@@ -49,8 +51,8 @@ user_t *topic_joiner_entity(topic_joiner_t *tje) {
 
 
 /// generic search
-static LIST_ENTRY *search_generic(LIST_ENTRY *list, void *val, cmp_node cmp) {
-	for(LIST_ENTRY *curr = list->flink; curr != list; curr = curr->flink) {
+static list_entry_t *search_generic(list_entry_t *list, void *val, cmp_node cmp) {
+	for(list_entry_t *curr = list->flink; curr != list; curr = curr->flink) {
 		if (cmp(curr, val) == 0) return curr;
 	}
 	return NULL;
@@ -60,10 +62,14 @@ static LIST_ENTRY *search_generic(LIST_ENTRY *list, void *val, cmp_node cmp) {
  * called when a topic has  joiners in addition to the owner
  */ 
 static void topic_fill_joiners(topic_t *topic, user_t *user, joiner_info_t **joiners, int *total) {
-	printf("malloc: joiners for topic_joiners\n"); inc_mallocs();
+#ifdef DEBUG_MEM
+	if (verbose_mode) 
+		printf("malloc: joiners for topic_joiners\n"); 
+	inc_mallocs();
+#endif
 	*joiners = (joiner_info_t*) malloc(sizeof(joiner_info_t)*topic->njoiners-1);
 	int pos = 0;
-	for(LIST_ENTRY *curr = topic->joiners.flink; curr != &topic->joiners; curr = curr->flink) {
+	for(list_entry_t *curr = topic->joiners.flink; curr != &topic->joiners; curr = curr->flink) {
 		topic_joiner_t *tj= container_of(curr, topic_joiner_t, link);
 		if (user != topic_joiner_entity(tj)) { // not broadcast to the emitter
 			strcpy((*joiners)[pos].username, topic_joiner_name(tj));
@@ -81,7 +87,7 @@ static void topic_fill_joiners(topic_t *topic, user_t *user, joiner_info_t **joi
 //
 
 
-static int cmp_by_theme_name(LIST_ENTRY *curr, void *val) {
+static int cmp_by_theme_name(list_entry_t *curr, void *val) {
 	char *name = (char*) val;
 	theme_t *theme = container_of(curr, theme_t, link);
 	
@@ -89,7 +95,7 @@ static int cmp_by_theme_name(LIST_ENTRY *curr, void *val) {
 }
 
 theme_t * theme_search(char *name) {
-	LIST_ENTRY *node = search_generic(&themes, name, cmp_by_theme_name);
+	list_entry_t *node = search_generic(&themes, name, cmp_by_theme_name);
 	if (node == NULL) return NULL;
 	return container_of(node, theme_t, link);
 }
@@ -103,7 +109,11 @@ int theme_remove(char *name, user_t *remover) {
 	remover->nthemes--;
 	nthemes--;
 	remove_entry_list(&theme->link);
-	printf("free: theme_remove\n"); inc_frees();
+#ifdef DEBUG_MEM
+	if (verbose_mode) 
+		printf("free: theme_remove\n"); 
+	inc_frees();
+#endif
 	free(theme);
 	return OPER_OK;
 }
@@ -112,8 +122,11 @@ int theme_create(char *name, user_t *creator) {
 	
 	if (strlen(name) > MAX_THEME_NAME) return THEME_NAME_TOO_BIG;
 	if (theme_search(name) != NULL) return THEME_DUPLICATE;
-	
-	printf("malloc: theme for theme_create\n"); inc_mallocs();	 
+#ifdef DEBUG_MEM	
+	if (verbose_mode) 
+		printf("malloc: theme for theme_create\n"); 
+	inc_mallocs();	 
+#endif
 	theme_t *theme = (theme_t *) malloc(sizeof(theme_t));
 	strcpy(theme->name,name);
 	theme->ntopics = 0;
@@ -128,12 +141,15 @@ int theme_create(char *name, user_t *creator) {
 
 int themes_collection(names_result_t *res) {
 	// create buffer  for max size;
-	
-	printf("malloc: buffer for themes_collection\n"); inc_mallocs();
+#ifdef DEBUG_MEM	
+	if (verbose_mode)
+		printf("malloc: buffer for themes_collection\n"); 
+	inc_mallocs();
+#endif
 	char *buf = 
 		(char*) malloc((MAX_THEME_NAME+ MAX_USER_NAME+10)*nthemes);
 	int pos = 0;
-	for(LIST_ENTRY *curr = themes.flink; curr != &themes; curr = curr->flink) {
+	for(list_entry_t *curr = themes.flink; curr != &themes; curr = curr->flink) {
 		theme_t *theme = container_of(curr, theme_t, link);
 
 		pos += sprintf(buf + pos, "%s %s %d\n", 
@@ -150,15 +166,15 @@ int themes_collection(names_result_t *res) {
 // topic joiners
 //
 
-static int cmp_by_user(LIST_ENTRY *curr, void *val) {
+static int cmp_by_user(list_entry_t *curr, void *val) {
 	user_t *user = (user_t *) val;
 	topic_joiner_t *tu = container_of(curr, topic_joiner_t, link);
 	
 	return strcmp(topic_joiner_name(tu), user->name);
 }
   
-static topic_joiner_t * topic_joiner_internal_search(LIST_ENTRY *joiners, user_t *user) {
-	LIST_ENTRY *node =  search_generic(joiners, user, cmp_by_user);
+static topic_joiner_t * topic_joiner_internal_search(list_entry_t *joiners, user_t *user) {
+	list_entry_t *node =  search_generic(joiners, user, cmp_by_user);
 	if (node == NULL) return NULL;
 	return container_of(node,topic_joiner_t, link);
 }
@@ -169,22 +185,25 @@ static topic_joiner_t * topic_joiner_internal_search(LIST_ENTRY *joiners, user_t
 // topics
 //
 
-static int cmp_by_topic_name(LIST_ENTRY *curr, void *val) {
+static int cmp_by_topic_name(list_entry_t *curr, void *val) {
 	char *name = (char*) val;
 	topic_t *topic = container_of(curr, topic_t, link);
 	
 	return strcmp(topic->name, name);
 }
 
-static topic_t * topic_internal_search(LIST_ENTRY *topics, char *name) {
-	LIST_ENTRY *node = search_generic(topics, name, cmp_by_topic_name);
+static topic_t * topic_internal_search(list_entry_t *topics, char *name) {
+	list_entry_t *node = search_generic(topics, name, cmp_by_topic_name);
 	if (node == NULL) return NULL;
 	return container_of(node, topic_t, link);
 }
 
 static void topic_join_internal(topic_t * topic, struct sockaddr_in *sock_addr, void *content) {
-	
-	printf("malloc: topic_joiner_t for topic_join_internal\n"); inc_mallocs();
+#ifdef DEBUG_MEM		
+	if (verbose_mode) 
+		printf("malloc: topic_joiner_t for topic_join_internal\n"); 
+	inc_mallocs();
+#endif
 	topic_joiner_t * tj = (topic_joiner_t * ) malloc(sizeof(topic_joiner_t));
 	
 	tj->content = content;
@@ -205,7 +224,11 @@ int topic_leave_internal(topic_t *topic, user_t *leaving_user) {
 	if (tj == NULL) return TOPIC_USER_NOT_JOINER;
 	if (!topic->is_persistent) session_leave_topic(tj->session, topic);
 	remove_entry_list(&tj->link);
-	printf("free: topic_leave\n"); inc_frees();
+#ifdef DEBUG_MEM	
+	if (verbose_mode) 
+		printf("free: topic_leave\n"); 
+	inc_frees();
+#endif
 	free(tj);
 	leaving_user->njoins--;
 	topic->njoiners--;
@@ -232,8 +255,11 @@ int topic_create(char *theme_name, char *name, struct sockaddr_in *sock_addr,
 		strcpy(owner, old_topic->owner_user->name);
 		return TOPIC_DUPLICATE;
 	}
- 
-	printf("malloc: topic_t for topic_create\n"); inc_mallocs();
+#ifdef DEBUG_MEM	
+	if (verbose_mode) 
+		printf("malloc: topic_t for topic_create\n"); 
+	inc_mallocs();
+#endif
 	topic_t *topic = (topic_t *) malloc(sizeof(topic_t));
 	strcpy(topic->name, name);
 	topic->belong_theme = theme;
@@ -272,8 +298,11 @@ void topic_remove2(topic_t *topic, user_t* remover) {
 	remove_entry_list(&topic->link);
 	topic->belong_theme->ntopics--;
 	remover->ntopics--;
-	
-	printf("free: topic_destroy\n"); inc_frees();
+#ifdef DEBUG_MEM		
+	if (verbose_mode) 
+		printf("free: topic_destroy\n"); 
+	inc_frees();
+#endif
 	free(topic);
 	
 
@@ -297,7 +326,11 @@ int topic_remove(char *theme_name, char *name, user_session_t * session) {
 	session_remove_topic(session, topic);
 	remove_entry_list(&topic->link);
 	
-	printf("free: topic_remove\n"); inc_frees();
+#ifdef DEBUG_MEM		
+	if (verbose_mode) 
+		printf("free: topic_remove\n"); 
+	inc_frees();
+#endif
 	free(topic);
 	remover->ntopics--;
 	theme->ntopics--;
@@ -322,8 +355,11 @@ int topic_destroy(char *theme_name, char *name, user_session_t* session) {
 	 
 	
 	remove_entry_list(&topic->link);
-	
-	printf("free: topic_destroy\n"); inc_frees();
+#ifdef DEBUG_MEM		
+	if (verbose_mode) 
+		printf("free: topic_destroy\n"); 
+	inc_frees();
+#endif
 	free(topic);
 	remover->ntopics--;
 	theme->ntopics--;
@@ -434,15 +470,19 @@ int topics_collection(char *theme_name, names_result_t *res) {
 	char *buf = NULL;
 	// create buffer  for max size;
 	if (theme->ntopics > 0)  {
-		printf("malloc: buffer for topics_collection\n"); inc_mallocs();
+#ifdef DEBUG_MEM	
+		if (verbose_mode) 
+			printf("malloc: buffer for topics_collection\n"); 
+		inc_mallocs();
+#endif
 		buf = (char*) malloc((MAX_TOPIC_NAME+1+ (MAX_USER_NAME*10)+ 5)*theme->ntopics);
 	
-		for(LIST_ENTRY *curr = theme->topics.flink; curr != &theme->topics; curr = curr->flink) {
+		for(list_entry_t *curr = theme->topics.flink; curr != &theme->topics; curr = curr->flink) {
 			topic_t *topic = container_of(curr, topic_t, link);
 			
 			pos += sprintf(buf + pos, "%s %s", topic->name, topic->owner_user->name);  
 			
-			for(LIST_ENTRY *curr = topic->joiners.flink; curr != &topic->joiners; curr = curr->flink) {
+			for(list_entry_t *curr = topic->joiners.flink; curr != &topic->joiners; curr = curr->flink) {
 				topic_joiner_t *tj= container_of(curr, topic_joiner_t, link);
 				if (topic->owner_user != topic_joiner_entity(tj)) { // not broadcast to the emitter
 					pos += sprintf(buf + pos, " %s", topic_joiner_name(tj));
@@ -483,7 +523,7 @@ int topic_joiners(char *theme_name, char *topic_name, joiner_info_t **joiners, i
 // users
 //
 
-static int cmp_by_user_name(LIST_ENTRY *curr, void *val) {
+static int cmp_by_user_name(list_entry_t *curr, void *val) {
 	char *name = (char*) val;
 	user_t *user = container_of(curr, user_t, link);
 	
@@ -491,7 +531,7 @@ static int cmp_by_user_name(LIST_ENTRY *curr, void *val) {
 }
   
 user_t * user_search(char *name) {
-	LIST_ENTRY *node =  search_generic(&users, name, cmp_by_user_name);
+	list_entry_t *node =  search_generic(&users, name, cmp_by_user_name);
 	if (node == NULL) return NULL;
 	return container_of(node, user_t, link);
 }
@@ -507,7 +547,11 @@ int user_create(char *name, char *passwd, int number ) {
 	if (strlen(name) > MAX_USER_NAME ) return USER_NAME_TOO_BIG;
 	if (strlen(passwd) > MAX_PASSWORD_SIZE) return USER_PASS_TOO_BIG;
 	if (user_search(name) != NULL) return USER_DUPLICATE; // name already exists
-	printf("malloc: user for user_create\n"); inc_mallocs();
+#ifdef DEBUG_MEM	
+	if (verbose_mode) 
+		printf("malloc: user for user_create\n"); 
+	inc_mallocs();
+#endif
 	user_t *user = (user_t *) malloc(sizeof(user_t));
 	strcpy(user->name,name);
 	// TODO- calculate the pasword hash
@@ -530,7 +574,11 @@ int user_remove(user_t* user) {
 	    user->ntopics > 0) return USER_NOT_EMPTY;
 	 
 	remove_entry_list(&user->link);
-	printf("free: user\n"); inc_frees();
+#ifdef DEBUG_MEM	
+	if (verbose_mode) 
+		printf("free: user\n"); 
+	inc_frees();
+#endif
 	free(user);
 	nusers--;
 	return OPER_OK;
@@ -543,9 +591,13 @@ int users_collection(names_result_t *res) {
 	int pos = 0;
 	
 	if (nusers > 0) {
-		printf("malloc: buffer for users_collection\n"); inc_mallocs();
+#ifdef DEBUG_MEM	
+		if (verbose_mode) 
+			printf("malloc: buffer for users_collection\n"); 
+		inc_mallocs();
+#endif
 		buf = (char*) malloc( (MAX_USER_NAME+10)*nusers);
-		for(LIST_ENTRY *curr = users.flink; curr != &users; curr = curr->flink) {
+		for(list_entry_t *curr = users.flink; curr != &users; curr = curr->flink) {
 			user_t *user = container_of(curr, user_t, link);
 
 			pos += sprintf(buf + pos, "%s %d\n", 
@@ -568,18 +620,22 @@ void db_init() {
 	nusers = 0;
 }
 
-static void destroy_list(LIST_ENTRY *list) {
-	LIST_ENTRY *curr = list->flink;
+static void destroy_list(list_entry_t *list) {
+	list_entry_t *curr = list->flink;
 	while(curr != list) {
-		LIST_ENTRY *rem = curr;
+		list_entry_t *rem = curr;
 		curr = curr->flink;
-		printf("free: destroy_list_elem\n"); inc_frees();
+#ifdef DEBUG_MEM	
+		if (verbose_mode) 
+			printf("free: destroy_list_elem\n"); 
+		inc_frees();
+#endif
 		free(rem);
 	}
 }
 
 static void topic_internal_destroy(topic_t *topic) {
-	for(LIST_ENTRY *curr = topic->joiners.flink; 
+	for(list_entry_t *curr = topic->joiners.flink; 
 				curr != &topic->joiners; curr = curr->flink) {
 		topic_joiner_t *entry = (topic_joiner_t*) curr;
 		if (!topic->is_persistent)
@@ -589,28 +645,36 @@ static void topic_internal_destroy(topic_t *topic) {
 }
 
 
-static void topics_destroy(LIST_ENTRY *list) {
-	LIST_ENTRY *curr = list->flink;
+static void topics_destroy(list_entry_t *list) {
+	list_entry_t *curr = list->flink;
 	while(curr != list) {
-		LIST_ENTRY *rem = curr;
+		list_entry_t *rem = curr;
 		topic_t *topic = container_of(curr, topic_t, link);
 		
 		topic_internal_destroy(topic);
 		curr = curr->flink;
-		printf("free: topic\n"); inc_frees();
+#ifdef DEBUG_MEM	
+		if (verbose_mode) 
+			printf("free: topic\n"); 
+		inc_frees();
+#endif
 		free(rem);
 	}
 }
 
 static void themes_destroy() {
-	LIST_ENTRY *curr = themes.flink;
+	list_entry_t *curr = themes.flink;
 	while(curr != &themes) {
-		LIST_ENTRY *rem = curr;
+		list_entry_t *rem = curr;
 		theme_t *theme = container_of(curr, theme_t, link);
 		
 		topics_destroy(&theme->topics);
 		curr = curr->flink;
-		printf("free: theme\n"); inc_frees();
+#ifdef DEBUG_MEM	
+		if (verbose_mode) 
+			printf("free: theme\n"); 
+		inc_frees();
+#endif
 		free(rem);
 	}
 }
