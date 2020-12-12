@@ -622,7 +622,12 @@ void cmd_create_topic(Cmd *_cmd) {
 		
 		user_session_t *session = get_session(&_cmd->chn->socket, _cmd->user);
 		int res = topic_create(cmd->theme, cmd->topic, &addr, session, owner);
-		if (res != OPER_OK) status = COMMAND_ERROR + res;	 
+		if (res != OPER_OK) {
+			Answer a = {.status = COMMAND_ERROR + res };
+			a.username = owner;
+			send_response(_cmd->chn, &a);
+			return;
+		} 
 	}
 	send_status_response(_cmd->chn, status);
 }

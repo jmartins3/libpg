@@ -14,12 +14,12 @@
 
 // DEBUG
 
-// #define DEBUG_START
+#define DEBUG_START
 // #define DEBUG_END
 // #define DEBUG_GAME
 // #define DEBUG_MSG
 
-#define GAME_TYPE "battleship2"
+#define GAME_TYPE "battleship"
 
 #define WINDOW_TITLE "Battleship"
 

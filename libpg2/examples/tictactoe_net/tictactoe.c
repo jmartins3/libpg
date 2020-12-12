@@ -251,6 +251,12 @@ void mouse_handler(MouseEvent me) {
 	}
 }
 
+void timer_handler() {
+	if (state == GameOver) return;
+	clk_tick(&mclock);
+	clk_show(&mclock);
+}
+
 
 void prepare_game() {
  	// draw background
@@ -286,6 +292,7 @@ int main() {
 	graph_init2(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
 	graph_regist_mouse_handler(mouse_handler);
+	graph_regist_timer_handler(timer_handler, 1000);
 	
 	prepare_game(); 
 	
