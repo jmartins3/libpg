@@ -72,7 +72,7 @@ void show_loose_message() {
 
 
 void show_draw_message() {
-	mv_show_text(&status_msg, "draw!", ALIGN_CENTER);
+	mv_show_text(&status_msg, "Draw!", ALIGN_CENTER);
 }
 
 
