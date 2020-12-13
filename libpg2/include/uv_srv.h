@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "list.h"
 
 #include <uv.h>
 
@@ -37,6 +38,7 @@ struct channel;
 typedef enum sess_state { Created, Pending, Connected, Closing, Closed } session_state_t;
 
 typedef struct session {
+	list_entry_t link;		// for maintain a list of active sessions
 	uv_udp_t msg_sock;
 	struct channel*chn;
 	

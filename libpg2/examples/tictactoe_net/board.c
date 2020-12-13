@@ -16,87 +16,75 @@
  
 
  
-static TTT_Board theBoard;
 
-
-bool screen_to_board(int mx, int my, Point *p) {
-	int third_size_x = BOARD_WIDTH/3+1;
-	int third_size_y = BOARD_HEIGHT/3+1;
-
-
-	int x = (mx - BOARD_X);
-	if ( x < 0) return false;
-	x = x /third_size_x;
-
-	int y = (my -BOARD_Y);
-	if ( y < 0) return false;
-	y = y /third_size_y;
-
-	if (y < 0 || x < 0 || y > 2 || x > 2 ) {
-		p->x = p->y = -1;
-		return false;
+void ttt_create_board(TTT_Board *ttt) {
+	for (int i=0; i < SIDE; ++i) {
+		 
+		for (int j = 0; j < SIDE; j++) {
+			ttt->board[i][j] = 0;
+		}
+		 
 	}
-	p-> x  = x;
-	p-> y  = y;
-	return true;
+	ttt->nplays = 0;
 }
 
 
 
-void ttt_create_board() {
-	
-}
-
-
-
-bool winner(int player) {
+bool winner(TTT_Board *ttt, int player) {
 	// check lines
 	 
-	for (int i=0; i < 3; ++i) {
+	for (int i=0; i < SIDE; ++i) {
 		int j=0;
-		for (; j < 3; j++) {
-			if (theBoard[i][j] != player) break;
+		for (; j < SIDE; j++) {
+			if (ttt->board[i][j] != player) break;
 		}
-		if (j == 3) return true;
+		if (j == SIDE) return true;
 	}
 	
 	// check collumns
-	for (int i=0; i < 3; ++i) {
+	for (int i=0; i < SIDE; ++i) {
 		int j=0;
-		for (; j < 3; j++) {
-			if (theBoard[j][i] != player) break;
+		for (; j < SIDE; j++) {
+			if (ttt->board[j][i] != player) break;
 		}
-		if (j == 3) return true;
+		if (j == SIDE) return true;
 	}
 	
 	// check first diag
 	int i;
-	for (i=0; i < 3; ++i) {
-		if (theBoard[i][i] != player) break;
+	for (i=0; i < SIDE; ++i) {
+		if (ttt->board[i][i] != player) break;
 	}
-	if (i== 3) return true;	
+	if (i== SIDE) return true;	
 	
 	// check second diag
  
-	for (i=0; i < 3; ++i) {
-		if (theBoard[i][2-i] != player) break;
+	for (i=0; i < SIDE; ++i) {
+		if (ttt->board[i][2-i] != player) break;
 	}
-	if (i== 3) return true;	
+	if (i== SIDE) return true;	
 	return false;
 }	
 
 
-bool ttt_play(int x, int y, int piece) {
-	if (theBoard[x][y] != 0)
-		return false;
+int ttt_play(TTT_Board *ttt, int x, int y, int piece) {
+	if (ttt->board[x][y] != 0)
+		return RESULT_BAD;
 	 
-	theBoard[x][y] 	= piece;
-
+	ttt->board[x][y] = piece;
+	ttt->nplays++;
 	if (piece == CROSS)
 		draw_cross(x, y); 	
 	else 
 		draw_circle(x, y);
-	return true;
+		
+	if (winner(ttt, piece)) 
+		return RESULT_WIN;
+	else if (ttt->nplays == SIDE*SIDE)
+		return RESULT_DRAW;
+	else
+		return RESULT_OK;
+ 
 }
 
 

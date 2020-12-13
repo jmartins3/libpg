@@ -14,8 +14,10 @@
 #include <cstring>
 
 #include "../include/socket_events.h"
-#include  "../include/graphics.h"
+#include "../include/graphics.h"
 #include "../include/comm.h"
+#include "../include/list.h"
+
 #include "strutils.h"
  
 
@@ -42,6 +44,7 @@
 #define BAD_NOTIFICATION_MSG_TYPE		"unknown notification type"
 #define BAD_OPPONENT_NAME				"wrong opponent name"
 #define INVALID_SESSION					"invalid session"
+
 
 
 typedef enum comm_game_state { 
@@ -78,11 +81,11 @@ typedef struct game_context {
 	int pending_results;
 } game_context_t;
 
+
 // globals
 
-static session_t session;				// the session 
-//In the future we could support more then one active session at once
-
+list_entry_t  sessions  = { .flink = &sessions, .blink = &sessions };				 
+ 
 // the adapter layer callbacks
 
 static void on_msg(const char msg[], void  *context);
@@ -543,7 +546,7 @@ static void on_response(int status, const char response[], void *_ctx) {
 				connection_abort(status, response, ctx);
 			else {
 				ctx->state = Connection;
-				list_themes(session);
+				list_themes(ctx->session);
 			}
 				
 			break;
@@ -607,7 +610,7 @@ static void on_response(int status, const char response[], void *_ctx) {
 			break;
 	
 		case SessionDestroyed:
-			assert(session->chn == NULL);
+			assert(ctx->session->chn == NULL);
 		 
 			if (ctx->state == SessionClosed) return;
 			
@@ -663,12 +666,12 @@ void srv_play(session_t session, const char args[]) {
 
 void srv_send_result(session_t game_session, const char args[]) {
 	char cmd[256];
-	if (session == NULL) {
+	if (game_session == NULL) {
 		warning(INVALID_SESSION);
 		return;
 	}
 	
-	game_context_t *ctx = (game_context_t *) session->context;
+	game_context_t *ctx = (game_context_t *) game_session->context;
 #ifdef DEBUG_GAME
 	printf("srv_send_result: state=%d\n", game_get_state(ctx));
 #endif
@@ -683,7 +686,7 @@ void srv_send_result(session_t game_session, const char args[]) {
     
 	sprintf(cmd, "%s %s\n%s\n", ctx->game_type, ctx->game_name, args);
 	ctx->pending_results++;
-	gs_request(session, BROADCAST, cmd);
+	gs_request(game_session, BROADCAST, cmd);
 }
 
 /**
@@ -713,16 +716,13 @@ session_t srv_connect(const char ip_addr[],
 					 const char user[],
 					 ResponseEventHandler on_resp,
 					 MsgEventHandler on_message) {
+	session_t session;
 	
-	if (session != NULL)  
-		 on_resp(-1, "Connection already Done");
-	else {
-		game_context_t *ctx = game_context_create( user, on_resp,on_message);
-		ctx->pending_results++;
-		session = gs_connect(ip_addr, user, on_response, on_msg, ctx);
-		ctx->session = session;
-	}
-	 
+	game_context_t *ctx = game_context_create( user, on_resp,on_message);
+	ctx->pending_results++;
+	session = gs_connect(ip_addr, user, on_response, on_msg, ctx);
+	ctx->session = session;
+    insert_tail_list(&sessions, &session->link);
 	return session;
 }
  
@@ -750,7 +750,7 @@ void srv_end_game(session_t session) {
 	}			
 }
 
-void srv_close_session(session_t s) {
+void srv_close_session(session_t session) {
 	if (session == NULL) {
 		warning(INVALID_SESSION);
 		return;
@@ -787,7 +787,7 @@ printf("ending session in state %d\n", state);
 			else {
 				ctx->state = SessionDestroyed;	
 				ctx->pending_results++;
-				gs_session_destroy(ctx->session);
+				gs_session_destroy(session);
 			}
 		}
 		else {
@@ -800,7 +800,7 @@ printf("ending session in state %d\n", state);
 			else {
 				ctx->state = SessionDestroyed;	
 				ctx->pending_results++;
-				gs_session_destroy(ctx->session);
+				gs_session_destroy(session);
 			}
 		}
 	
@@ -814,9 +814,12 @@ printf("ending session in state %d\n", state);
 
 
 bool onEnd() {
-	if (session == NULL) {	 
+	if (is_list_empty(&sessions)) {	 
 		return true;
 	}
+	
+	session_t session = 
+		container_of(remove_head_list(&sessions),sess_t, link) ;
 	game_context_t *ctx = (game_context_t *) session->context;
 	if ( ctx->state >= EndingSession) {
 #ifdef DEBUG_CLOSE

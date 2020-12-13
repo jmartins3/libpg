@@ -2,62 +2,54 @@
 
 //should be the first include 
 #include "pg/pglib.h"
+
+
+#include <unistd.h>
 #include <stdio.h>
 #include <stdbool.h>
  
-#include "battleship2.h"
+#include "btship.h"
 #include "board.h"
 #include "strutils.h"
 
-#include <unistd.h>
 
 
 // DEBUG
 
-#define DEBUG_START
+// #define DEBUG_START
 // #define DEBUG_END
 // #define DEBUG_GAME
 // #define DEBUG_MSG
 
-#define GAME_TYPE "battleship"
 
-#define WINDOW_TITLE "Battleship"
-
-
-#define TIMER_PERIOD  50
-
-#define SEC_TICKS (1000 / TIMER_PERIOD)
-
-#define CLOCK_X WINDOW_WIDTH/2 -20
-#define CLOCK_Y 10
-
-// States
-typedef enum state { Start, CreateGame, InGame, GameOver, Error } state_t;
 
 // globals
 
-int timer_tick_count;
 
-MsgView msg, status_msg;
+Clock mclock;
+int clock_tick_count;
+
+MsgView status_msg;
+
+
 battleship_t battle;
 
 char username[MAX_NAME_SIZE];
 char opponent_name[MAX_NAME_SIZE];
 char game_name[MAX_NAME_SIZE];
 
-bool demo_mode = true;
+bool demo_mode = false;
 session_t game_session;
 state_t state;
 bool send_result;
 int turn; // MY_TURN or OPPON_TURN
 
  
+
 // for random auto-play
 int random_auto_play[NSQUARES*NSQUARES];
 int remaining_parts;
 
-
-Clock mclock;
 
 //
 // auxiliary functions
@@ -88,7 +80,7 @@ void show_curr_player() {
 		sprintf(msg, "player %-15s", opponent_name);
 	
 	mv_show_text(&status_msg, msg, ALIGN_LEFT);
-	//graph_text2(MSG_PLAYER_X, MSG_PLAYER_Y, c_gray ,  BACK_COLOR, msg, MEDIUM_FONT);
+	 
 	 
 }
 
@@ -128,7 +120,7 @@ bool play(int x, int y) {
 	
 	turn = OPPON_TURN;
 	show_curr_player();
-	do_play(GAME_NAME, p.x, p.y);
+	do_play(game_name, p.x, p.y);
 
 	return true;
 }
@@ -154,7 +146,7 @@ void play_auto() {
 	draw_place_try(&battle.oppon_board, p.x, p.y);
 	battle.last_play = p;
 	
-	do_play(GAME_NAME, p.x, p.y);
+	do_play(game_name, p.x, p.y);
 	turn = OPPON_TURN;
 	show_curr_player();
 	return;
@@ -177,7 +169,7 @@ void process_opponent_shot(int x, int y) {
 		 battle.total_injuries++;
 		 shot_place(&battle.my_board, x,y);
 	 }
-	 do_send_result(GAME_NAME, x, y, val);
+	 do_send_result(game_name, x, y, val);
 	 
 	 //turn = MY_TURN;
 	 show_curr_player();
@@ -253,13 +245,8 @@ bool process_creation_response(const char *resp) {
 
 
 void on_msg(const char sender[], const char msg[]) {
-#ifdef DEBUG_MSG
-	printf("msg received from group joiner %s: %s\n", sender, msg);
-#endif
+ 
 	if (state != InGame || turn != OPPON_TURN) {
-#ifdef DEBUG_MSG	
-printf("state=%d, turn=%d\n", state, turn);
-#endif
 		error(BAD_STATE_MSG); return;
 	}
 	char msg_type[MAX_RESP_TYPE_SIZE] = {0};
@@ -271,12 +258,10 @@ printf("state=%d, turn=%d\n", state, turn);
 	if (start != -1) start = str_next_char(msg, start, &letter);
 	if (start != -1) start = str_next_int(msg, start, &num);
 	
-	if (start == -1 ) {
-		 error("Invalid message received!\n"); return;
+	if (start == -1 ) { 
+		error("Invalid message received!\n"); return;
 	}
-#ifdef DEBUG_MSG
-	printf("msg received: type='%s', letter= '%c', num=%d\n", msg_type, letter, num);
-#endif
+ 
 	if (strcmp(SHOT, msg_type) == 0) 	
 		process_opponent_shot(letter -'A', num-1);
 	else if (strcmp(RESULT, msg_type)== 0) {
@@ -319,10 +304,6 @@ void on_response(int status, const char response[]) {
 				 }
 				break;	
 		case GameOver:
-#ifdef DEBUG_END
-				printf("end game!\n");
-#endif
-			
 				break;
 		default:
 			break;
@@ -341,10 +322,10 @@ void timer_handler() {
 		 
 			}
 	}
-	if (++timer_tick_count == SEC_TICKS) {
+	if (++clock_tick_count == SEC_TICKS) {
 		clk_tick(&mclock);
 		clk_show(&mclock);
-		timer_tick_count =0;
+		clock_tick_count =0;
 		
 	}
 }
@@ -381,8 +362,6 @@ void prepare_board() {
 	draw_board(&battle.my_board, true);
 	draw_board(&battle.oppon_board, false);
 	
-	mv_create(&msg, MSG_X, MSG_Y, MSG_SIZE, MEDIUM_FONT,MSG_TC, MSG_BC);
-	mv_set_margins(&msg, MSG_MARGIN_X, MSG_MARGIN_Y);
 	
 	mv_create(&status_msg, STATUS_MSG_X, STATUS_MSG_Y, STATUS_MSG_SIZE, STATUS_MSG_FONT,MSG_TC, MSG_BC);
 	mv_show_text(&status_msg, "Wait Opponent...", ALIGN_LEFT);

@@ -51,9 +51,7 @@ MsgView status_msg;						// status messagebox
 Clock mclock;							// the game clock
 
 TTT_Board theBoard;
-
-
-int nplays;								// total plays
+ 
  
 int my_piece;							// our piece (BALL or CROSS)
 int other_piece;
@@ -100,33 +98,35 @@ void show_curr_player() {
 // game messages
 
 
-void do_play(int x, int y) {
+void send_play(int x, int y) {
 	char args[32];
 	sprintf(args, "%s %d %d\n", PLAY_MSG, x, y);
 	
 	srv_play(game_session, args);
 }
 
-
-void process_opponent_shot(int x, int y) {	
-	ttt_play(x, y, other_piece);
-
-	nplays++;
-	if (winner(other_piece)) {
-		show_loose_message();
+void process_play(int res, int piece) {
+	if (res == RESULT_WIN) {
+		if (piece == my_piece) show_victory_message();
+		else show_loose_message();
 		srv_close_session(game_session);
 		state = GameOver;
 	
 	}
-	else if (nplays == 9) {	
+	else if (res == RESULT_DRAW) {	
 		show_draw_message();
 		state = GameOver;
 		 
 	}
 	else {
-		turn = MY_TURN;
+		turn = (piece == my_piece) ? OPPON_TURN : MY_TURN;
 		show_curr_player();
 	}
+}
+
+void process_opponent_shot(int x, int y) {	
+	int res = ttt_play(&theBoard, x, y, other_piece);
+	process_play(res, other_piece);
 }
 
 
@@ -159,14 +159,12 @@ bool process_creation_response(const char *resp) {
 
 
 void on_msg(const char sender[], const char msg[]) {
-#ifdef DEBUG_MSG	
-	printf("msg received from group joiner %s: %s\n", sender, msg);
-#endif
 	if (state != InGame || turn != OPPON_TURN) {
- 
 		error(BAD_STATE_MSG); return;
 	}
+	
 	char msg_type[MAX_RESP_TYPE_SIZE] = {0};
+	
 	int start = 0;
 	int x, y;
 	
@@ -174,16 +172,8 @@ void on_msg(const char sender[], const char msg[]) {
 	if (start != -1) start = str_next_int(msg, start, &x);
 	if (start != -1) start = str_next_int(msg, start, &y);
 	
-	if (start == -1 ) {
-#ifdef DEBUG_MSG
-		 error("Invalid message received!\n"); 
-#endif
-		 return;
-		
-	}
-#ifdef DEBUG_MSG
-	printf("msg received: type='%s', x= '%c', y=%d\n", msg_type, x, y);
-#endif
+	if (start == -1 ) return;
+	
 	if (strcmp(PLAY_MSG, msg_type) == 0) 	
 		process_opponent_shot(x, y);
 }
@@ -222,6 +212,28 @@ void on_response(int status, const char response[]) {
 						
 }
 
+bool screen_to_board(int mx, int my, Point *p) {
+	int third_size_x = BOARD_WIDTH/3+1;
+	int third_size_y = BOARD_HEIGHT/3+1;
+
+
+	int x = (mx - BOARD_X);
+	if ( x < 0) return false;
+	x = x /third_size_x;
+
+	int y = (my -BOARD_Y);
+	if ( y < 0) return false;
+	y = y /third_size_y;
+
+	if (y < 0 || x < 0 || y > 2 || x > 2 ) {
+		p->x = p->y = -1;
+		return false;
+	}
+	p-> x  = x;
+	p-> y  = y;
+	return true;
+}
+
 
 void mouse_handler(MouseEvent me) {
 	
@@ -230,35 +242,25 @@ void mouse_handler(MouseEvent me) {
 			graph_exit();
 			return;
 		}
-		else if (state != InGame) return;
-		
-		
-		Point bp;
-		if (!screen_to_board(me.x, me.y, &bp)) return;
-		
-		if (turn == MY_TURN && ttt_play(bp.x, bp.y, my_piece)) {
-			do_play(bp.x, bp.y);
-			nplays++;
-			if (winner(my_piece)) {
-				show_victory_message();
-				srv_close_session(game_session);
-				state = GameOver;
+		else {
+			Point bp;
+			 
 			
+			if (state != InGame ||  turn != MY_TURN || 
+			    !screen_to_board(me.x, me.y, &bp)) {
+				return;  // cannot play
 			}
-			else if (nplays == 9) {	
-				show_draw_message();
-				srv_close_session(game_session);
-				state = GameOver;
-				 
-			}
-			else {
-				turn = OPPON_TURN;
-				show_curr_player();
+			 
+			int res = ttt_play(&theBoard, bp.x, bp.y, my_piece);
+			if (res != RESULT_BAD) {
+				send_play(bp.x, bp.y);
+				process_play(res, my_piece);
 			}
 		}
 		
 	}
 }
+
 
 void timer_handler() {
 	if (state == GameOver) return;
@@ -271,17 +273,16 @@ void prepare_game() {
  	// draw background
 	graph_rect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT,  BACK_COLOR, true);
 	
-	ttt_create_board();
+	ttt_create_board(&theBoard);
 	ttt_draw_board(BACK_COLOR);
 		
 	 	
-	 
 	mv_create(&status_msg, STATUS_MSG_X, STATUS_MSG_Y, STATUS_MSG_SIZE, STATUS_MSG_FONT,MSG_TC, MSG_BC);
 	mv_show_text(&status_msg, "Wait Opponent...", ALIGN_LEFT);
 	
 	clk_create(&mclock, CLOCK_X, CLOCK_Y, MEDIUM_CLOCK, c_green, c_dgray);
-
 	clk_show(&mclock);
+	
 	state = Start;
 	 
 }

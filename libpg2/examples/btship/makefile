@@ -5,10 +5,10 @@ CPPFLAGS=-c -g -Wall
 CC=gcc
 CFLAGS=-c -g -std=c99 -Wall
 
-all: btship2   
+all: btship   
 
-btship2: battleship2.o board.o  strutils.o
-	$(CC) -o btship2  battleship2.o board.o  strutils.o -lpg  -lm
+btship: btship.o board.o  strutils.o
+	$(CC) -o btship  btship.o board.o  strutils.o -lpg  -lm
 
  
 	
@@ -17,4 +17,4 @@ btship2: battleship2.o board.o  strutils.o
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 	
 clean:
-	rm -rf *.o  btship2 btship
+	rm -rf *.o  btship 

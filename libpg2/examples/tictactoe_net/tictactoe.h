@@ -5,20 +5,23 @@
  
  -----------------------------------------*/
 
+#define SIDE						3
 
+
+
+#define PLAY_MSG  "PLAY"
 
 // Warning Messages
 
-#define BAD_RESULT_MSG 				"bad opponent result"
-#define BAD_SHOT_MSG				"bad opponent play"
 #define BAD_STATE_MSG 				"msg received in the wrong state"
 #define BAD_CREATION_MSG			"bad creation message"
 
-
-#define MAX_RESP_TYPE_SIZE 	 		20
+ 
 
 #define WINDOW_WIDTH 				700
 #define WINDOW_HEIGHT 				550
+
+#define MAX_RESP_TYPE_SIZE			16
 
 #define BACK_COLOR graph_rgb(0, 220, 240)
 
@@ -27,11 +30,16 @@
 #define BALL	1
 #define CROSS	2
 
+#define RESULT_DRAW		0
+#define RESULT_WIN		2
+#define RESULT_LOOSE	3
+#define RESULT_OK		1
+#define RESULT_BAD		-1
 
-#define PLAY_MSG  "PLAY"
-
-
-typedef int TTT_Board[3][3];
+typedef struct {
+	int board[SIDE][SIDE];
+	int nplays;
+} TTT_Board;
 
 #define BOARD_X	90
 #define BOARD_Y	60
@@ -65,13 +73,10 @@ void draw_cross(int x, int y);
 	 
 
 void draw_circle(int x, int y);
-	 
 
-bool winner(int player);
-	 
 
 bool screen_to_board(int mx, int my, Point *p);
 
-bool ttt_play(int x, int y, int piece);
+int ttt_play(TTT_Board *board, int x, int y, int piece);
 
-void ttt_create_board();
+void ttt_create_board(TTT_Board *board);
