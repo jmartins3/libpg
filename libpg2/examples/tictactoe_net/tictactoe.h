@@ -30,6 +30,7 @@
 
 #define PLAY_MSG  "PLAY"
 
+
 typedef int TTT_Board[3][3];
 
 #define BOARD_X	90
@@ -57,7 +58,7 @@ typedef int TTT_Board[3][3];
 #define min(x,y) ((x) < (y) ? (x) : (y))
 
 
-void ttt_draw_board();
+void ttt_draw_board(RGB back_color);
 	 
 	
 void draw_cross(int x, int y);
@@ -73,4 +74,4 @@ bool screen_to_board(int mx, int my, Point *p);
 
 bool ttt_play(int x, int y, int piece);
 
-void ttt_create_board(RGB bc);
+void ttt_create_board();

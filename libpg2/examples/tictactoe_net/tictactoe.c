@@ -230,6 +230,8 @@ void mouse_handler(MouseEvent me) {
 			graph_exit();
 			return;
 		}
+		else if (state != InGame) return;
+		
 		
 		Point bp;
 		if (!screen_to_board(me.x, me.y, &bp)) return;
@@ -269,7 +271,7 @@ void prepare_game() {
  	// draw background
 	graph_rect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT,  BACK_COLOR, true);
 	
-	ttt_create_board(BACK_COLOR);
+	ttt_create_board();
 	ttt_draw_board(BACK_COLOR);
 		
 	 	
