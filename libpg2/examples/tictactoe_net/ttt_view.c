@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "tictactoe.h"
 
-
+//#define GRAPH_SIMPLE
  
 /* 
  *  draw a paralelogram 
@@ -11,8 +11,15 @@
  */
 
 static RGB back_color;
- 
 
+
+static void grapg_bold_line(int x0, int y0, int x1, int y1, int bold, RGB color) {
+	int delta = (x0 -x1) < 0 ? 1 : -1;
+	for (int i =0; i < SQUARE_WEIGHT; ++i) 
+		graph_line(x0+ i*delta, y0, x1 +i*delta, y1, color);
+}
+
+#ifndef GRAPH_SIMPLE
 static void graph_paralelogram(int xc, int yc, int w, int h, int x0, RGB color, bool toFill) {
 	
 	if (x0 == 0 || x0 == -w) {
@@ -27,7 +34,7 @@ static void graph_paralelogram(int xc, int yc, int w, int h, int x0, RGB color, 
 		x0 = -x0;
 		
 		if (toFill) {
-			double m = (double) (xc - (xc + w - x0) ) / h;
+			double m = (double) -( w - x0)  / h;
 			
 			int ye = min(WINDOW_HEIGHT-1,yc+h-1);
 			for (int y = yc; y <= ye; ++y) {
@@ -38,6 +45,7 @@ static void graph_paralelogram(int xc, int yc, int w, int h, int x0, RGB color, 
 			}		
 		}
 		else {
+			
 			graph_line(xc + w -x0, yc, xc + w , yc, color);
 			graph_line(xc + w -x0, yc, xc, yc + h, color);
 			graph_line(xc, yc + h, xc + x0, yc + h, color);
@@ -48,7 +56,7 @@ static void graph_paralelogram(int xc, int yc, int w, int h, int x0, RGB color, 
 	else {
 		
 		if (toFill) {
-			double m = (double) ((xc + w - x0) - xc) / h;
+			double m = (double) ( w - x0)  / h;
 			
 			int ye = min(WINDOW_HEIGHT-1,yc+h-1);
 			for (int y = yc; y <= ye; ++y) {
@@ -67,6 +75,7 @@ static void graph_paralelogram(int xc, int yc, int w, int h, int x0, RGB color, 
 		 
 	}
 }
+#endif
 
 void ttt_draw_board(RGB bc) {
 	
@@ -117,17 +126,19 @@ void draw_cross(int x, int y) {
 	if (x < 0 || x > 2 || y < 0 || y >2) return;
 
 #ifdef GRAPH_SIMPLE
-	graph_line(BOARD_X +  third_size_x *x + SQUARE_BORDER,
+	grapg_bold_line(BOARD_X +  third_size_x *x + SQUARE_BORDER,
 				BOARD_Y + third_size_y *y + SQUARE_BORDER,
 				BOARD_X +  third_size_x*(x +1) - SQUARE_BORDER,
 				BOARD_Y + third_size_y*(y+1) - SQUARE_BORDER, 
-				c_blue);
+				SQUARE_WEIGHT,
+				c_red);
 	
-	graph_line(BOARD_X +  third_size_x *x + SQUARE_BORDER,
+	grapg_bold_line(BOARD_X +  third_size_x *x + SQUARE_BORDER,
 				BOARD_Y + third_size_y*(y+1) - SQUARE_BORDER,
 				BOARD_X + third_size_x*(x+1) - SQUARE_BORDER,
 				BOARD_Y + third_size_y *y + SQUARE_BORDER,
-				c_blue);
+				SQUARE_WEIGHT,
+				c_red);
 	
 #else					
 	graph_paralelogram(BOARD_X + third_size_x*x + SQUARE_BORDER,

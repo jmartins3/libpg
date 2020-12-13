@@ -167,8 +167,8 @@ void process_opponent_shot(int x, int y) {
 	
 	 if (val > 0) {
 		 battle.total_injuries++;
-		 shot_place(&battle.my_board, x,y);
 	 }
+	 shot_place(&battle.my_board, x,y);
 	 do_send_result(game_name, x, y, val);
 	 
 	 //turn = MY_TURN;
