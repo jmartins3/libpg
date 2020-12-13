@@ -33,7 +33,7 @@
 #define CLOCK_Y 10
 
 // States
-typedef enum state { Start, CreateGame, InGame, GameOver, Error } state_t;
+typedef enum state { Start, CreateGame, InGame, GameOver, SessionClosed, Error } state_t;
 
  
 
@@ -114,6 +114,7 @@ void process_opponent_shot(int x, int y) {
 	nplays++;
 	if (winner(other_piece)) {
 		show_loose_message();
+		srv_close_session(game_session);
 		state = GameOver;
 	
 	}
@@ -122,8 +123,10 @@ void process_opponent_shot(int x, int y) {
 		state = GameOver;
 		 
 	}
- 	turn = MY_TURN;
-		
+	else {
+		turn = MY_TURN;
+		show_curr_player();
+	}
 }
 
 
@@ -211,7 +214,7 @@ void on_response(int status, const char response[]) {
 		case InGame:
 				break;	
 		case GameOver:
-			 
+				state = SessionClosed;
 				break;
 		default:
 			break;
@@ -223,7 +226,7 @@ void on_response(int status, const char response[]) {
 void mouse_handler(MouseEvent me) {
 	
 	if (me.type == MOUSE_BUTTON_EVENT && me.state == BUTTON_CLICK) {
-		if (state == GameOver) {
+		if (state == SessionClosed) {
 			graph_exit();
 			return;
 		}
@@ -236,16 +239,20 @@ void mouse_handler(MouseEvent me) {
 			nplays++;
 			if (winner(my_piece)) {
 				show_victory_message();
+				srv_close_session(game_session);
 				state = GameOver;
 			
 			}
 			else if (nplays == 9) {	
 				show_draw_message();
+				srv_close_session(game_session);
 				state = GameOver;
 				 
 			}
-			
-			turn = OPPON_TURN;
+			else {
+				turn = OPPON_TURN;
+				show_curr_player();
+			}
 		}
 		
 	}

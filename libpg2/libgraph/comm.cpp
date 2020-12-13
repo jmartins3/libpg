@@ -610,11 +610,14 @@ static void on_response(int status, const char response[], void *_ctx) {
 			assert(session->chn == NULL);
 		 
 			if (ctx->state == SessionClosed) return;
-			ctx->state = SessionClosed;
+			
+			// forward response to application callback and change state to SessionClosed
+			dispatch_resp(ctx, STATUS_OK, "Session Closed", SessionClosed);
+			
 #ifdef DEBUG_END
 			printf("Session closed for %s!\n", ctx->username);
 #endif
-//			if (ctx->closing_window)
+			if (ctx->closing_window)
 				graph_exit();
 			break;
 		default:
