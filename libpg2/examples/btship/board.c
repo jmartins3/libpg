@@ -167,7 +167,7 @@ static int populate_board(board_t *board) {
 		 
 		board_clear(board);
 		
-		/*
+		
 		add_air_carrier(board);
 		
 		// put four cannon
@@ -189,10 +189,10 @@ static int populate_board(board_t *board) {
 		if (!add_n_cannon_boat(board, SUBMARINE)) continue;
 		if (!add_n_cannon_boat(board, SUBMARINE)) continue;
 		if (!add_n_cannon_boat(board, SUBMARINE)) continue;
-		*/
+		
 		if (!add_n_cannon_boat(board, SUBMARINE)) continue;
 		
-		return 1; //TOTAL_PARTS;
+		return TOTAL_PARTS;
 	} while (true);
 
 }
