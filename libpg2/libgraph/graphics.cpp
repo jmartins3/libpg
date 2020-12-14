@@ -60,7 +60,7 @@ static int internal_init(const char title[], bool with_timer, int width, int hei
 	
 	if (window == NULL) return -1;
 	
-	screen = SDL_CreateRenderer(window, -1, 0);
+	screen = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 	
 	SDL_SetRenderDrawColor(screen, 255,255,255,255);
 	
