@@ -1,7 +1,7 @@
 /*------------------------------------------
  O jogo do galo
  
- Jorge Martins, 2014
+ Jorge Martins, 2020
  
  -----------------------------------------*/
  
@@ -12,7 +12,8 @@
 
 #include "pg/pglib.h"
 
-#include "tictactoe.h" 
+#include "ttt_board.h"
+#include "ttt.h"
  
 
  
@@ -69,7 +70,7 @@ bool winner(TTT_Board *ttt, int player) {
 
 int ttt_play(TTT_Board *ttt, int x, int y, int piece) {
 	if (ttt->board[x][y] != 0)
-		return RESULT_BAD;
+		return PLAY_INVALID;
 	 
 	ttt->board[x][y] = piece;
 	ttt->nplays++;
@@ -79,11 +80,11 @@ int ttt_play(TTT_Board *ttt, int x, int y, int piece) {
 		draw_circle(x, y);
 		
 	if (winner(ttt, piece)) 
-		return RESULT_WIN;
+		return PLAY_WIN;
 	else if (ttt->nplays == SIDE*SIDE)
-		return RESULT_DRAW;
+		return PLAY_DRAW;
 	else
-		return RESULT_OK;
+		return PLAY_NO_WIN;
  
 }
 

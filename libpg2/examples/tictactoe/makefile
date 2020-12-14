@@ -1,5 +1,5 @@
-ttt: tictactoe.c board.c tictactoe.h ttt_view.c strutils.c 
-	gcc -o ttt -Wall -g tictactoe.c board.c ttt_view.c strutils.c -lpg -lm
+ttt: ttt.c ttt_board.c ttt.h ttt_view.c  
+	gcc -o ttt -Wall -g ttt.c ttt_board.c ttt_view.c   -lpg -lm
 	
 clean:
 	rm ttt

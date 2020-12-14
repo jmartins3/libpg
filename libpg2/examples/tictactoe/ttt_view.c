@@ -1,7 +1,10 @@
 #include "pg/pglib.h"
 
 #include <stdbool.h>
-#include "tictactoe.h"
+#include "ttt.h"
+
+
+#define min(x,y) ((x) < (y) ? (x) : (y))
 
 //#define GRAPH_SIMPLE
  
@@ -13,13 +16,14 @@
 static RGB back_color;
 
 
+#ifdef GRAPH_SIMPLE
 static void grapg_bold_line(int x0, int y0, int x1, int y1, int bold, RGB color) {
 	int delta = (x0 -x1) < 0 ? 1 : -1;
 	for (int i =0; i < SQUARE_WEIGHT; ++i) 
 		graph_line(x0+ i*delta, y0, x1 +i*delta, y1, color);
 }
 
-#ifndef GRAPH_SIMPLE
+#else
 static void graph_paralelogram(int xc, int yc, int w, int h, int x0, RGB color, bool toFill) {
 	
 	if (x0 == 0 || x0 == -w) {
