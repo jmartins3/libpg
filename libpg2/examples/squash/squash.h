@@ -24,6 +24,13 @@
 #define BALL_START_Y 	200
 
 
+#define COUNTER_X (GRAPH_WIDTH /2 - 40)
+#define COUNTER_Y 5
+#define COUNTER_WIDTH 70
+#define COUNTER_HEIGHT 60
+#define COUNTER_INITIAL 19
+
+
 RGB  border_color();
 RGB  floor_color();
 void loosePoint();

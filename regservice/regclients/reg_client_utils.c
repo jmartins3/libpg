@@ -16,14 +16,19 @@
 #include <sys/socket.h>
 
 #include "../include/reg_service.h"
-
+#include "reg_client_utils.h"
 
 void get_passwd(const char *user, char *pass) {
 	sprintf(pass, "%s_pass", user);
 }
 	
 
-//
+char *get_server_ip() {
+	char *server_ip_addr = getenv("REG_SERVER_IP");
+    if (server_ip_addr != NULL) return server_ip_addr;
+	return DEFAULT_SERVER_IP;
+}
+
 // Sockets
 // 
 
@@ -42,10 +47,6 @@ static FILE *get_resp_stream(int cfd) {
 	return resp;
 }
 
-typedef struct connection {
-	int cfd; 		// connection socket
-	FILE *resp; 	// response stream
-} connection_t;
 
 
 connection_t * connect_to(const char *server_ip_addr) {

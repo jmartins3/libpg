@@ -76,7 +76,7 @@ void ball_move(Ball *b, Racket *r) {
 	
 	res = intersects(b, r);
 	if (res == 1) {
-		sound_play(RACKET_SOUND); 
+		//sound_play(RACKET_SOUND); 
 		ball_reverse_x(b);
 	}
 	else if (res == -1) {

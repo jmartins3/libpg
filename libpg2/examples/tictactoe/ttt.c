@@ -1,7 +1,7 @@
 /*------------------------------------------
  O jogo do galo
  
- Jorge Martins, 2014
+ Jorge Martins, 2020
  
  -----------------------------------------*/
  
@@ -13,17 +13,19 @@
 
 #include "pg/pglib.h"
 
-#include "ttt_board.h"
 #include "ttt.h" 
  
 
 // variáveis globais 
 
 bool game_over;
-
-TTT_Board theBoard;
-MsgView status_msg;
+ttt_board_t theBoard;
 int turn;
+
+MsgView status_msg;
+Clock clk;
+
+
 
 void show_victory_message(int piece) {
 	char msg[128];
@@ -77,19 +79,22 @@ void mouse_handler(MouseEvent me) {
 			}
 			 
 			int res = ttt_play(&theBoard, bp.x, bp.y, turn);
-			switch(res) {
-				case PLAY_WIN:
-					show_victory_message(turn);
-					game_over = true;
-					break;
-				case PLAY_DRAW:
-					show_draw_message();
-					game_over = true;
-				case PLAY_NO_WIN:
-					turn = (turn == CROSS) ? BALL : CROSS;
-					break;
-				default:
-					break;
+			if (res != PLAY_INVALID) {
+				draw_piece(bp.x, bp.y, turn);
+				switch(res) {
+					case PLAY_WIN:
+						show_victory_message(turn);
+						game_over = true;
+						break;
+					case PLAY_DRAW:
+						show_draw_message();
+						game_over = true;
+					case PLAY_NO_WIN:
+						turn = (turn == CROSS) ? BALL : CROSS;
+						break;
+					default:
+						break;
+				}
 			}
 					
 				
@@ -98,16 +103,28 @@ void mouse_handler(MouseEvent me) {
 	}
 }
 
+
+void timer_handler() {
+	if (!game_over) {
+		clk_tick(&clk);
+		clk_show(&clk);
+	}
+}
+
+
+
 void prepare_game() {
  	// draw background
-	graph_rect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT,  BACK_COLOR, true);
+	graph_rect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT,  BOARD_COLOR, true);
 	
 	ttt_create_board(&theBoard);
-	ttt_draw_board(BACK_COLOR);
-		
-	 	
-	mv_create(&status_msg, STATUS_MSG_X, STATUS_MSG_Y, STATUS_MSG_SIZE, STATUS_MSG_FONT,MSG_TC, MSG_BC);
-
+	ttt_draw_board();	
+	 
+	mv_create(&status_msg, STATUS_MSG_X, STATUS_MSG_Y, STATUS_MSG_CHARS, STATUS_MSG_FONT, STATUS_MSG_TC, STATUS_MSG_BC);
+	mv_show_text(&status_msg, "Game Started", ALIGN_CENTER);
+	
+	clk_create(&clk, CLOCK_X, CLOCK_Y, CLOCK_FONT, CLOCK_CLR, CLOCK_BACK_COLOR);
+	clk_show(&clk);
 	
 	turn = CROSS;
 	 
@@ -118,9 +135,10 @@ void prepare_game() {
 int main() {
 	 
 	graph_init2("Tic Tac Toe", WINDOW_WIDTH, WINDOW_HEIGHT);
-	graph_regist_mouse_handler(mouse_handler);
 	prepare_game();
-	
+		
+	graph_regist_mouse_handler(mouse_handler);
+	graph_regist_timer_handler(timer_handler, TIMER_PERIOD);
 	
 	graph_start();
 	 

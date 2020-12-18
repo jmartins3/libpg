@@ -246,11 +246,11 @@ static ColourStats graph_area_colors(short x0, short y0, Size sz) {
  */
 static void do_graph_text(short x, short y, Size area, RGB fore_color, RGB back_color, const char text[], int font_type ) {
 	 	 
-	// use maj_color as background fore_color
+	// use background back_color
 	graph_rect(x, y - area.height+1, area.width, area.height, back_color, true);
 	
 	if (font_type  == SMALL_FONT) {
-		graph_write(text, x, y, fore_color);
+		graph_write(text, x, y+2, fore_color);
 		return;
 	}
 	

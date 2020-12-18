@@ -55,9 +55,32 @@ typedef struct MouseEvent  {
 	int type; 		/* mouse motion or mouse button event type */
 	byte state;		/* button pressed or released */
 	int button;		/* which button is pressed */
-	ushort x, y;	/* coordinates of the mosue */
+	ushort x, y;	/* coordinates of the mouse */
 	short dx, dy;	/* delta move when mouse motion */
 } MouseEvent;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* 
  * KEYBOARD Events constants 

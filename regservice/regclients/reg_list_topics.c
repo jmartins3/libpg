@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	}
 	theme = argv[1];
 	
-	char *server_ip_addr = getenv("REG_SERVER_IP");
+	char *server_ip_addr= get_server_ip();
 
 	connection_t *cn;
 

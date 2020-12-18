@@ -1,9 +1,5 @@
-#define COUNTER_Y 350
 
-#define COUNTER_DIGITS 4
 
-#define CMARGIN_X 10
-#define CMARGIN_Y 10
 
  
 
@@ -18,6 +14,7 @@ typedef struct {
 } MsgView;
 
 // Possibilidades de alinhamento do texto na mensagem
+
 #define ALIGN_CENTER 1
 #define ALIGN_RIGHT  2
 #define ALIGN_LEFT   3
@@ -27,7 +24,6 @@ typedef struct {
 
 
 #define MAX_BUT_TEXT 32
-
 #define BUTTON_MARGIN 15
 #define RELEASED_BUT_CLR graph_rgb(105,105,105)
 #define PRESSED_BUT_CLR graph_rgb(80,80,80)
@@ -144,6 +140,8 @@ void clk_reset(Clock *c);
 /*
  *Funções para lidar com contadores
  */
+
+
 
 // criação de um contador na posição dada
 void ct_create(Counter  *ct, int x, int y, int initial, char title[], int font_size);

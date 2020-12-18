@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "gcc -o ttt -Wall -g ttt.c ttt_board.c ttt_view.c strutils.c -lpg -lm"
+gcc -o ttt -Wall -g ttt.c ttt_board.c ttt_view.c strutils.c -lpg -lm
+	
+ 

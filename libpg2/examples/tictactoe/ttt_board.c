@@ -12,13 +12,13 @@
 
 #include "pg/pglib.h"
 
-#include "ttt_board.h"
+
 #include "ttt.h"
  
 
  
 
-void ttt_create_board(TTT_Board *ttt) {
+void ttt_create_board(ttt_board_t *ttt) {
 	for (int i=0; i < SIDE; ++i) {
 		 
 		for (int j = 0; j < SIDE; j++) {
@@ -31,7 +31,7 @@ void ttt_create_board(TTT_Board *ttt) {
 
 
 
-bool winner(TTT_Board *ttt, int player) {
+bool winner(ttt_board_t *ttt, int player) {
 	// check lines
 	 
 	for (int i=0; i < SIDE; ++i) {
@@ -68,17 +68,13 @@ bool winner(TTT_Board *ttt, int player) {
 }	
 
 
-int ttt_play(TTT_Board *ttt, int x, int y, int piece) {
+int ttt_play(ttt_board_t *ttt, int x, int y, int piece) {
 	if (ttt->board[x][y] != 0)
 		return PLAY_INVALID;
 	 
 	ttt->board[x][y] = piece;
 	ttt->nplays++;
-	if (piece == CROSS)
-		draw_cross(x, y); 	
-	else 
-		draw_circle(x, y);
-		
+	
 	if (winner(ttt, piece)) 
 		return PLAY_WIN;
 	else if (ttt->nplays == SIDE*SIDE)

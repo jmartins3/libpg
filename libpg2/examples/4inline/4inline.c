@@ -15,21 +15,9 @@
 
  
 FourBoard theBoard;
-int game_ended;
+int game_over;
 
 
-
-
-void PointInit(Point *p, int x, int y) {
-	p->x = x; p->y = y;
-}
-
-void HoleInit(Hole *h, Point p, int x, int y) {
-	h->color = 0;
-	h->center = p;
-	h->x = x;
-	h->y = y;
-}
 
 
 int getCollumn(int x, int y) {
@@ -52,85 +40,7 @@ bool draw_piece(int col, int color) {
 }
 
 
-bool isdraw() {
-	for (int i=0; i < NCOLS ; ++i)
-		if (theBoard.height[i] < NLINES) return false;
-	return true;
-}
 
-bool winner(int player) {
-	// check lines 
-	for (int i=0; i < NLINES; ++i) {
-		int count=0;
-		for (int j = 0; j < NCOLS; ++j) {
-			if (theBoard.holes[i][j].color == player) {
-				++count;
-				if (count == 4) return true;
-			}
-			else count = 0;
-		}
-	}
-	
-	// check cols 
-	for (int i=0; i < NLINES; ++i) {
-		int count=0;
-		for (int j = 0; j < NCOLS; ++j) {
-			if (theBoard.holes[j][i].color  == player) {
-				++count;
-				if (count == 4) return true;
-			}
-			else count = 0;
-		}
-	}
-	
-	// check diags 
-	for (int i=0; i < 4; ++i) {
-		int count1 = 0;
-		for (int j =0; j + i < NCOLS ; ++j) {
-			if (theBoard.holes[j][j+i].color  == player) {
-				++count1;
-				if (count1 == 4) return true;
-			}
-			else count1 = 0;
-		}
-	}		
-	
-	for (int i=0; i < 4; ++i) {
-		int count1 = 0;
-		for (int j =0; j + i < NLINES; ++j) {
-			if (theBoard.holes[j+i][j].color  == player) {
-				++count1;
-				if (count1 == 4) return true;
-			}
-			else count1 = 0;
-		}
-	}		
-	
-	for (int i=NCOLS-1; i >= 3; --i) {
-		int count1 = 0;
-		for (int j =0;  i  - j  >= 0   ; ++j) {
-			if (theBoard.holes[j][i - j].color  == player) {
-				++count1;
-				if (count1 == 4) return true;
-			}
-			else count1 = 0;
-			
-		}
-	}
-	
-	for (int i=NCOLS-1; i >= 3; --i) {
-		int count1 = 0;
-		for (int j =0;  i  - j  >= 0 && (NCOLS -1) - i + j < NLINES ; ++j) {
-			 
-			if (theBoard.holes[(NCOLS -1) -i + j][NCOLS -1 - j].color  == player) {
-				++count1;
-				if (count1 == 4) return true;
-			}
-			else count1 = 0;
-		}
-	}
-	return false;
-}		
 			
 static void fourl_draw_board() {
 	RGB c_brown = graph_rgb(148, 79, 58);
@@ -167,20 +77,20 @@ static void fourl_draw_board() {
 void myMouseEventHandler(MouseEvent me) {
 	static int turn = YELLOW;
 	
-	if (game_ended == true) return;
+	if (game_over == true) return;
 	if (me.type == MOUSE_BUTTON_EVENT && me.state == BUTTON_PRESSED) {
 		int col = getCollumn(me.x, me.y);
 		if (col != -1 && draw_piece(col, turn)) {
 			theBoard.height[col]++;
 			
-			if (winner(turn)) {
+			if (winner(&theBoard, turn)) {
 				printf("player %s wins the game!\n", turn == YELLOW ? "yellow" : "red");
-				game_ended=true;
+				game_over=true;
 				printf("press key to continue\n");
 			}	
-			else if (isdraw()) {
+			else if (is_draw(&theBoard)) {
 				printf("the game end with a draw!\n");
-				game_ended=true;
+				game_over=true;
 				printf("press key to continue\n");
 			}
 			turn = turn % 2 + 1;
@@ -189,7 +99,7 @@ void myMouseEventHandler(MouseEvent me) {
 }
 		
 void myKeyEventHandler(KeyEvent ke) {
-	if (game_ended)
+	if (game_over)
 		graph_exit();
 		 
 }		
@@ -205,8 +115,6 @@ int main()  {
 	 
 	fourl_draw_board();
 	
-	 
-	graph_refresh();
 	 
 	graph_start();
 	return 0;

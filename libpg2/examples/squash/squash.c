@@ -73,7 +73,7 @@ void draw_board() {
 	draw_border();
 	
 	// draw counter
-	Counter_init(&counter, 19, 300, 5, 70, 60);	
+	Counter_init(&counter, COUNTER_INITIAL, COUNTER_X, COUNTER_Y, COUNTER_WIDTH, COUNTER_HEIGHT);	
 }
 
 
@@ -83,7 +83,7 @@ int main() {
 		printf("Error initializing events library!\n");
 		return (1);
 	}
-	graph_set_auto_repeat_off();
+	graph_set_auto_repeat_on();
 	 
 	// regist callbacks
 	uint kup=SDLK_UP;

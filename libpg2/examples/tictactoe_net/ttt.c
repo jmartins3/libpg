@@ -14,14 +14,11 @@
 #include "pg/pglib.h"
 #include "strutils.h"
 
-#include "tictactoe.h" 
+#include "ttt.h" 
 
 #define GAME_TYPE	"tictactoe"
 
-// #define DEBUG_MSG
 
-
-	
 #define WINDOW_TITLE "Tic-Tac-Toe"
 
 
@@ -48,9 +45,9 @@ char game_name[MAX_NAME_SIZE];			// the game name
 
 
 MsgView status_msg;						// status messagebox 
-Clock mclock;							// the game clock
+ 
 
-TTT_Board theBoard;
+ttt_board_t theBoard;
  
  
 int my_piece;							// our piece (BALL or CROSS)
@@ -106,16 +103,17 @@ void send_play(int x, int y) {
 }
 
 void process_play(int res, int piece) {
-	if (res == RESULT_WIN) {
+	if (res == PLAY_WIN) {
 		if (piece == my_piece) show_victory_message();
 		else show_loose_message();
+		state = GameOver;
 		srv_close_session(game_session);
-		state = GameOver;
-	
 	}
-	else if (res == RESULT_DRAW) {	
+	else if (res == PLAY_DRAW) {	
 		show_draw_message();
+			
 		state = GameOver;
+		srv_close_session(game_session);
 		 
 	}
 	else {
@@ -126,7 +124,10 @@ void process_play(int res, int piece) {
 
 void process_opponent_shot(int x, int y) {	
 	int res = ttt_play(&theBoard, x, y, other_piece);
-	process_play(res, other_piece);
+	if (res != PLAY_INVALID) {
+		draw_piece(x, y, other_piece);
+		process_play(res, other_piece);
+	}
 }
 
 
@@ -134,20 +135,16 @@ bool process_creation_response(const char *resp) {
 	// get args
 	int rank; 
 
- 
-
 	int start = str_next_word(resp, 0, opponent_name, MAX_NAME_SIZE);
 	if (start != -1) start = str_next_int(resp, start, &rank);
 	
 	if (start == -1) { error(BAD_CREATION_MSG); return false;  }
 	if (rank == 1) {
-		 
 		turn = MY_TURN;
 		my_piece = CROSS;
 		other_piece = BALL;
 	}
 	else {
-		 
 		turn = OPPON_TURN;
 		my_piece = BALL;
 		other_piece = CROSS;
@@ -244,7 +241,6 @@ void mouse_handler(MouseEvent me) {
 		}
 		else {
 			Point bp;
-			 
 			
 			if (state != InGame ||  turn != MY_TURN || 
 			    !screen_to_board(me.x, me.y, &bp)) {
@@ -252,7 +248,8 @@ void mouse_handler(MouseEvent me) {
 			}
 			 
 			int res = ttt_play(&theBoard, bp.x, bp.y, my_piece);
-			if (res != RESULT_BAD) {
+			if (res !=PLAY_INVALID) {
+				draw_piece(bp.x, bp.y, my_piece);
 				send_play(bp.x, bp.y);
 				process_play(res, my_piece);
 			}
@@ -262,27 +259,19 @@ void mouse_handler(MouseEvent me) {
 }
 
 
-void timer_handler() {
-	if (state == GameOver) return;
-	clk_tick(&mclock);
-	clk_show(&mclock);
-}
-
-
 void prepare_game() {
  	// draw background
-	graph_rect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT,  BACK_COLOR, true);
+	graph_rect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT,  BOARD_COLOR, true);
 	
 	ttt_create_board(&theBoard);
-	ttt_draw_board(BACK_COLOR);
+	ttt_draw_board();
 		
 	 	
-	mv_create(&status_msg, STATUS_MSG_X, STATUS_MSG_Y, STATUS_MSG_SIZE, STATUS_MSG_FONT,MSG_TC, MSG_BC);
+	mv_create(&status_msg, STATUS_MSG_X, STATUS_MSG_Y, STATUS_MSG_CHARS, 
+				STATUS_MSG_FONT, STATUS_MSG_TC, STATUS_MSG_BC);
 	mv_show_text(&status_msg, "Wait Opponent...", ALIGN_LEFT);
 	
-	clk_create(&mclock, CLOCK_X, CLOCK_Y, MEDIUM_CLOCK, c_green, c_dgray);
-	clk_show(&mclock);
-	
+
 	state = Start;
 	 
 }
@@ -302,7 +291,6 @@ int main() {
 	graph_init2(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
 	graph_regist_mouse_handler(mouse_handler);
-	graph_regist_timer_handler(timer_handler, 1000);
 	
 	prepare_game(); 
 	

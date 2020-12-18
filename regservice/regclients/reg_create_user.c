@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "reg_client_utils.h"
  
-
+#define DE
 	
 int main(int argc, char *argv[]) {
 	int number;
@@ -26,8 +26,9 @@ int main(int argc, char *argv[]) {
 	get_passwd(user,pass);
 	
  
-	char *server_ip_addr = getenv("REG_SERVER_IP");
-
+ 
+	char *server_ip_addr= get_server_ip();
+	
 	connection_t *cn;
 
 	if ((cn = connect_to(server_ip_addr)) == NULL ) {

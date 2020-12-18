@@ -62,3 +62,13 @@ typedef struct FourBoard {
 #define HOLE_HEIGHT (BOARD_HEIGHT / NLINES)
 
 
+// functions
+
+bool is_draw(FourBoard *board);
+bool winner(FourBoard *board, int player) ;
+
+
+void PointInit(Point *p, int x, int y);
+	 
+
+void HoleInit(Hole *h, Point p, int x, int y);

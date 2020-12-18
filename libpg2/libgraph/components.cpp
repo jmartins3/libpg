@@ -172,6 +172,14 @@ void clk_reset(Clock *c) {
  
 
 // criação de um contador na posição dada
+
+
+#define COUNTER_DIGITS 4
+
+#define CMARGIN_X 10
+#define CMARGIN_Y 10
+
+
 void ct_create(Counter  *c, int x, int y, int initial, char title[], int font_size) {
 	Size nameSize = graph_text_size(title, MEDIUM_FONT);
 	// mostrar nome

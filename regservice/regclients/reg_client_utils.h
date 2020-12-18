@@ -3,6 +3,9 @@
 
 #include "../include/reg_service.h"
 
+// Default server Ip
+#define DEFAULT_SERVER_IP "127.0.0.1"
+
 
 //
 // Admin user
@@ -23,6 +26,7 @@ connection_t * connect_to(const char *server_ip_addr);
 void cn_close( connection_t *cn);
 
 void get_passwd(const char *user, char *pass);
+char *get_server_ip();
 
 //
 // Responses

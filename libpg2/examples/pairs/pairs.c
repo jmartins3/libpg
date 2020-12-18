@@ -267,19 +267,7 @@ int main() {
 	graph_regist_mouse_handler(mouseHandler);
 	graph_regist_key_handler(keyHandler);
 	graph_regist_timer_handler(timerHandler, BASE_TIME);
-	/*
- 	char a[50];
-	int c=0;
-	graph_rect(5,49,8*('j'-'a'+ 'J'-'A' + 2),10, graph_rgb(210,210,210), true);
-	for(c='A'; c <= 'J'; c++) {
-		a[c-'A']=c;
-	}
-	for(c='a'; c <= 'j'; c++) {
-		a['J'-'A' + 1 + c-'a']=c;
-	}
-	a['J'-'A' + 1 + c-'a']=0;
-	graph_text(5,60, c_orange, a, SMALL_FONT);
-	*/
+
 	graph_start();
 	return 0;
 }
