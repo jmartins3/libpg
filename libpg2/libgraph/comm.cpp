@@ -1,7 +1,7 @@
 
 /**
  * This module solves the  games creation and destruction protocols
- * in order to simplify the student process and help to keep the server in a 
+ * in order to simplify the student work and help to keep the server in a 
  * sane state
  * 
  * It's an adapter between the pglib communication services and the program model exposed to students
@@ -372,7 +372,8 @@ static void process_leave_partner(const char *msg, int start, game_context_t *ct
 	switch (game_get_state(ctx)) {
 	  case  InGame:
 
-			ctx->npartners = 0;
+			if (ctx->npartners  > 0) 
+				--ctx->npartners;
 #ifdef DEBUG_MSGS
 			warning("opponent leave game\n");
 #endif
