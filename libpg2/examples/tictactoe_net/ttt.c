@@ -210,24 +210,15 @@ void on_response(int status, const char response[]) {
 }
 
 bool screen_to_board(int mx, int my, Point *p) {
-    int third_size_x = BOARD_WIDTH/3+1;
-    int third_size_y = BOARD_HEIGHT/3+1;
+    if (mx < BOARD_X || mx >= BOARD_X + BOARD_WIDTH ||
+        my < BOARD_Y || my >= BOARD_Y + BOARD_HEIGHT) return false;
+    
+    int cell_size_x = BOARD_WIDTH/SIDE;
+    int cell_size_y = BOARD_HEIGHT/SIDE;
 
-
-    int x = (mx - BOARD_X);
-    if ( x < 0) return false;
-    x = x /third_size_x;
-
-    int y = (my -BOARD_Y);
-    if ( y < 0) return false;
-    y = y /third_size_y;
-
-    if (y < 0 || x < 0 || y > 2 || x > 2 ) {
-        p->x = p->y = -1;
-        return false;
-    }
-    p-> x  = x;
-    p-> y  = y;
+    
+    p-> x  = (mx-BOARD_X)/cell_size_x;
+    p-> y  = (my-BOARD_Y)/cell_size_y;
     return true;
 }
 
