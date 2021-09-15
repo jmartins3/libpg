@@ -1,3 +1,4 @@
+#add new comment to makefile just for test purposes!
 
 BIN=bin
 LIBS= -lpthread -Wl,-rpath,/usr/local/lib -lSDL2_gfx -lSDL2_image  -lSDL2_mixer -lSDL2 -luv 
