@@ -97,7 +97,13 @@ void graph_pixel(short x, short y, RGB color);
  *  draw a line at position with specified color
  */
 void graph_line(short x1, short y1, short x2, short y2, RGB color);
-	 
+
+/**
+ *  draw a pie at position with specified color and area, filled or not
+ */
+void graph_pie(short cx, short cy, short radius, short sangle, short eangle, RGB color, bool toFill);
+
+
 /**
  *  draw a circle at position with specified color, filled or not
  */

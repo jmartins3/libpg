@@ -68,7 +68,7 @@ int  main() {
 	
 	graph_image("media/DSC_0033.JPG", 0, 0, GRAPH_WIDTH, GRAPH_HEIGHT);
 	
-	sound_play("media/videogames.wav");
+	//sound_play("media/videogames.wav");
 	// start the graph engine	
 	graph_start();
 	

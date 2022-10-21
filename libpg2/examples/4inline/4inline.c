@@ -20,6 +20,7 @@ int game_over;
 
 
 
+
 int getCollumn(int x, int y) {
 	if (x < BOARD_CORNER_X || x > BOARD_CORNER_X + BOARD_WIDTH ||
 	    y < BOARD_CORNER_Y || y > BOARD_CORNER_Y + BOARD_HEIGHT) return -1;
@@ -28,14 +29,20 @@ int getCollumn(int x, int y) {
 	return (x - BOARD_CORNER_X) / HOLE_WIDTH;
 }
 
-bool draw_piece(int col, int color) {
+bool add_piece(int col, int color) {
 	int top = theBoard.height[col];
 	if (top >= NLINES) return false; 
-	Point cp = theBoard.holes[NLINES - top -1][col].center;
 	
-	graph_circle(cp.x, cp.y, HOLE_RADIUS, color == YELLOW ? c_yellow : c_red, true);
 	theBoard.holes[NLINES - top -1][col].color = color;
-	graph_refresh();
+    theBoard.height[col]++;
+	return true;
+}
+
+bool draw_piece(int line, int col) {
+    Hole hole = theBoard.holes[NLINES-line-1][col];
+	Point cp = hole.center;
+	
+	graph_circle(cp.x, cp.y, HOLE_RADIUS, hole.color == YELLOW ? c_yellow : c_red, true);
 	return true;
 }
 
@@ -74,14 +81,24 @@ static void fourl_draw_board() {
 				 BOARD_HEIGHT + HOLE_BORDER, c_dark_brown, true);
 }
 
+static void fourl_draw_pieces() {
+ 	
+	for (int i=0; i < NCOLS; ++i) {
+		for (int j = 0; j < theBoard.height[i]; ++j) {
+			 draw_piece(j, i);
+		}
+	}
+	
+}
+
+
 void myMouseEventHandler(MouseEvent me) {
 	static int turn = YELLOW;
 	
 	if (game_over == true) return;
 	if (me.type == MOUSE_BUTTON_EVENT && me.state == BUTTON_PRESSED) {
 		int col = getCollumn(me.x, me.y);
-		if (col != -1 && draw_piece(col, turn)) {
-			theBoard.height[col]++;
+		if (col != -1 && add_piece(col, turn)) {
 			
 			if (winner(&theBoard, turn)) {
 				printf("player %s wins the game!\n", turn == YELLOW ? "yellow" : "red");
@@ -102,7 +119,12 @@ void myKeyEventHandler(KeyEvent ke) {
 	if (game_over)
 		graph_exit();
 		 
-}		
+}
+
+void ontick() {
+    fourl_draw_pieces();
+}
+    
 
 
 int main()  {
@@ -111,6 +133,8 @@ int main()  {
 	graph_regist_mouse_handler(myMouseEventHandler);
 	
 	graph_regist_key_handler(myKeyEventHandler);
+    
+    graph_regist_timer_handler(ontick, 25);
 
 	 
 	fourl_draw_board();

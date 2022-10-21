@@ -24,7 +24,7 @@ typedef  void (*MsgEventHandlerEx)(const char msg[], void * context);
 
 
 /*------------------------------------------
- * events callback registration
+ * events callback 
  * -----------------------------------------*/
 
 /*
@@ -58,25 +58,6 @@ typedef struct MouseEvent  {
 	ushort x, y;	/* coordinates of the mouse */
 	short dx, dy;	/* delta move when mouse motion */
 } MouseEvent;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

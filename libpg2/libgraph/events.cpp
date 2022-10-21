@@ -26,8 +26,8 @@ using namespace std;
  * Globals
  *------------------------------------*/
 
-#define TIMEBASE		25	// 10 ms
-#define NTICKSREPEAT 	6	// 150 ms
+#define TIMEBASE		20	// 20 ms
+#define NTICKSREPEAT 	6	// 120 ms
 
 
 unsigned int __USER_EVENTS;
@@ -207,6 +207,8 @@ void timebase_handler() {
  
 	// audio
 	audio_process();
+    
+ 
 
 }
 
@@ -412,7 +414,8 @@ void  graph_start() {
 			}
 		}
 		
-		graph_refresh();
+	   // refresh graphics
+        graph_refresh();
 	 
 	}
 	audio_close();

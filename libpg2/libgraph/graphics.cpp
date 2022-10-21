@@ -208,11 +208,13 @@ void graph_line(short x1, short y1, short x2, short y2, RGB color) {
 void graph_rect(short x0, short y0, short w, short h, RGB color, bool toFill) {
 	// for some reason, filled rectangles have one more pixel in width 
 	// compared to the  dimensions of a non filled rect. Adjust it here
-	int x1 = x0+w-1, y1=y0+h-1;
+	int x1 = x0+w, y1=y0+h;
+    if (w < 0) x1++; else x1--;
+    if (h < 0) y1++; else y1--;
 	if (toFill)
 		boxColor(screen, x0, y0, x1, y1, (Uint32) color);
 	else
-		rectangleColor(screen, x0, y0, x1+1, y1+1, (Uint32) color);
+		rectangleColor(screen, x0, y0, x1, y1, (Uint32) color);
 }
 
 void graph_refresh() {
@@ -227,7 +229,13 @@ void  graph_circle(short x0, short y0, short radius, RGB color, bool toFill) {
 		circleColor(screen, x0, y0, radius, (Uint32) color);
 }
                 
-
+//int filledPieColor(SDL_Renderer * renderer, Sint16 x, Sint16 y, Sint16 rad,Sint16 start, Sint16 end, Uint32 color);
+void graph_pie(short cx, short cy, short radius, short sangle, short eangle, RGB color, bool toFill) {
+    if (toFill)
+        filledPieColor(screen, cx, cy, radius, sangle, eangle, color);
+    else
+        pieColor(screen, cx, cy, radius, sangle, eangle, color);
+}
 
 
 void  graph_ellipse(short x0, short y0, short xr, short yr, RGB color, bool toFill) { 
