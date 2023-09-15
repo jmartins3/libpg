@@ -10,7 +10,7 @@
 
 
 
-static void graph_bold_line(int x0, int y0, int x1, int y1, int bold, RGB color) {
+void graph_bold_line(int x0, int y0, int x1, int y1, int bold, RGB color) {
 	int delta = (x0 -x1) < 0 ? 1 : -1;
 	for (int i =0; i < bold; ++i) 
 		graph_line(x0+ i*delta, y0, x1 +i*delta, y1, color);

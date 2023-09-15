@@ -113,13 +113,17 @@ void mv_set_margins(MsgView *mv, int mw, int mh);
 void clk_create(Clock  *c, int x, int y, int font, RGB tcolor, RGB bcolor);
 	 
 /*
- *  Criação de relógio 
+ *  Criação de relógio temporizador
  *  Parâmetros:
  * 		x, y : coordenadas do canto superior esquerdo
  * 		tcolor: côr dos dígitos
  * 		bcolor: côr do fundo
+ *      sm, sm: minutos e segundos iniciais
  */
-void clk_create_cron(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor);
+void chrono_create(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor);
+
+
+void chrono_restart(Clock *c, int sm, int ss);
 
 
 // mostrar tempo
@@ -130,7 +134,8 @@ void clk_show(Clock *c);
 void clk_tick(Clock *c);
 	 
 // decremento de um segundo
-Clock clk_down_tick(Clock c);
+#define CHRON_TIMEOUT 1
+int clk_down_tick(Clock *c);
 
 // Reset
 void clk_reset(Clock *c);

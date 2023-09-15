@@ -104,6 +104,8 @@ void mv_show_number(MsgView* mv, int num) {
  * com minutos e segundos
  */
 
+
+
 /*
  *  Criação de relógio 
  *  Parâmetros:
@@ -111,7 +113,7 @@ void mv_show_number(MsgView* mv, int num) {
  * 		tcolor: côr dos dígitos
  * 		bcolor: côr do fundo
  */
-void clk_create(Clock *c, int x, int y, int font, RGB tcolor, RGB bcolor) {
+void clk_create(Clock *c,  int x, int y, int font, RGB tcolor, RGB bcolor) {
 	const int nchars = 5;
 	mv_create(&c->view, x, y, nchars, font, tcolor, bcolor);
 	
@@ -123,14 +125,15 @@ void clk_create(Clock *c, int x, int y, int font, RGB tcolor, RGB bcolor) {
 			case MEDIUM_CLOCK: margin_x = 5; margin_y = 5; break;
 			case LARGE_CLOCK: margin_x = 10; margin_y = 10; break;
 		};
-		
-	
-		mv_set_margins(&c->view, margin_x, margin_y);
+		 mv_set_margins(&c->view, margin_x, margin_y); 
 	}
+    else {
+       mv_set_margins(&c->view, 0, 0); 
+    }
 	c->m = c->s = 0;
 }
 
-void clk_create_cron(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor) {
+void chrono_create(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor) {
 	
 	clk_create(c, x, y, font, tcolor, bcolor);
 	c->m = sm; c->s = ss;
@@ -154,15 +157,23 @@ void clk_tick(Clock *c) {
 	}
 }
 
-void clk_down_tick(Clock *c) {
-	if (c->s == 0 && c->m == 0) return;
+
+
+int clk_down_tick(Clock *c) {
+	if (c->s == 0 && c->m == 0) return CHRON_TIMEOUT;
 	c->s--;
 	if (c->s < 0) {
 		c->s = 59;
 		c->m--;
 	}
+    return 0;
 }
 
+void chrono_restart(Clock *c, int sm, int ss) {
+    c->m = sm;
+    c->s = ss;
+}
+    
 void clk_reset(Clock *c) {
 	c->m = 0;
 	c->s = 0;
