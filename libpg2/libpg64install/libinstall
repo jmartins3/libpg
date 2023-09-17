@@ -7,7 +7,7 @@ chmod 666 /usr/local/include/pg/*.h
 #regserver installation
 cp launch_server reg_init regsrv reg_create_user \
 	reg_stop reg_create_topic reg_create_theme /usr/local/bin
-chmod 755 /usr/local/bin/*
+chmod 755 /usr/local/bin/reg_*
 
 if [ $? -eq 0 ] ; then 
 	echo "pg lib installed!"

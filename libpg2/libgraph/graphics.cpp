@@ -272,7 +272,7 @@ int graph_init2(const char title[], int width, int height) {
 	printf("start server!\n");
 #endif
 
-	start_server();
+	//start_server();
 	
 #ifdef DEBUG_START	
 	printf("server started!\n");
