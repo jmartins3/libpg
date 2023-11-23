@@ -133,7 +133,7 @@ void clk_create(Clock *c,  int x, int y, int font, RGB tcolor, RGB bcolor) {
 	c->m = c->s = 0;
 }
 
-void chrono_create(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor) {
+void clk_create_cron(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor) {
 	
 	clk_create(c, x, y, font, tcolor, bcolor);
 	c->m = sm; c->s = ss;
