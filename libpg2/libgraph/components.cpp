@@ -125,7 +125,7 @@ void clk_create(Clock *c,  int x, int y, int font, RGB tcolor, RGB bcolor) {
 			case MEDIUM_CLOCK: margin_x = 5; margin_y = 5; break;
 			case LARGE_CLOCK: margin_x = 10; margin_y = 10; break;
 		};
-		 mv_set_margins(&c->view, margin_x, margin_y); 
+        mv_set_margins(&c->view, margin_x, margin_y); 
 	}
     else {
        mv_set_margins(&c->view, 0, 0); 
