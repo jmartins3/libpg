@@ -19,7 +19,8 @@ SDL_Texture*  icache_get(const char *img_path) {
 }
 
 void icache_put(const char *img_path, SDL_Texture*  texture) {
-    img_cache[img_path] = texture;
+    
+    img_cache[strdup(img_path)] = texture;
 }
 
 
