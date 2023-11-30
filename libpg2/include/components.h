@@ -120,7 +120,7 @@ void clk_create(Clock  *c, int x, int y, int font, RGB tcolor, RGB bcolor);
  * 		bcolor: côr do fundo
  *      sm, sm: minutos e segundos iniciais
  */
-void chrono_create(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor);
+void clk_create_cron(Clock *c, int x, int y, int sm, int ss, int font, RGB tcolor, RGB bcolor);
 
 
 void chrono_restart(Clock *c, int sm, int ss);

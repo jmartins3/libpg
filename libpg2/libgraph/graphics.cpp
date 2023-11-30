@@ -86,6 +86,7 @@ bool graph_image(const char *path, int x, int y, int width, int height) {
 	SDL_Rect texr; texr.x = x; texr.y = y; 
 	texr.w = width; texr.h = height; 
 	SDL_RenderCopy(screen, img, NULL, &texr);
+    SDL_DestroyTexture(img);
 	return true;
 }
 
