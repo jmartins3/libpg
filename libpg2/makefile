@@ -7,7 +7,7 @@ LIBS= -lpthread -Wl,-rpath,/usr/local/lib -lSDL2_gfx -lSDL2_image  -lSDL2_mixer 
 OBJS= libgraph/graphics.o libgraph/events.o libgraph/triangles.o \
 	libgraph/audio.o  libgraph/graphics_text.o libgraph/hooks.o \
 	libgraph/socket_events.o libgraph/uv_srv.o  libgraph/components.o \
-	libgraph/comm.o libgraph/strutils.o
+	libgraph/comm.o libgraph/strutils.o libgraph/img_cache.o
 
 
 

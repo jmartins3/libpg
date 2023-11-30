@@ -11,7 +11,7 @@
 
 #include 	"../include/socket_events.h"
 #include 	"../include/uv_srv.h"
-
+#include    "../include/img_cache.h"
 
 // #define DEBUG_START
 
@@ -82,11 +82,17 @@ void graph_delay(int ms) {
 }
 
 bool graph_image(const char *path, int x, int y, int width, int height) {
-	SDL_Texture  *img = IMG_LoadTexture(screen, path);
+    
+	SDL_Texture  *img = icache_get(path);
+    if (img == NULL) {
+        img = IMG_LoadTexture(screen, path);
+        if (img == NULL) return false;
+        icache_put(path, img);
+    }
 	SDL_Rect texr; texr.x = x; texr.y = y; 
 	texr.w = width; texr.h = height; 
 	SDL_RenderCopy(screen, img, NULL, &texr);
-    SDL_DestroyTexture(img);
+    //SDL_DestroyTexture(img);
 	return true;
 }
 

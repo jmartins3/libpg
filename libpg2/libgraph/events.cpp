@@ -87,7 +87,6 @@ static void convertMouseMotionEvent(SDL_MouseMotionEvent *msdl, MouseEvent *me) 
 }
 
 
-
 #define MAX_CLICK_PERIOD	20
 
 static MouseEvent lastMe;
@@ -182,34 +181,25 @@ void graph_set_auto_repeat_on() {
 
 extern "C" {
 void onTick();
-	 
-
 bool onEnd();
-
- 
 }
 
+
 void timebase_handler() {
-	
 	if (nTicks != 0 && ++currTick == nTicks) {
 		currTick = 0;
 		onTick();
 		if (timerHandler != NULL)
 				timerHandler();
 	}
-	
 	if (keyHandler!= NULL && auto_repeat && ++currTickRepeat == NTICKSREPEAT   ) {
 		currTickRepeat = 0;
 		for (map<uint,KeyEvent>::iterator it = pressedKeys.begin(); 
 			it != pressedKeys.end(); ++it)
 			keyHandler(it->second);
 	}
- 
 	// audio
 	audio_process();
-    
- 
-
 }
 
 void timebase_regist() {
@@ -236,7 +226,7 @@ static void prepare_dispatch_response(msg_request_t *msg) {
 		}
 		// adjust status 
 #ifdef DEBUG
-		printfprintf("msg status = %d,msg='%s'\n", msg->status, msg->resp);
+		printf("msg status = %d,msg='%s'\n", msg->status, msg->resp);
 #endif
 		if (msg->status == 0 || msg->status == STATUS_OK) { // no comm error
 			if (msg->resp == NULL) {
@@ -273,20 +263,16 @@ static void prepare_dispatch_notification(session_t session) {
 #endif
 		dispatch_msg_cb(session, msg);
 		free(msg);
-		 
 	}	 
 }
-
 		
 static bool process_user_event(SDL_Event *event) {
-	 if (event->user.code == REQUEST_RESPONSE_EVENT) {
+    if (event->user.code == REQUEST_RESPONSE_EVENT) {
 		msg_request_t *msg = (msg_request_t*) event->user.data1;
 		
 		prepare_dispatch_response(msg);
 	}
-	 
 	return true;
-					
 }
 
 static bool process_timer_event(SDL_Event *event) {
@@ -294,9 +280,7 @@ static bool process_timer_event(SDL_Event *event) {
 		timebase_handler();
 		
 	}
-	 
 	return true;
-					
 }
 
 
@@ -308,7 +292,6 @@ static bool process_notication_event(SDL_Event *event) {
 		session_t session = (session_t) event->user.data1;
 		 
 		prepare_dispatch_notification(session);
-				 
 	}
 	return true;
 					
@@ -365,10 +348,8 @@ void  graph_start() {
 			process_end_loop(&event);
 			return;
 		}
-			
 		else {
 			switch (event.type) {
-		  
 				case SDL_KEYDOWN:	
 					if (keyHandler != NULL) {
 						convertKeyEvent((SDL_KeyboardEvent*) &event, &keyEvent);
@@ -387,7 +368,6 @@ void  graph_start() {
 						}
 					}
 					break;
-						
 				case SDL_MOUSEMOTION:
 					if (mouseHandler != NULL) {
 						convertMouseMotionEvent((SDL_MouseMotionEvent*) &event, &mouseEvent);
@@ -407,14 +387,13 @@ void  graph_start() {
 						return;
 					}
 					break;
-				 
 				default:
 					break;
 				
 			}
 		}
 		
-	   // refresh graphics
+	    // refresh graphics
         graph_refresh();
 	 
 	}
