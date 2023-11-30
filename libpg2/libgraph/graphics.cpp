@@ -89,9 +89,7 @@ bool graph_image(const char *path, int x, int y, int width, int height) {
         if (img == NULL) return false;
         icache_put(path, img);
     }
-    else {
-        printf("use %s from cache!\n", path);
-    }
+   
 	SDL_Rect texr; texr.x = x; texr.y = y; 
 	texr.w = width; texr.h = height; 
 	SDL_RenderCopy(screen, img, NULL, &texr);
