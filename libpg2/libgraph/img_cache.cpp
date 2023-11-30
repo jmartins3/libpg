@@ -1,6 +1,7 @@
 
 #include "../include/img_cache.h"
 #include 	<map>
+#include <string>
 
 /**************************************************************
  * A cache to optimize image access on pglib
@@ -11,16 +12,17 @@
 
 using namespace std;
  
-static map<const char *, SDL_Texture* > img_cache;
+static map<string, SDL_Texture* > img_cache;
 
 
 SDL_Texture*  icache_get(const char *img_path) {
-    return img_cache[img_path];
+    
+    return img_cache[string(img_path)];
 }
 
 void icache_put(const char *img_path, SDL_Texture*  texture) {
     
-    img_cache[strdup(img_path)] = texture;
+    img_cache[string(img_path)] = texture;
 }
 
 
