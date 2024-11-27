@@ -5,7 +5,7 @@
 #define RACKET_MAX_HEIGHT 	90
 #define RACKET_MIN_HEIGHT 	50
 
-#define RACKET_DELTA 		25
+#define RACKET_DELTA 		10
 
 
 typedef struct racket {

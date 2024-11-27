@@ -27,7 +27,7 @@ using namespace std;
  *------------------------------------*/
 
 #define TIMEBASE		20	// 20 ms
-#define NTICKSREPEAT 	6	// 120 ms
+#define NTICKSREPEAT 	1	// 120 ms
 
 
 unsigned int __USER_EVENTS;

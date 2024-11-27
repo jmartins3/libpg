@@ -159,6 +159,9 @@ void ct_inc(Counter *c);
 
 // retorna um contador que resulta do decremento do contador dado
 void ct_dec(Counter *c);
+
+// adiciona o valor v e apresenta o contador dado
+void ct_add(Counter *c, int v);
 	 
 /*
  * Funções para lidar com botões

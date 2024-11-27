@@ -213,6 +213,13 @@ void ct_inc(Counter *c) {
 	ct_show(c);
 }
 
+// adiciona o valor v e apresenta o contador dado
+void ct_add(Counter *c, int v) {
+	c->val += v;
+	ct_show(c);
+}
+
+
 // decrementa e apresenta o contador dado
 void ct_dec(Counter *c) {
 	if (c->val>0) c->val--;
