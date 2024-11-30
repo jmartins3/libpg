@@ -125,6 +125,13 @@ void graph_regist_timer_handler(TimerEventHandler te, uint period);
 void graph_set_auto_repeat_off();
 void graph_set_auto_repeat_on();
 
+/**
+ * auto repeat com configuração de velocidade
+ * de 1 (mais lento) a 10 (mais rápido)
+ */
+void graph_set_auto_repeat_on_2(int velocity);
+
+
 #ifdef __cplusplus 
 }
 #endif 

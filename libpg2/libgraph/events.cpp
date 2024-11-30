@@ -26,8 +26,8 @@ using namespace std;
  * Globals
  *------------------------------------*/
 
-#define TIMEBASE		20	// 20 ms
-#define NTICKSREPEAT 	1	// 120 ms
+#define TIMEBASE		10	// 20 ms
+#define NTICKSREPEAT 	2	// 20 ms
 
 
 unsigned int __USER_EVENTS;
@@ -42,6 +42,7 @@ static map<uint, KeyEvent> pressedKeys;
 static KeyEventHandler keyHandler;
 static MouseEventHandler mouseHandler;
 static TimerEventHandler timerHandler;
+
 
 // SDL allocated timer 
 static SDL_TimerID my_timer_id;
@@ -92,6 +93,8 @@ static void convertMouseMotionEvent(SDL_MouseMotionEvent *msdl, MouseEvent *me) 
 static MouseEvent lastMe;
 static clock_t lastTicks;
 static bool auto_repeat;
+static int nTicksInRepeat = NTICKSREPEAT;
+
 
 static void convertMouseButtonEvent(SDL_MouseButtonEvent *msdl, MouseEvent *me) {
 	clock_t currTicks = times(NULL);
@@ -173,9 +176,22 @@ void graph_regist_timer_handler(TimerEventHandler te, uint period) {
 void graph_set_auto_repeat_off() {
 	auto_repeat = false;
 	currTickRepeat = 0;
+    nTicksInRepeat = NTICKSREPEAT;
 }
 
 void graph_set_auto_repeat_on() {
+	auto_repeat = true;
+}
+
+/*
+ * auto repeat com configuração de velocidade
+ * de 1 (mais lento) a 10 (mais rápido)
+ */
+void graph_set_auto_repeat_on_2(int velocity) {
+    if (velocity < 1) velocity = 1;
+    else if (velocity > 10) velocity = 10;
+    
+    nTicksInRepeat = (10 -velocity + 1)*2;
 	auto_repeat = true;
 }
 
@@ -192,7 +208,7 @@ void timebase_handler() {
 		if (timerHandler != NULL)
 				timerHandler();
 	}
-	if (keyHandler!= NULL && auto_repeat && ++currTickRepeat == NTICKSREPEAT   ) {
+	if (keyHandler!= NULL && auto_repeat && ++currTickRepeat == nTicksInRepeat   ) {
 		currTickRepeat = 0;
 		for (map<uint,KeyEvent>::iterator it = pressedKeys.begin(); 
 			it != pressedKeys.end(); ++it)
