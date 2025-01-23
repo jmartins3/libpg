@@ -26,8 +26,8 @@ using namespace std;
  * Globals
  *------------------------------------*/
 
-#define TIMEBASE		10	// 20 ms
-#define NTICKSREPEAT 	2	// 20 ms
+#define TIMEBASE		20	// 20 ms
+#define NTICKSREPEAT 	2	// 40 ms
 
 
 unsigned int __USER_EVENTS;
@@ -133,7 +133,7 @@ static void convertMouseButtonEvent(SDL_MouseButtonEvent *msdl, MouseEvent *me) 
 
 
 // this callback is running on a separate thread
-// generates a user event to processe the base time in 
+// generates a user event to process the base time in 
 // the proper thread
 static uint my_callbackfunc(Uint32 interval, void *param)
 {
@@ -167,7 +167,7 @@ void graph_regist_mouse_handler(MouseEventHandler me) {
 
 
 void graph_regist_timer_handler(TimerEventHandler te, uint period) {
-	nTicks = (period-1) / TIMEBASE +1 ;  /* To round it down to the nearest 10 ms */
+	nTicks = (period-1) / TIMEBASE +1 ;  /* To round it down to the nearest TIMEBASE ms */
 	currTick = 0;
 	currTickRepeat = 0;
 	timerHandler = te;
@@ -181,6 +181,8 @@ void graph_set_auto_repeat_off() {
 
 void graph_set_auto_repeat_on() {
 	auto_repeat = true;
+    currTickRepeat = 0;
+    nTicksInRepeat = NTICKSREPEAT;
 }
 
 /*
@@ -191,7 +193,7 @@ void graph_set_auto_repeat_on_2(int velocity) {
     if (velocity < 1) velocity = 1;
     else if (velocity > 10) velocity = 10;
     
-    nTicksInRepeat = (10 -velocity + 1)*2;
+    nTicksInRepeat = (10 -velocity + 1);
 	auto_repeat = true;
 }
 
@@ -211,8 +213,9 @@ void timebase_handler() {
 	if (keyHandler!= NULL && auto_repeat && ++currTickRepeat == nTicksInRepeat   ) {
 		currTickRepeat = 0;
 		for (map<uint,KeyEvent>::iterator it = pressedKeys.begin(); 
-			it != pressedKeys.end(); ++it)
+			it != pressedKeys.end(); ++it) {
 			keyHandler(it->second);
+        }
 	}
 	// audio
 	audio_process();

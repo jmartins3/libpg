@@ -63,7 +63,7 @@ void sound_stop() {
 }
 
 
-// free adio resources if music stopped
+// free audio resources if music stopped
 void audio_process() {
 	if (music != NULL && Mix_Playing(-1) == 0  ) {
 		audio_close();
