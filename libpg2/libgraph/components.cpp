@@ -40,7 +40,7 @@ void mv_set_clr(MsgView *mv, RGB clr) {
 }
 
 /**
- * altera as margins da MsgView "mv"
+ * altera as margens da MsgView "mv"
  */
 void mv_set_margins(MsgView *mv, int mw, int mh) {
 	mv->margins.width = mw;
@@ -50,7 +50,7 @@ void mv_set_margins(MsgView *mv, int mw, int mh) {
 
 /**
  * Apresentação de uma dada string através do MsgView 
- * e alinhamento especificados
+ * com alinhamento e côr especificados
  */
 void mv_show_clrtext(MsgView * mv, const char  msg[], RGB tcolor, int align) {
 	 
@@ -216,6 +216,9 @@ void ct_inc(Counter *c) {
 // adiciona o valor v e apresenta o contador dado
 void ct_add(Counter *c, int v) {
 	c->val += v;
+	if (c->val < 0) {
+		c->val = 0;
+	}
 	ct_show(c);
 }
 

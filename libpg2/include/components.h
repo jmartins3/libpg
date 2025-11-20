@@ -83,16 +83,21 @@ void mv_show_number(MsgView* nv, int num);
  */
 void mv_show_text(MsgView* mv, const char  msg[], int align);
 
-/*
+/**
  * Apresentação de uma dada string através do MsgView 
- * côr e alinhamento especificados
+ * com alinhamento e côr especificados
  */
 void mv_show_clrtext(MsgView* mv, const char  msg[], RGB tcolor, int align);
 
-
+/**
+ * redefinir a cor do texto na MsgView
+ */
 void mv_set_clr(MsgView *mv, RGB clr);
 	 
 
+/**
+ * Redefinir as margens da Msgview
+ */
 void mv_set_margins(MsgView *mv, int mw, int mh);
 	 
 

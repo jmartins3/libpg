@@ -88,7 +88,7 @@ static void convertMouseMotionEvent(SDL_MouseMotionEvent *msdl, MouseEvent *me) 
 }
 
 
-#define MAX_CLICK_PERIOD	20
+#define MAX_CLICK_PERIOD	15
 
 static MouseEvent lastMe;
 static clock_t lastTicks;
@@ -96,7 +96,7 @@ static bool auto_repeat;
 static int nTicksInRepeat = NTICKSREPEAT;
 
 
-static void convertMouseButtonEvent(SDL_MouseButtonEvent *msdl, MouseEvent *me) {
+static void convertMouseButtonEvent(SDL_MouseButtonEvent *msdl, MouseEvent *me, bool*sendClick) {
 	clock_t currTicks = times(NULL);
 	
 	me->type = MOUSE_BUTTON_EVENT;
@@ -115,11 +115,10 @@ static void convertMouseButtonEvent(SDL_MouseButtonEvent *msdl, MouseEvent *me) 
 	else if ( msdl->button == SDL_BUTTON_RIGHT) me->button = BUTTON_RIGHT;
 	else  me->button = 0; 
 	
-	if (lastMe.state == BUTTON_PRESSED && me->state == BUTTON_RELEASED &&
-	    lastMe.button == me->button && currTicks - lastTicks < MAX_CLICK_PERIOD) {
-		// produce a click instead of a release state
-		me->state = BUTTON_CLICK;
-	}
+	// check send click
+	*sendClick = lastMe.state == BUTTON_PRESSED && me->state == BUTTON_RELEASED &&
+	    lastMe.button == me->button && currTicks - lastTicks < MAX_CLICK_PERIOD;
+	 
 	
 	lastMe = *me;
 	lastTicks = currTicks;
@@ -394,12 +393,19 @@ void  graph_start() {
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-				case SDL_MOUSEBUTTONUP:
+				case SDL_MOUSEBUTTONUP: {
+					bool sendClick;
 					if (mouseHandler != NULL) {
-						convertMouseButtonEvent((SDL_MouseButtonEvent*) &event, &mouseEvent);
+						convertMouseButtonEvent((SDL_MouseButtonEvent*) &event, &mouseEvent, &sendClick);
 						mouseHandler(mouseEvent);
+						if (sendClick) {
+							mouseEvent.state = BUTTON_CLICK;
+							mouseHandler(mouseEvent);
+						}
 					}
 					break;
+				}
+					
 				case SDL_QUIT:
 					if (onEnd()) {
 						SDL_Quit();

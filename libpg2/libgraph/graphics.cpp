@@ -217,10 +217,10 @@ void graph_rect(short x0, short y0, short w, short h, RGB color, bool toFill) {
 	// for some reason, filled rectangles have one more pixel in width 
 	// compared to the  dimensions of a non filled rect. Adjust it here
 	int x1 = x0+w, y1=y0+h;
-    if (w < 0) x1++; else x1--;
-    if (h < 0) y1++; else y1--;
+    // if (w < 0) x1++; else x1--;
+    // if (h < 0) y1++; else y1--;
 	if (toFill)
-		boxColor(screen, x0, y0, x1, y1, (Uint32) color);
+		boxColor(screen, x0, y0, x1-1, y1-1, (Uint32) color);
 	else
 		rectangleColor(screen, x0, y0, x1, y1, (Uint32) color);
 }
